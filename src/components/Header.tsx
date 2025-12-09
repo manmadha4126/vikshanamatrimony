@@ -8,9 +8,9 @@ const Header = () => {
   const location = useLocation();
 
   const navLinks = [
-    { name: "Home", path: "/" },
-    { name: "About Us", path: "/about" },
-    { name: "Contact Us", path: "/contact" },
+    { name: "Home", path: "/", isAnchor: false },
+    { name: "About Us", path: "/#about", isAnchor: true },
+    { name: "Contact Us", path: "/#contact", isAnchor: true },
   ];
 
   const isActive = (path: string) => location.pathname === path;
