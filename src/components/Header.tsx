@@ -8,12 +8,20 @@ const Header = () => {
   const location = useLocation();
 
   const navLinks = [
-    { name: "Home", path: "/", isAnchor: false },
-    { name: "About Us", path: "/#about", isAnchor: true },
-    { name: "Contact Us", path: "/#contact", isAnchor: true },
+    { name: "Home", href: "#hero" },
+    { name: "About Us", href: "#about" },
+    { name: "Contact Us", href: "#contact" },
   ];
 
-  const isActive = (path: string) => location.pathname === path;
+  const scrollToSection = (href: string) => {
+    const element = document.querySelector(href);
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth" });
+    }
+    setIsMenuOpen(false);
+  };
+
+  
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
@@ -33,23 +41,19 @@ const Header = () => {
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center gap-8">
           {navLinks.map((link) => (
-            <Link
-              key={link.path}
-              to={link.path}
-              className={`text-sm font-medium transition-colors hover:text-primary ${
-                isActive(link.path) 
-                  ? "text-primary" 
-                  : "text-muted-foreground"
-              }`}
+            <button
+              key={link.href}
+              onClick={() => scrollToSection(link.href)}
+              className="text-sm font-medium transition-colors hover:text-primary text-muted-foreground"
             >
               {link.name}
-            </Link>
+            </button>
           ))}
         </nav>
 
         {/* Desktop Auth Buttons */}
         <div className="hidden md:flex items-center gap-4">
-          <Button variant="ghost" className="text-sm font-medium" asChild>
+          <Button className="bg-red-600 hover:bg-red-700 text-white" asChild>
             <Link to="/staff-login">Staff Login</Link>
           </Button>
           <Button className="bg-red-600 hover:bg-red-700 text-white" asChild>
@@ -71,21 +75,16 @@ const Header = () => {
         <div className="md:hidden absolute top-20 left-0 right-0 bg-background border-b border-border shadow-lg animate-fade-in">
           <nav className="container py-4 flex flex-col gap-4">
             {navLinks.map((link) => (
-              <Link
-                key={link.path}
-                to={link.path}
-                onClick={() => setIsMenuOpen(false)}
-                className={`text-sm font-medium py-2 transition-colors ${
-                  isActive(link.path) 
-                    ? "text-primary" 
-                    : "text-muted-foreground"
-                }`}
+              <button
+                key={link.href}
+                onClick={() => scrollToSection(link.href)}
+                className="text-sm font-medium py-2 transition-colors text-muted-foreground hover:text-primary text-left"
               >
                 {link.name}
-              </Link>
+              </button>
             ))}
             <div className="flex flex-col gap-2 pt-4 border-t border-border">
-              <Button variant="ghost" className="w-full justify-center" asChild>
+              <Button className="w-full bg-red-600 hover:bg-red-700 text-white" asChild>
                 <Link to="/staff-login">Staff Login</Link>
               </Button>
               <Button className="w-full bg-red-600 hover:bg-red-700 text-white" asChild>
