@@ -15,17 +15,29 @@ const loginSchema = z.object({
 const StaffLogin = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [checkingAuth, setCheckingAuth] = useState(true);
+  const [isFirstTimeSetup, setIsFirstTimeSetup] = useState(false);
+  const [showSignup, setShowSignup] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
   useEffect(() => {
+    // Check if any admins exist
+    const checkAdmins = async () => {
+      const { count } = await supabase
+        .from("user_roles")
+        .select("*", { count: "exact", head: true })
+        .eq("role", "admin");
+      
+      setIsFirstTimeSetup(count === 0);
+    };
+
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
         if (session?.user) {
-          // Defer role check to prevent deadlock
           setTimeout(() => {
             checkStaffRole(session.user.id);
           }, 0);
@@ -43,6 +55,8 @@ const StaffLogin = () => {
         setCheckingAuth(false);
       }
     });
+
+    checkAdmins();
 
     return () => subscription.unsubscribe();
   }, []);
@@ -63,7 +77,6 @@ const StaffLogin = () => {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Validate input
     const result = loginSchema.safeParse({ email, password });
     if (!result.success) {
       toast({
@@ -92,7 +105,6 @@ const StaffLogin = () => {
     }
 
     if (data.user) {
-      // Check if user has staff/admin role
       const { data: roles } = await supabase
         .from("user_roles")
         .select("role")
@@ -116,6 +128,78 @@ const StaffLogin = () => {
     setLoading(false);
   };
 
+  const handleFirstAdminSetup = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (password !== confirmPassword) {
+      toast({
+        title: "Error",
+        description: "Passwords do not match",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const result = loginSchema.safeParse({ email, password });
+    if (!result.success) {
+      toast({
+        title: "Validation Error",
+        description: result.error.errors[0].message,
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setLoading(true);
+
+    // Sign up the user
+    const { data, error } = await supabase.auth.signUp({
+      email: result.data.email,
+      password: result.data.password,
+      options: {
+        emailRedirectTo: `${window.location.origin}/staff-dashboard`,
+      },
+    });
+
+    if (error) {
+      toast({
+        title: "Signup Failed",
+        description: error.message,
+        variant: "destructive",
+      });
+      setLoading(false);
+      return;
+    }
+
+    if (data.user) {
+      // Add admin role
+      const { error: roleError } = await supabase
+        .from("user_roles")
+        .insert({ user_id: data.user.id, role: "admin" });
+
+      if (roleError) {
+        toast({
+          title: "Role Assignment Failed",
+          description: roleError.message,
+          variant: "destructive",
+        });
+        setLoading(false);
+        return;
+      }
+
+      toast({
+        title: "Admin Account Created!",
+        description: "You can now log in with your credentials.",
+      });
+      
+      setIsFirstTimeSetup(false);
+      setShowSignup(false);
+      setPassword("");
+      setConfirmPassword("");
+    }
+    setLoading(false);
+  };
+
   if (checkingAuth) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-cream via-white to-cream">
@@ -129,51 +213,125 @@ const StaffLogin = () => {
       <div className="w-full max-w-md">
         <div className="bg-white rounded-2xl shadow-xl p-8 border border-gold/20">
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-maroon mb-2">Staff Login</h1>
+            <h1 className="text-3xl font-bold text-maroon mb-2">
+              {showSignup ? "Create Admin Account" : "Staff Login"}
+            </h1>
             <p className="text-muted-foreground">
-              Access the admin dashboard
+              {showSignup 
+                ? "Set up your first admin account" 
+                : "Access the admin dashboard"}
             </p>
           </div>
 
-          <form onSubmit={handleLogin} className="space-y-6">
-            <div className="space-y-2">
-              <Label htmlFor="email" className="text-foreground">
-                Email
-              </Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="staff@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="border-gold/30 focus:border-maroon focus:ring-maroon"
-                required
-              />
+          {isFirstTimeSetup && !showSignup && (
+            <div className="mb-6 p-4 bg-gold/10 rounded-lg border border-gold/30">
+              <p className="text-sm text-foreground mb-3">
+                No admin account exists yet. Create the first admin account to get started.
+              </p>
+              <Button
+                onClick={() => setShowSignup(true)}
+                className="w-full bg-maroon hover:bg-maroon/90 text-white"
+              >
+                Create First Admin
+              </Button>
             </div>
+          )}
 
-            <div className="space-y-2">
-              <Label htmlFor="password" className="text-foreground">
-                Password
-              </Label>
-              <Input
-                id="password"
-                type="password"
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="border-gold/30 focus:border-maroon focus:ring-maroon"
-                required
-              />
-            </div>
+          {showSignup ? (
+            <form onSubmit={handleFirstAdminSetup} className="space-y-6">
+              <div className="space-y-2">
+                <Label htmlFor="email" className="text-foreground">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="admin@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="border-gold/30 focus:border-maroon focus:ring-maroon"
+                  required
+                />
+              </div>
 
-            <Button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-maroon hover:bg-maroon/90 text-white py-6 text-lg font-semibold"
-            >
-              {loading ? "Signing in..." : "Sign In"}
-            </Button>
-          </form>
+              <div className="space-y-2">
+                <Label htmlFor="password" className="text-foreground">Password</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="border-gold/30 focus:border-maroon focus:ring-maroon"
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="confirmPassword" className="text-foreground">Confirm Password</Label>
+                <Input
+                  id="confirmPassword"
+                  type="password"
+                  placeholder="••••••••"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className="border-gold/30 focus:border-maroon focus:ring-maroon"
+                  required
+                />
+              </div>
+
+              <Button
+                type="submit"
+                disabled={loading}
+                className="w-full bg-maroon hover:bg-maroon/90 text-white py-6 text-lg font-semibold"
+              >
+                {loading ? "Creating..." : "Create Admin Account"}
+              </Button>
+
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={() => setShowSignup(false)}
+                className="w-full"
+              >
+                Back to Login
+              </Button>
+            </form>
+          ) : (
+            <form onSubmit={handleLogin} className="space-y-6">
+              <div className="space-y-2">
+                <Label htmlFor="email" className="text-foreground">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="staff@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="border-gold/30 focus:border-maroon focus:ring-maroon"
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="password" className="text-foreground">Password</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="border-gold/30 focus:border-maroon focus:ring-maroon"
+                  required
+                />
+              </div>
+
+              <Button
+                type="submit"
+                disabled={loading}
+                className="w-full bg-maroon hover:bg-maroon/90 text-white py-6 text-lg font-semibold"
+              >
+                {loading ? "Signing in..." : "Sign In"}
+              </Button>
+            </form>
+          )}
 
           <div className="mt-6 text-center">
             <a
