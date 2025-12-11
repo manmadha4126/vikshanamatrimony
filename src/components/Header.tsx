@@ -50,10 +50,10 @@ const Header = () => {
         {/* Desktop Auth Buttons */}
         <div className="hidden md:flex items-center gap-4">
           <Button variant="ghost" className="text-sm font-medium" asChild>
-            <Link to="/login">Log In</Link>
+            <Link to="/staff-login">Staff Login</Link>
           </Button>
-          <Button variant="primary" asChild>
-            <Link to="/#register">Create Account</Link>
+          <Button className="bg-red-600 hover:bg-red-700 text-white" asChild>
+            <Link to="/login">Log In</Link>
           </Button>
         </div>
 
@@ -86,10 +86,10 @@ const Header = () => {
             ))}
             <div className="flex flex-col gap-2 pt-4 border-t border-border">
               <Button variant="ghost" className="w-full justify-center" asChild>
-                <Link to="/login">Log In</Link>
+                <Link to="/staff-login">Staff Login</Link>
               </Button>
-              <Button variant="primary" className="w-full" asChild>
-                <Link to="/#register">Create Account</Link>
+              <Button className="w-full bg-red-600 hover:bg-red-700 text-white" asChild>
+                <Link to="/login">Log In</Link>
               </Button>
             </div>
           </nav>
