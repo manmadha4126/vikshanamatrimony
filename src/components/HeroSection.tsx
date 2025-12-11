@@ -10,8 +10,8 @@ const HeroSection = () => {
         <div className="absolute bottom-20 right-10 w-80 h-80 bg-primary/10 rounded-full blur-3xl" />
       </div>
 
-      <div className="container relative z-10 py-12 lg:py-20">
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+      <div className="container relative z-10 py-8 lg:py-12">
+        <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
           {/* Left Side - Image and Text */}
           <div className="order-2 lg:order-1 space-y-8">
             <div className="animate-fade-up">
