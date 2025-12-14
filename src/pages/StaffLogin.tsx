@@ -200,18 +200,18 @@ const StaffLogin = () => {
 
   if (checkingAuth) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-cream via-white to-cream">
-        <div className="animate-pulse text-maroon">Checking authentication...</div>
+      <div className="min-h-screen flex items-center justify-center gradient-cream">
+        <div className="animate-pulse text-primary">Checking authentication...</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-cream via-white to-cream px-4">
+    <div className="min-h-screen flex items-center justify-center gradient-cream px-4">
       <div className="w-full max-w-md">
-        <div className="bg-white rounded-2xl shadow-xl p-8 border border-gold/20">
+        <div className="bg-card rounded-2xl shadow-xl p-8 border border-accent/20">
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-maroon mb-2">
+            <h1 className="text-3xl font-bold text-primary mb-2">
               {showSignup ? "Create Admin Account" : "Staff Login"}
             </h1>
             <p className="text-muted-foreground">
@@ -232,7 +232,7 @@ const StaffLogin = () => {
                   placeholder="admin@example.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="border-gold/30 focus:border-maroon focus:ring-maroon"
+                  className="border-accent/30 focus:border-primary focus:ring-primary"
                   required
                 />
               </div>
@@ -245,7 +245,7 @@ const StaffLogin = () => {
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="border-gold/30 focus:border-maroon focus:ring-maroon"
+                  className="border-accent/30 focus:border-primary focus:ring-primary"
                   required
                 />
               </div>
@@ -258,7 +258,7 @@ const StaffLogin = () => {
                   placeholder="••••••••"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="border-gold/30 focus:border-maroon focus:ring-maroon"
+                  className="border-accent/30 focus:border-primary focus:ring-primary"
                   required
                 />
               </div>
@@ -266,7 +266,7 @@ const StaffLogin = () => {
               <Button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-maroon hover:bg-maroon/90 text-white py-6 text-lg font-semibold"
+                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground py-6 text-lg font-semibold"
               >
                 {loading ? "Creating..." : "Create Admin Account"}
               </Button>
@@ -290,7 +290,7 @@ const StaffLogin = () => {
                   placeholder="staff@example.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="border-gold/30 focus:border-maroon focus:ring-maroon"
+                  className="border-accent/30 focus:border-primary focus:ring-primary"
                   required
                 />
               </div>
@@ -303,7 +303,7 @@ const StaffLogin = () => {
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="border-gold/30 focus:border-maroon focus:ring-maroon"
+                  className="border-accent/30 focus:border-primary focus:ring-primary"
                   required
                 />
               </div>
@@ -311,7 +311,7 @@ const StaffLogin = () => {
               <Button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-maroon hover:bg-maroon/90 text-white py-6 text-lg font-semibold"
+                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground py-6 text-lg font-semibold"
               >
                 {loading ? "Signing in..." : "Sign In"}
               </Button>
@@ -329,7 +329,7 @@ const StaffLogin = () => {
                 type="button"
                 variant="outline"
                 onClick={() => setShowSignup(true)}
-                className="w-full border-maroon text-maroon hover:bg-maroon hover:text-white py-6 text-lg font-semibold"
+                className="w-full border-primary text-primary hover:bg-primary hover:text-primary-foreground py-6 text-lg font-semibold"
               >
                 Create Admin Account
               </Button>
@@ -339,7 +339,7 @@ const StaffLogin = () => {
           <div className="mt-6 text-center">
             <a
               href="/"
-              className="text-maroon hover:text-maroon/80 text-sm font-medium"
+              className="text-primary hover:text-primary/80 text-sm font-medium"
             >
               ← Back to Home
             </a>
