@@ -14,6 +14,54 @@ export type Database = {
   }
   public: {
     Tables: {
+      profiles: {
+        Row: {
+          created_at: string
+          email: string
+          email_otp: string | null
+          email_verified: boolean | null
+          gender: string
+          id: string
+          name: string
+          otp_expires_at: string | null
+          phone: string
+          phone_otp: string | null
+          phone_verified: boolean | null
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          email_otp?: string | null
+          email_verified?: boolean | null
+          gender: string
+          id?: string
+          name: string
+          otp_expires_at?: string | null
+          phone: string
+          phone_otp?: string | null
+          phone_verified?: boolean | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          email_otp?: string | null
+          email_verified?: boolean | null
+          gender?: string
+          id?: string
+          name?: string
+          otp_expires_at?: string | null
+          phone?: string
+          phone_otp?: string | null
+          phone_verified?: boolean | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
