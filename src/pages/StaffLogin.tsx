@@ -189,13 +189,11 @@ const StaffLogin = () => {
 
       toast({
         title: "Admin Account Created!",
-        description: "You can now log in with your credentials.",
+        description: "Welcome to the dashboard.",
       });
       
-      setIsFirstTimeSetup(false);
-      setShowSignup(false);
-      setPassword("");
-      setConfirmPassword("");
+      // Navigate to dashboard after successful creation
+      navigate("/staff-dashboard");
     }
     setLoading(false);
   };
@@ -223,19 +221,6 @@ const StaffLogin = () => {
             </p>
           </div>
 
-          {isFirstTimeSetup && !showSignup && (
-            <div className="mb-6 p-4 bg-gold/10 rounded-lg border border-gold/30">
-              <p className="text-sm text-foreground mb-3">
-                No admin account exists yet. Create the first admin account to get started.
-              </p>
-              <Button
-                onClick={() => setShowSignup(true)}
-                className="w-full bg-maroon hover:bg-maroon/90 text-white"
-              >
-                Create First Admin
-              </Button>
-            </div>
-          )}
 
           {showSignup ? (
             <form onSubmit={handleFirstAdminSetup} className="space-y-6">
@@ -329,6 +314,24 @@ const StaffLogin = () => {
                 className="w-full bg-maroon hover:bg-maroon/90 text-white py-6 text-lg font-semibold"
               >
                 {loading ? "Signing in..." : "Sign In"}
+              </Button>
+
+              <div className="relative my-4">
+                <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t border-border" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-white px-2 text-muted-foreground">Or</span>
+                </div>
+              </div>
+
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setShowSignup(true)}
+                className="w-full border-maroon text-maroon hover:bg-maroon hover:text-white py-6 text-lg font-semibold"
+              >
+                Create Admin Account
               </Button>
             </form>
           )}
