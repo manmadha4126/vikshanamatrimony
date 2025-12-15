@@ -17,16 +17,27 @@ const RegistrationForm = () => {
   const { toast } = useToast();
   const [formData, setFormData] = useState({
     name: "",
+    profileFor: "",
     gender: "",
     email: "",
     phone: "",
   });
 
+  const profileForOptions = [
+    { value: "myself", label: "Myself" },
+    { value: "daughter", label: "Daughter" },
+    { value: "son", label: "Son" },
+    { value: "sister", label: "Sister" },
+    { value: "brother", label: "Brother" },
+    { value: "relative", label: "Relative" },
+    { value: "friend", label: "Friend" },
+  ];
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
     // Validate all fields
-    if (!formData.name || !formData.gender || !formData.email || !formData.phone) {
+    if (!formData.name || !formData.profileFor || !formData.gender || !formData.email || !formData.phone) {
       toast({
         title: "Please fill all fields",
         description: "All fields are required for registration.",
@@ -64,6 +75,28 @@ const RegistrationForm = () => {
             required
             className="h-12"
           />
+        </div>
+
+        <div className="space-y-2">
+          <Label className="text-sm font-medium">
+            Profile Created for
+          </Label>
+          <div className="grid grid-cols-4 gap-2">
+            {profileForOptions.map((option) => (
+              <button
+                key={option.value}
+                type="button"
+                onClick={() => setFormData({ ...formData, profileFor: option.value })}
+                className={`px-3 py-2 text-xs font-medium rounded-lg border transition-all ${
+                  formData.profileFor === option.value
+                    ? "bg-primary text-primary-foreground border-primary"
+                    : "bg-background text-foreground border-border hover:border-primary/50 hover:bg-accent"
+                }`}
+              >
+                {option.label}
+              </button>
+            ))}
+          </div>
         </div>
 
         <div className="space-y-2">
