@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -12,6 +13,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 
 const RegistrationForm = () => {
+  const navigate = useNavigate();
   const { toast } = useToast();
   const [formData, setFormData] = useState({
     name: "",
@@ -22,10 +24,19 @@ const RegistrationForm = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    toast({
-      title: "Registration Successful!",
-      description: "Welcome to Lakshmi Matrimony. We'll be in touch soon.",
-    });
+    
+    // Validate all fields
+    if (!formData.name || !formData.gender || !formData.email || !formData.phone) {
+      toast({
+        title: "Please fill all fields",
+        description: "All fields are required for registration.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Navigate to verification page with form data
+    navigate("/verification", { state: formData });
   };
 
   return (
