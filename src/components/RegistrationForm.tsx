@@ -51,19 +51,19 @@ const RegistrationForm = () => {
   };
 
   return (
-    <div id="register" className="bg-card rounded-xl shadow-card p-8 border border-border/50">
-      <div className="text-center mb-6">
-        <h3 className="font-display text-2xl font-bold text-foreground">
+    <div id="register" className="bg-card rounded-xl shadow-card p-6 border border-border/50">
+      <div className="text-center mb-4">
+        <h3 className="font-display text-xl font-bold text-foreground">
           Begin Your Journey
         </h3>
-        <p className="text-sm text-muted-foreground mt-2">
+        <p className="text-xs text-muted-foreground mt-1">
           Register now to find your perfect match
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-5">
-        <div className="space-y-2">
-          <Label htmlFor="name" className="text-sm font-medium">
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="space-y-1.5">
+          <Label htmlFor="name" className="text-xs font-medium">
             Profile Name
           </Label>
           <Input
@@ -73,19 +73,19 @@ const RegistrationForm = () => {
             value={formData.name}
             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
             required
-            className="h-12"
+            className="h-10"
           />
         </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="profileFor" className="text-sm font-medium">
+        <div className="space-y-1.5">
+          <Label htmlFor="profileFor" className="text-xs font-medium">
             Profile Created for
           </Label>
           <Select 
             value={formData.profileFor} 
             onValueChange={(value) => setFormData({ ...formData, profileFor: value })}
           >
-            <SelectTrigger className="h-12">
+            <SelectTrigger className="h-10">
               <SelectValue placeholder="Select profile created for" />
             </SelectTrigger>
             <SelectContent className="bg-popover z-50">
@@ -98,15 +98,15 @@ const RegistrationForm = () => {
           </Select>
         </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="gender" className="text-sm font-medium">
+        <div className="space-y-1.5">
+          <Label htmlFor="gender" className="text-xs font-medium">
             Gender
           </Label>
           <Select 
             value={formData.gender} 
             onValueChange={(value) => setFormData({ ...formData, gender: value })}
           >
-            <SelectTrigger className="h-12">
+            <SelectTrigger className="h-10">
               <SelectValue placeholder="Select your gender" />
             </SelectTrigger>
             <SelectContent>
@@ -117,8 +117,8 @@ const RegistrationForm = () => {
           </Select>
         </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="email" className="text-sm font-medium">
+        <div className="space-y-1.5">
+          <Label htmlFor="email" className="text-xs font-medium">
             Email
           </Label>
           <Input
@@ -128,12 +128,12 @@ const RegistrationForm = () => {
             value={formData.email}
             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
             required
-            className="h-12"
+            className="h-10"
           />
         </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="phone" className="text-sm font-medium">
+        <div className="space-y-1.5">
+          <Label htmlFor="phone" className="text-xs font-medium">
             Phone Number
           </Label>
           <Input
@@ -143,15 +143,15 @@ const RegistrationForm = () => {
             value={formData.phone}
             onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
             required
-            className="h-12"
+            className="h-10"
           />
         </div>
 
-        <Button type="submit" variant="primary" size="lg" className="w-full">
+        <Button type="submit" variant="primary" size="default" className="w-full">
           Register Now
         </Button>
 
-        <div className="relative my-4">
+        <div className="relative my-3">
           <div className="absolute inset-0 flex items-center">
             <span className="w-full border-t border-border" />
           </div>
@@ -162,7 +162,7 @@ const RegistrationForm = () => {
           </div>
         </div>
 
-        <Button type="button" variant="outline" size="lg" className="w-full">
+        <Button type="button" variant="outline" size="default" className="w-full">
           Sign In
         </Button>
       </form>
