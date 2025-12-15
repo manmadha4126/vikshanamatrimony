@@ -78,25 +78,24 @@ const RegistrationForm = () => {
         </div>
 
         <div className="space-y-2">
-          <Label className="text-sm font-medium">
+          <Label htmlFor="profileFor" className="text-sm font-medium">
             Profile Created for
           </Label>
-          <div className="grid grid-cols-4 gap-2">
-            {profileForOptions.map((option) => (
-              <button
-                key={option.value}
-                type="button"
-                onClick={() => setFormData({ ...formData, profileFor: option.value })}
-                className={`px-3 py-2 text-xs font-medium rounded-lg border transition-all ${
-                  formData.profileFor === option.value
-                    ? "bg-primary text-primary-foreground border-primary"
-                    : "bg-background text-foreground border-border hover:border-primary/50 hover:bg-accent"
-                }`}
-              >
-                {option.label}
-              </button>
-            ))}
-          </div>
+          <Select 
+            value={formData.profileFor} 
+            onValueChange={(value) => setFormData({ ...formData, profileFor: value })}
+          >
+            <SelectTrigger className="h-12">
+              <SelectValue placeholder="Select profile created for" />
+            </SelectTrigger>
+            <SelectContent className="bg-popover z-50">
+              {profileForOptions.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
 
         <div className="space-y-2">
