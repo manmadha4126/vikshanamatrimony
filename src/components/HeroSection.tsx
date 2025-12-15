@@ -1,9 +1,7 @@
 import heroWedding from "@/assets/hero-wedding.jpg";
 import RegistrationForm from "./RegistrationForm";
-
 const HeroSection = () => {
-  return (
-    <section className="relative min-h-[90vh] gradient-hero overflow-hidden">
+  return <section className="relative min-h-[90vh] gradient-hero overflow-hidden">
       {/* Decorative elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-20 left-10 w-64 h-64 bg-secondary/10 rounded-full blur-3xl" />
@@ -23,21 +21,15 @@ const HeroSection = () => {
                 <span className="text-primary">Perfect</span>{" "}
                 <span className="text-secondary">Life Partner</span>
               </h1>
-              <p className="text-lg text-muted-foreground leading-relaxed max-w-xl">
-                Join thousands of families who have found their perfect match through 
-                Lakshmi Matrimony. Your journey to a beautiful marriage begins here, 
-                rooted in tradition and trust.
-              </p>
+              <p className="text-lg text-muted-foreground leading-relaxed max-w-xl">Join thousands of families who have found their perfect match through Lakshmi Matrimony. Your journey to a beautiful marriage begins here, rooted in tradition and trust.</p>
             </div>
 
             {/* Hero Image */}
-            <div className="relative animate-fade-up" style={{ animationDelay: "0.2s" }}>
+            <div className="relative animate-fade-up" style={{
+            animationDelay: "0.2s"
+          }}>
               <div className="relative rounded-2xl overflow-hidden shadow-card">
-                <img
-                  src={heroWedding}
-                  alt="Happy Indian Wedding Couple"
-                  className="w-full h-[400px] lg:h-[500px] object-cover"
-                />
+                <img src={heroWedding} alt="Happy Indian Wedding Couple" className="w-full h-[400px] lg:h-[500px] object-cover" />
                 <div className="absolute inset-0 bg-gradient-to-t from-primary/30 to-transparent" />
               </div>
               
@@ -60,13 +52,13 @@ const HeroSection = () => {
           </div>
 
           {/* Right Side - Registration Form */}
-          <div className="order-1 lg:order-2 animate-fade-up" style={{ animationDelay: "0.3s" }}>
+          <div className="order-1 lg:order-2 animate-fade-up" style={{
+          animationDelay: "0.3s"
+        }}>
             <RegistrationForm />
           </div>
         </div>
       </div>
-    </section>
-  );
+    </section>;
 };
-
 export default HeroSection;
