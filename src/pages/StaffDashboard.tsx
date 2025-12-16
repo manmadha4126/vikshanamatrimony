@@ -17,6 +17,7 @@ import { RefreshCw, Users, CheckCircle, Clock } from "lucide-react";
 
 interface Profile {
   id: string;
+  profile_id: string | null;
   name: string;
   email: string;
   phone: string;
@@ -86,7 +87,7 @@ const StaffDashboard = () => {
     try {
       const { data, error } = await supabase
         .from("profiles")
-        .select("id, name, email, phone, gender, profile_for, email_verified, created_at")
+        .select("id, profile_id, name, email, phone, gender, profile_for, email_verified, created_at")
         .order("created_at", { ascending: false });
 
       if (error) throw error;
@@ -215,6 +216,7 @@ const StaffDashboard = () => {
             <Table>
               <TableHeader>
                 <TableRow>
+                  <TableHead>Profile ID</TableHead>
                   <TableHead>Name</TableHead>
                   <TableHead>Profile For</TableHead>
                   <TableHead>Gender</TableHead>
@@ -227,13 +229,14 @@ const StaffDashboard = () => {
               <TableBody>
                 {profiles.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                    <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
                       No profiles found
                     </TableCell>
                   </TableRow>
                 ) : (
                   profiles.map((profile) => (
                     <TableRow key={profile.id}>
+                      <TableCell className="font-mono font-bold text-primary">{profile.profile_id || "-"}</TableCell>
                       <TableCell className="font-medium">{profile.name}</TableCell>
                       <TableCell className="capitalize">{profile.profile_for || "-"}</TableCell>
                       <TableCell className="capitalize">{profile.gender}</TableCell>
