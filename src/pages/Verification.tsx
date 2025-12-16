@@ -10,6 +10,7 @@ import { Mail, User, Phone, CheckCircle, Lock, Eye, EyeOff } from "lucide-react"
 
 interface RegistrationData {
   name: string;
+  profileFor: string;
   gender: string;
   email: string;
   phone: string;
@@ -39,14 +40,14 @@ const Verification = () => {
     }
     setRegistrationData(data);
     // Send OTP automatically when page loads
-    sendOtp(data.email, data.name, data.gender, data.phone);
+    sendOtp(data.email, data.name, data.gender, data.phone, data.profileFor);
   }, [location.state, navigate]);
 
-  const sendOtp = async (email: string, name: string, gender: string, phone: string) => {
+  const sendOtp = async (email: string, name: string, gender: string, phone: string, profileFor: string) => {
     setIsSendingOtp(true);
     try {
       const { data, error } = await supabase.functions.invoke("send-email-otp", {
-        body: { email, name, gender, phone },
+        body: { email, name, gender, phone, profileFor },
       });
 
       if (error) throw error;
@@ -187,7 +188,7 @@ const Verification = () => {
 
   const resendOtp = () => {
     if (registrationData) {
-      sendOtp(registrationData.email, registrationData.name, registrationData.gender, registrationData.phone);
+      sendOtp(registrationData.email, registrationData.name, registrationData.gender, registrationData.phone, registrationData.profileFor);
     }
   };
 
@@ -226,6 +227,14 @@ const Verification = () => {
               <div>
                 <p className="text-xs text-muted-foreground">Profile Name</p>
                 <p className="text-sm font-medium">{registrationData.name}</p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <User className="w-4 h-4 text-muted-foreground" />
+              <div>
+                <p className="text-xs text-muted-foreground">Profile Created For</p>
+                <p className="text-sm font-medium capitalize">{registrationData.profileFor}</p>
               </div>
             </div>
 

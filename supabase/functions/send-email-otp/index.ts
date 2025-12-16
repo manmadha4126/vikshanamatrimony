@@ -13,6 +13,7 @@ interface SendOtpRequest {
   name: string;
   gender: string;
   phone: string;
+  profileFor: string;
 }
 
 const generateOtp = (): string => {
@@ -26,9 +27,9 @@ serve(async (req: Request): Promise<Response> => {
   }
 
   try {
-    const { email, name, gender, phone }: SendOtpRequest = await req.json();
+    const { email, name, gender, phone, profileFor }: SendOtpRequest = await req.json();
 
-    if (!email || !name || !gender || !phone) {
+    if (!email || !name || !gender || !phone || !profileFor) {
       throw new Error("Missing required fields");
     }
 
@@ -62,6 +63,7 @@ serve(async (req: Request): Promise<Response> => {
           name,
           gender,
           phone,
+          profile_for: profileFor,
         })
         .eq("id", existingProfile.id);
 
@@ -79,6 +81,7 @@ serve(async (req: Request): Promise<Response> => {
           name,
           gender,
           phone,
+          profile_for: profileFor,
           email_otp: otp,
           otp_expires_at: otpExpiresAt.toISOString(),
         })
