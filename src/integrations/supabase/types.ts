@@ -28,6 +28,7 @@ export type Database = {
           phone_otp: string | null
           phone_verified: boolean | null
           profile_for: string | null
+          profile_id: string | null
           updated_at: string
           user_id: string | null
         }
@@ -44,6 +45,7 @@ export type Database = {
           phone_otp?: string | null
           phone_verified?: boolean | null
           profile_for?: string | null
+          profile_id?: string | null
           updated_at?: string
           user_id?: string | null
         }
@@ -60,6 +62,7 @@ export type Database = {
           phone_otp?: string | null
           phone_verified?: boolean | null
           profile_for?: string | null
+          profile_id?: string | null
           updated_at?: string
           user_id?: string | null
         }
@@ -91,6 +94,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      generate_profile_id: { Args: { p_gender: string }; Returns: string }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
