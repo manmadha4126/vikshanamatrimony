@@ -27,6 +27,7 @@ export type Database = {
           phone: string
           phone_otp: string | null
           phone_verified: boolean | null
+          profile_for: string | null
           updated_at: string
           user_id: string | null
         }
@@ -42,6 +43,7 @@ export type Database = {
           phone: string
           phone_otp?: string | null
           phone_verified?: boolean | null
+          profile_for?: string | null
           updated_at?: string
           user_id?: string | null
         }
@@ -57,6 +59,7 @@ export type Database = {
           phone?: string
           phone_otp?: string | null
           phone_verified?: boolean | null
+          profile_for?: string | null
           updated_at?: string
           user_id?: string | null
         }
