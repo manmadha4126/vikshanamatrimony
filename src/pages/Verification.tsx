@@ -31,6 +31,8 @@ const Verification = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [profileId, setProfileId] = useState<string | null>(null);
+  const [userProfileId, setUserProfileId] = useState<string | null>(null);
+  const [isAccountCreated, setIsAccountCreated] = useState(false);
 
   useEffect(() => {
     const data = location.state as RegistrationData;
@@ -166,14 +168,33 @@ const Verification = () => {
         if (updateError) {
           console.error("Error updating profile:", updateError);
         }
+
+        // Fetch the generated profile_id
+        const { data: profileData, error: fetchError } = await supabase
+          .from("profiles")
+          .select("profile_id")
+          .eq("id", profileId)
+          .single();
+
+        if (!fetchError && profileData?.profile_id) {
+          setUserProfileId(profileData.profile_id);
+          
+          // Send welcome email with profile ID
+          await supabase.functions.invoke("send-welcome-email", {
+            body: {
+              email: registrationData!.email,
+              name: registrationData!.name,
+              profileId: profileData.profile_id,
+            },
+          });
+        }
       }
 
+      setIsAccountCreated(true);
       toast({
         title: "Account Created Successfully!",
-        description: "Welcome to Lakshmi Matrimony. You can now login.",
+        description: "Welcome to Lakshmi Matrimony!",
       });
-
-      navigate("/login");
     } catch (error: any) {
       console.error("Error creating account:", error);
       toast({
@@ -201,185 +222,232 @@ const Verification = () => {
       <Card className="w-full max-w-lg shadow-xl border-border/50">
         <CardHeader className="text-center pb-4">
           <div className="mx-auto w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4">
-            {isEmailVerified ? (
+            {isAccountCreated ? (
               <CheckCircle className="w-8 h-8 text-green-500" />
+            ) : isEmailVerified ? (
+              <Lock className="w-8 h-8 text-primary" />
             ) : (
               <Mail className="w-8 h-8 text-primary" />
             )}
           </div>
           <CardTitle className="font-display text-2xl">
-            {isEmailVerified ? "Create Your Password" : "Verify Your Email"}
+            {isAccountCreated 
+              ? "Welcome to Lakshmi Matrimony!" 
+              : isEmailVerified 
+                ? "Create Your Password" 
+                : "Verify Your Email"}
           </CardTitle>
           <CardDescription>
-            {isEmailVerified 
-              ? "Set a secure password for your account"
-              : "We've sent a verification code to your email"}
+            {isAccountCreated
+              ? "Your account has been created successfully"
+              : isEmailVerified 
+                ? "Set a secure password for your account"
+                : "We've sent a verification code to your email"}
           </CardDescription>
         </CardHeader>
 
         <CardContent className="space-y-6">
-          {/* User Details Display */}
-          <div className="bg-muted/50 rounded-lg p-4 space-y-3">
-            <h4 className="font-semibold text-sm text-foreground mb-3">Your Details</h4>
-            
-            <div className="flex items-center gap-3">
-              <User className="w-4 h-4 text-muted-foreground" />
-              <div>
-                <p className="text-xs text-muted-foreground">Profile Name</p>
-                <p className="text-sm font-medium">{registrationData.name}</p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3">
-              <User className="w-4 h-4 text-muted-foreground" />
-              <div>
-                <p className="text-xs text-muted-foreground">Profile Created For</p>
-                <p className="text-sm font-medium capitalize">{registrationData.profileFor}</p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3">
-              <User className="w-4 h-4 text-muted-foreground" />
-              <div>
-                <p className="text-xs text-muted-foreground">Gender</p>
-                <p className="text-sm font-medium capitalize">{registrationData.gender}</p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3">
-              <Phone className="w-4 h-4 text-muted-foreground" />
-              <div>
-                <p className="text-xs text-muted-foreground">Phone Number</p>
-                <p className="text-sm font-medium">{registrationData.phone}</p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3">
-              <Mail className="w-4 h-4 text-muted-foreground" />
-              <div>
-                <p className="text-xs text-muted-foreground">Email</p>
-                <p className="text-sm font-medium">{registrationData.email}</p>
-              </div>
-            </div>
-          </div>
-
-          {!isEmailVerified ? (
+          {isAccountCreated ? (
             <>
-              {/* OTP Input */}
-              <div className="space-y-3">
-                <Label htmlFor="otp" className="text-sm font-medium">
-                  Enter 6-digit OTP
-                </Label>
-                <Input
-                  id="otp"
-                  type="text"
-                  placeholder="Enter OTP"
-                  value={otp}
-                  onChange={(e) => setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))}
-                  maxLength={6}
-                  className="h-12 text-center text-lg tracking-widest"
-                />
+              {/* Success State with Profile ID */}
+              <div className="bg-gradient-to-br from-primary/10 to-accent/20 rounded-lg p-6 text-center space-y-4">
+                <div className="space-y-2">
+                  <p className="text-sm text-muted-foreground">Your Unique Profile ID</p>
+                  <p className="text-3xl font-bold text-primary tracking-wider">{userProfileId}</p>
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  Please save this ID for future reference. A welcome email with your Profile ID has been sent to your email address.
+                </p>
+              </div>
+
+              <div className="bg-muted/50 rounded-lg p-4 space-y-2">
+                <h4 className="font-semibold text-sm text-foreground">Your Registration Details</h4>
+                <div className="grid grid-cols-2 gap-2 text-sm">
+                  <span className="text-muted-foreground">Name:</span>
+                  <span className="font-medium">{registrationData.name}</span>
+                  <span className="text-muted-foreground">Email:</span>
+                  <span className="font-medium">{registrationData.email}</span>
+                  <span className="text-muted-foreground">Phone:</span>
+                  <span className="font-medium">{registrationData.phone}</span>
+                </div>
               </div>
 
               <Button 
-                onClick={verifyOtp} 
-                disabled={isLoading || otp.length !== 6}
+                onClick={() => navigate("/login")}
                 className="w-full"
                 size="lg"
               >
-                {isLoading ? "Verifying..." : "Verify Email"}
+                Go to Login
               </Button>
-
-              <div className="text-center">
-                <button
-                  onClick={resendOtp}
-                  disabled={isSendingOtp}
-                  className="text-sm text-primary hover:underline disabled:opacity-50"
-                >
-                  {isSendingOtp ? "Sending..." : "Didn't receive OTP? Resend"}
-                </button>
-              </div>
             </>
           ) : (
             <>
-              {/* Password Creation */}
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="password" className="text-sm font-medium">
-                    Create Password
-                  </Label>
-                  <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                    <Input
-                      id="password"
-                      type={showPassword ? "text" : "password"}
-                      placeholder="Enter password (min 6 characters)"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      className="h-12 pl-10 pr-10"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2"
-                    >
-                      {showPassword ? (
-                        <EyeOff className="w-4 h-4 text-muted-foreground" />
-                      ) : (
-                        <Eye className="w-4 h-4 text-muted-foreground" />
-                      )}
-                    </button>
+              {/* User Details Display */}
+              <div className="bg-muted/50 rounded-lg p-4 space-y-3">
+                <h4 className="font-semibold text-sm text-foreground mb-3">Your Details</h4>
+                
+                <div className="flex items-center gap-3">
+                  <User className="w-4 h-4 text-muted-foreground" />
+                  <div>
+                    <p className="text-xs text-muted-foreground">Profile Name</p>
+                    <p className="text-sm font-medium">{registrationData.name}</p>
                   </div>
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="confirmPassword" className="text-sm font-medium">
-                    Confirm Password
-                  </Label>
-                  <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                    <Input
-                      id="confirmPassword"
-                      type={showConfirmPassword ? "text" : "password"}
-                      placeholder="Confirm your password"
-                      value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)}
-                      className="h-12 pl-10 pr-10"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2"
-                    >
-                      {showConfirmPassword ? (
-                        <EyeOff className="w-4 h-4 text-muted-foreground" />
-                      ) : (
-                        <Eye className="w-4 h-4 text-muted-foreground" />
-                      )}
-                    </button>
+                <div className="flex items-center gap-3">
+                  <User className="w-4 h-4 text-muted-foreground" />
+                  <div>
+                    <p className="text-xs text-muted-foreground">Profile Created For</p>
+                    <p className="text-sm font-medium capitalize">{registrationData.profileFor}</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <User className="w-4 h-4 text-muted-foreground" />
+                  <div>
+                    <p className="text-xs text-muted-foreground">Gender</p>
+                    <p className="text-sm font-medium capitalize">{registrationData.gender}</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <Phone className="w-4 h-4 text-muted-foreground" />
+                  <div>
+                    <p className="text-xs text-muted-foreground">Phone Number</p>
+                    <p className="text-sm font-medium">{registrationData.phone}</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <Mail className="w-4 h-4 text-muted-foreground" />
+                  <div>
+                    <p className="text-xs text-muted-foreground">Email</p>
+                    <p className="text-sm font-medium">{registrationData.email}</p>
                   </div>
                 </div>
               </div>
 
-              <Button 
-                onClick={createAccount} 
-                disabled={isLoading || password.length < 6}
-                className="w-full"
-                size="lg"
-              >
-                {isLoading ? "Creating Account..." : "Create Account"}
-              </Button>
+              {!isEmailVerified ? (
+                <>
+                  {/* OTP Input */}
+                  <div className="space-y-3">
+                    <Label htmlFor="otp" className="text-sm font-medium">
+                      Enter 6-digit OTP
+                    </Label>
+                    <Input
+                      id="otp"
+                      type="text"
+                      placeholder="Enter OTP"
+                      value={otp}
+                      onChange={(e) => setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                      maxLength={6}
+                      className="h-12 text-center text-lg tracking-widest"
+                    />
+                  </div>
+
+                  <Button 
+                    onClick={verifyOtp} 
+                    disabled={isLoading || otp.length !== 6}
+                    className="w-full"
+                    size="lg"
+                  >
+                    {isLoading ? "Verifying..." : "Verify Email"}
+                  </Button>
+
+                  <div className="text-center">
+                    <button
+                      onClick={resendOtp}
+                      disabled={isSendingOtp}
+                      className="text-sm text-primary hover:underline disabled:opacity-50"
+                    >
+                      {isSendingOtp ? "Sending..." : "Didn't receive OTP? Resend"}
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <>
+                  {/* Password Creation */}
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="password" className="text-sm font-medium">
+                        Create Password
+                      </Label>
+                      <div className="relative">
+                        <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                        <Input
+                          id="password"
+                          type={showPassword ? "text" : "password"}
+                          placeholder="Enter password (min 6 characters)"
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          className="h-12 pl-10 pr-10"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword(!showPassword)}
+                          className="absolute right-3 top-1/2 transform -translate-y-1/2"
+                        >
+                          {showPassword ? (
+                            <EyeOff className="w-4 h-4 text-muted-foreground" />
+                          ) : (
+                            <Eye className="w-4 h-4 text-muted-foreground" />
+                          )}
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="confirmPassword" className="text-sm font-medium">
+                        Confirm Password
+                      </Label>
+                      <div className="relative">
+                        <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                        <Input
+                          id="confirmPassword"
+                          type={showConfirmPassword ? "text" : "password"}
+                          placeholder="Confirm your password"
+                          value={confirmPassword}
+                          onChange={(e) => setConfirmPassword(e.target.value)}
+                          className="h-12 pl-10 pr-10"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                          className="absolute right-3 top-1/2 transform -translate-y-1/2"
+                        >
+                          {showConfirmPassword ? (
+                            <EyeOff className="w-4 h-4 text-muted-foreground" />
+                          ) : (
+                            <Eye className="w-4 h-4 text-muted-foreground" />
+                          )}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <Button 
+                    onClick={createAccount} 
+                    disabled={isLoading || password.length < 6}
+                    className="w-full"
+                    size="lg"
+                  >
+                    {isLoading ? "Creating Account..." : "Create Account"}
+                  </Button>
+                </>
+              )}
             </>
           )}
 
-          <div className="text-center">
-            <button
-              onClick={() => navigate("/")}
-              className="text-sm text-muted-foreground hover:text-foreground"
-            >
-              ← Back to Home
-            </button>
-          </div>
+          {!isAccountCreated && (
+            <div className="text-center">
+              <button
+                onClick={() => navigate("/")}
+                className="text-sm text-muted-foreground hover:text-foreground"
+              >
+                ← Back to Home
+              </button>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>
