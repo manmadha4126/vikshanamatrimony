@@ -13,8 +13,15 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { RefreshCw, Users, CheckCircle, Clock, Search } from "lucide-react";
+import { RefreshCw, Users, CheckCircle, Clock, Search, ChevronLeft, ChevronRight } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface Profile {
   id: string;
@@ -35,6 +42,8 @@ const StaffDashboard = () => {
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [loadingProfiles, setLoadingProfiles] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -141,6 +150,17 @@ const StaffDashboard = () => {
       profile.email.toLowerCase().includes(query)
     );
   });
+
+  // Pagination calculations
+  const totalPages = Math.ceil(filteredProfiles.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedProfiles = filteredProfiles.slice(startIndex, endIndex);
+
+  // Reset to page 1 when search changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery]);
 
   const totalRegistrations = profiles.length;
   const verifiedProfiles = profiles.filter(p => p.email_verified).length;
@@ -257,14 +277,14 @@ const StaffDashboard = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredProfiles.length === 0 ? (
+                {paginatedProfiles.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
                       {searchQuery ? "No profiles match your search" : "No profiles found"}
                     </TableCell>
                   </TableRow>
                 ) : (
-                  filteredProfiles.map((profile) => (
+                  paginatedProfiles.map((profile) => (
                     <TableRow key={profile.id}>
                       <TableCell className="font-mono font-bold text-primary">{profile.profile_id || "-"}</TableCell>
                       <TableCell className="font-medium">{profile.name}</TableCell>
@@ -292,6 +312,62 @@ const StaffDashboard = () => {
               </TableBody>
             </Table>
           </div>
+
+          {/* Pagination Controls */}
+          {filteredProfiles.length > 0 && (
+            <div className="p-4 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <span>Show</span>
+                <Select
+                  value={itemsPerPage.toString()}
+                  onValueChange={(value) => {
+                    setItemsPerPage(Number(value));
+                    setCurrentPage(1);
+                  }}
+                >
+                  <SelectTrigger className="w-[70px] h-8">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="5">5</SelectItem>
+                    <SelectItem value="10">10</SelectItem>
+                    <SelectItem value="20">20</SelectItem>
+                    <SelectItem value="50">50</SelectItem>
+                  </SelectContent>
+                </Select>
+                <span>per page</span>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-muted-foreground">
+                  {startIndex + 1}-{Math.min(endIndex, filteredProfiles.length)} of {filteredProfiles.length}
+                </span>
+                <div className="flex items-center gap-1">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                    disabled={currentPage === 1}
+                    className="h-8 w-8 p-0"
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                  </Button>
+                  <span className="text-sm px-2">
+                    Page {currentPage} of {totalPages || 1}
+                  </span>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                    disabled={currentPage === totalPages || totalPages === 0}
+                    className="h-8 w-8 p-0"
+                  >
+                    <ChevronRight className="w-4 h-4" />
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </main>
     </div>
