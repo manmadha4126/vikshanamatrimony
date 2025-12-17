@@ -13,7 +13,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { RefreshCw, Users, CheckCircle, Clock } from "lucide-react";
+import { RefreshCw, Users, CheckCircle, Clock, Search } from "lucide-react";
+import { Input } from "@/components/ui/input";
 
 interface Profile {
   id: string;
@@ -33,6 +34,7 @@ const StaffDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [loadingProfiles, setLoadingProfiles] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -131,6 +133,15 @@ const StaffDashboard = () => {
     );
   }
 
+  const filteredProfiles = profiles.filter((profile) => {
+    const query = searchQuery.toLowerCase();
+    return (
+      (profile.profile_id?.toLowerCase() || "").includes(query) ||
+      profile.name.toLowerCase().includes(query) ||
+      profile.email.toLowerCase().includes(query)
+    );
+  });
+
   const totalRegistrations = profiles.length;
   const verifiedProfiles = profiles.filter(p => p.email_verified).length;
   const pendingVerification = profiles.filter(p => !p.email_verified).length;
@@ -199,17 +210,36 @@ const StaffDashboard = () => {
 
         {/* Profiles Table */}
         <div className="bg-white rounded-xl shadow-md border border-gold/20 overflow-hidden">
-          <div className="p-6 border-b border-border flex justify-between items-center">
-            <h2 className="text-xl font-bold text-maroon">Registered Profiles</h2>
-            <Button
-              onClick={fetchProfiles}
-              variant="outline"
-              size="sm"
-              disabled={loadingProfiles}
-            >
-              <RefreshCw className={`w-4 h-4 mr-2 ${loadingProfiles ? "animate-spin" : ""}`} />
-              Refresh
-            </Button>
+          <div className="p-6 border-b border-border space-y-4">
+            <div className="flex justify-between items-center">
+              <h2 className="text-xl font-bold text-maroon">Registered Profiles</h2>
+              <Button
+                onClick={fetchProfiles}
+                variant="outline"
+                size="sm"
+                disabled={loadingProfiles}
+              >
+                <RefreshCw className={`w-4 h-4 mr-2 ${loadingProfiles ? "animate-spin" : ""}`} />
+                Refresh
+              </Button>
+            </div>
+            
+            {/* Search Input */}
+            <div className="relative max-w-md">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Input
+                type="text"
+                placeholder="Search by Profile ID, Name, or Email..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+            {searchQuery && (
+              <p className="text-sm text-muted-foreground">
+                Showing {filteredProfiles.length} of {profiles.length} profiles
+              </p>
+            )}
           </div>
           
           <div className="overflow-x-auto">
@@ -227,14 +257,14 @@ const StaffDashboard = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {profiles.length === 0 ? (
+                {filteredProfiles.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
-                      No profiles found
+                      {searchQuery ? "No profiles match your search" : "No profiles found"}
                     </TableCell>
                   </TableRow>
                 ) : (
-                  profiles.map((profile) => (
+                  filteredProfiles.map((profile) => (
                     <TableRow key={profile.id}>
                       <TableCell className="font-mono font-bold text-primary">{profile.profile_id || "-"}</TableCell>
                       <TableCell className="font-medium">{profile.name}</TableCell>
