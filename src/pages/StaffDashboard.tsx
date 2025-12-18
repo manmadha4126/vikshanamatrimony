@@ -13,7 +13,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { RefreshCw, Users, CheckCircle, Clock, Search, ChevronLeft, ChevronRight } from "lucide-react";
+import { RefreshCw, Users, CheckCircle, Clock, Search, ChevronLeft, ChevronRight, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -22,6 +22,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 interface Profile {
   id: string;
@@ -44,6 +50,7 @@ const StaffDashboard = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [selectedProfile, setSelectedProfile] = useState<Profile | null>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -286,7 +293,11 @@ const StaffDashboard = () => {
                   </TableRow>
                 ) : (
                   paginatedProfiles.map((profile) => (
-                    <TableRow key={profile.id}>
+                    <TableRow 
+                      key={profile.id} 
+                      className="cursor-pointer hover:bg-muted/50 transition-colors"
+                      onClick={() => setSelectedProfile(profile)}
+                    >
                       <TableCell className="font-mono font-bold text-primary">{profile.profile_id || "-"}</TableCell>
                       <TableCell className="font-medium">{profile.name}</TableCell>
                       <TableCell className="capitalize">{profile.profile_for || "-"}</TableCell>
@@ -371,6 +382,70 @@ const StaffDashboard = () => {
           )}
         </div>
       </main>
+
+      {/* Profile Detail Modal */}
+      <Dialog open={!!selectedProfile} onOpenChange={(open) => !open && setSelectedProfile(null)}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="text-maroon flex items-center gap-2">
+              Profile Details
+              {selectedProfile?.profile_id && (
+                <span className="font-mono text-sm bg-primary/10 text-primary px-2 py-1 rounded">
+                  {selectedProfile.profile_id}
+                </span>
+              )}
+            </DialogTitle>
+          </DialogHeader>
+          
+          {selectedProfile && (
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Name</label>
+                  <p className="font-medium">{selectedProfile.name}</p>
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Gender</label>
+                  <p className="capitalize">{selectedProfile.gender}</p>
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Profile For</label>
+                  <p className="capitalize">{selectedProfile.profile_for || "-"}</p>
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Status</label>
+                  <div>
+                    {selectedProfile.email_verified ? (
+                      <Badge className="bg-green-100 text-green-700 hover:bg-green-100">
+                        Verified
+                      </Badge>
+                    ) : (
+                      <Badge variant="secondary" className="bg-yellow-100 text-yellow-700">
+                        Pending Verification
+                      </Badge>
+                    )}
+                  </div>
+                </div>
+              </div>
+              
+              <div className="border-t pt-4 space-y-3">
+                <div className="space-y-1">
+                  <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Email</label>
+                  <p className="font-medium">{selectedProfile.email}</p>
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Phone</label>
+                  <p className="font-medium">{selectedProfile.phone}</p>
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Registered On</label>
+                  <p className="text-sm text-muted-foreground">{formatDate(selectedProfile.created_at)}</p>
+                </div>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
