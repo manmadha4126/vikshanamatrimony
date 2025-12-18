@@ -47,6 +47,11 @@ const StaffDashboard = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
+  // Reset to page 1 when search changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery]);
+
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
@@ -157,10 +162,6 @@ const StaffDashboard = () => {
   const endIndex = startIndex + itemsPerPage;
   const paginatedProfiles = filteredProfiles.slice(startIndex, endIndex);
 
-  // Reset to page 1 when search changes
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [searchQuery]);
 
   const totalRegistrations = profiles.length;
   const verifiedProfiles = profiles.filter(p => p.email_verified).length;
