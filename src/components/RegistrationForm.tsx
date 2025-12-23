@@ -46,8 +46,8 @@ const RegistrationForm = () => {
       return;
     }
 
-    // Navigate to verification page with form data
-    navigate("/verification", { state: formData });
+    // Navigate directly to register-v2 page
+    navigate("/register-v2");
   };
 
   return (
