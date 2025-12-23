@@ -19,6 +19,7 @@ const EmailOTPStep = ({ onComplete }: EmailOTPStepProps) => {
   const [profileId, setProfileId] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isVerifying, setIsVerifying] = useState(false);
+  const [devOtp, setDevOtp] = useState<string | null>(null);
 
   const validateEmail = (email: string) => {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -35,6 +36,7 @@ const EmailOTPStep = ({ onComplete }: EmailOTPStepProps) => {
     }
 
     setIsLoading(true);
+    setDevOtp(null);
     try {
       const { data, error } = await supabase.functions.invoke("send-email-otp", {
         body: {
@@ -50,10 +52,21 @@ const EmailOTPStep = ({ onComplete }: EmailOTPStepProps) => {
 
       setProfileId(data.profileId);
       setOtpSent(true);
-      toast({
-        title: "OTP Sent!",
-        description: "Please check your email for the verification code.",
-      });
+      
+      // If in dev mode (Resend test mode), show the OTP
+      if (data.devOtp) {
+        setDevOtp(data.devOtp);
+        toast({
+          title: "Development Mode",
+          description: `OTP: ${data.devOtp} (Email not sent - Resend test mode)`,
+          duration: 15000,
+        });
+      } else {
+        toast({
+          title: "OTP Sent!",
+          description: "Please check your email for the verification code.",
+        });
+      }
     } catch (error: any) {
       toast({
         title: "Error",
@@ -177,6 +190,14 @@ const EmailOTPStep = ({ onComplete }: EmailOTPStepProps) => {
               </InputOTP>
             </div>
           </div>
+
+          {devOtp && (
+            <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 text-center">
+              <p className="text-xs text-amber-600 font-medium">Development Mode - OTP:</p>
+              <p className="text-2xl font-bold text-amber-700 tracking-widest">{devOtp}</p>
+              <p className="text-xs text-amber-500 mt-1">Verify domain at resend.com for production</p>
+            </div>
+          )}
 
           <Button
             onClick={verifyOTP}
