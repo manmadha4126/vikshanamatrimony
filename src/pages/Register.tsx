@@ -85,6 +85,7 @@ const Register = () => {
             profileId={profileId}
             onComplete={completeRegistration}
             isLoading={isLoading}
+            fromStaff={fromStaff}
           />
         );
       default:

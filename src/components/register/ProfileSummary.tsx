@@ -9,14 +9,19 @@ interface ProfileSummaryProps {
   profileId: string | null;
   onComplete: () => void;
   isLoading: boolean;
+  fromStaff?: boolean;
 }
 
-export const ProfileSummary = ({ formData, profileId, onComplete, isLoading }: ProfileSummaryProps) => {
+export const ProfileSummary = ({ formData, profileId, onComplete, isLoading, fromStaff }: ProfileSummaryProps) => {
   const navigate = useNavigate();
 
   const handleComplete = async () => {
     await onComplete();
-    navigate("/");
+    if (fromStaff) {
+      navigate("/staff-dashboard");
+    } else {
+      navigate("/");
+    }
   };
 
   return (
