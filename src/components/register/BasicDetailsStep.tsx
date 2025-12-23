@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { SearchableSelect } from "@/components/ui/searchable-select";
 import { RegistrationData } from "@/hooks/useRegistration";
 import { profileForOptions, genderOptions } from "@/data/registrationOptions";
 
@@ -14,6 +14,9 @@ interface BasicDetailsStepProps {
 
 export const BasicDetailsStep = ({ formData, updateFormData, onSubmit, isLoading }: BasicDetailsStepProps) => {
   const isValid = formData.name && formData.profileFor && formData.gender && formData.email && formData.phone;
+
+  const profileForSelectOptions = profileForOptions.map((option) => ({ value: option, label: option }));
+  const genderSelectOptions = genderOptions.map((option) => ({ value: option, label: option }));
 
   return (
     <div className="space-y-6">
@@ -35,34 +38,24 @@ export const BasicDetailsStep = ({ formData, updateFormData, onSubmit, isLoading
 
         <div className="space-y-2">
           <Label htmlFor="profileFor">Profile For *</Label>
-          <Select value={formData.profileFor} onValueChange={(value) => updateFormData({ profileFor: value })}>
-            <SelectTrigger>
-              <SelectValue placeholder="Select profile for" />
-            </SelectTrigger>
-            <SelectContent>
-              {profileForOptions.map((option) => (
-                <SelectItem key={option} value={option}>
-                  {option}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <SearchableSelect
+            options={profileForSelectOptions}
+            value={formData.profileFor}
+            onValueChange={(value) => updateFormData({ profileFor: value })}
+            placeholder="Select profile for"
+            searchPlaceholder="Search..."
+          />
         </div>
 
         <div className="space-y-2">
           <Label htmlFor="gender">Gender *</Label>
-          <Select value={formData.gender} onValueChange={(value) => updateFormData({ gender: value })}>
-            <SelectTrigger>
-              <SelectValue placeholder="Select gender" />
-            </SelectTrigger>
-            <SelectContent>
-              {genderOptions.map((option) => (
-                <SelectItem key={option} value={option}>
-                  {option}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <SearchableSelect
+            options={genderSelectOptions}
+            value={formData.gender}
+            onValueChange={(value) => updateFormData({ gender: value })}
+            placeholder="Select gender"
+            searchPlaceholder="Search..."
+          />
         </div>
 
         <div className="space-y-2">
