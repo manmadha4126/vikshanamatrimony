@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { SearchableSelect } from "@/components/ui/searchable-select";
 import { ArrowLeft } from "lucide-react";
 import { RegistrationData } from "@/hooks/useRegistration";
 import {
@@ -28,6 +28,9 @@ interface PersonalDetailsStepProps {
   isLoading: boolean;
 }
 
+// Helper to convert string array to options format
+const toOptions = (arr: string[]) => arr.map((item) => ({ value: item, label: item }));
+
 export const PersonalDetailsStep = ({ formData, updateFormData, onSubmit, onBack, isLoading }: PersonalDetailsStepProps) => {
   // Get cascading options based on selections
   const casteOptions = formData.religion ? castesByReligion[formData.religion] || [] : [];
@@ -51,6 +54,7 @@ export const PersonalDetailsStep = ({ formData, updateFormData, onSubmit, onBack
   const handleStateChange = (value: string) => {
     updateFormData({ state: value, city: "" });
   };
+
   return (
     <div className="space-y-6">
       <div className="text-center mb-6">
@@ -75,44 +79,35 @@ export const PersonalDetailsStep = ({ formData, updateFormData, onSubmit, onBack
 
             <div className="space-y-2">
               <Label>Mother Tongue</Label>
-              <Select value={formData.motherTongue} onValueChange={(value) => updateFormData({ motherTongue: value })}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select mother tongue" />
-                </SelectTrigger>
-                <SelectContent>
-                  {motherTongueOptions.map((option) => (
-                    <SelectItem key={option} value={option}>{option}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <SearchableSelect
+                options={toOptions(motherTongueOptions)}
+                value={formData.motherTongue}
+                onValueChange={(value) => updateFormData({ motherTongue: value })}
+                placeholder="Select mother tongue"
+                searchPlaceholder="Search language..."
+              />
             </div>
 
             <div className="space-y-2">
               <Label>Height</Label>
-              <Select value={formData.height} onValueChange={(value) => updateFormData({ height: value })}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select height" />
-                </SelectTrigger>
-                <SelectContent>
-                  {heightOptions.map((option) => (
-                    <SelectItem key={option} value={option}>{option}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <SearchableSelect
+                options={toOptions(heightOptions)}
+                value={formData.height}
+                onValueChange={(value) => updateFormData({ height: value })}
+                placeholder="Select height"
+                searchPlaceholder="Search height..."
+              />
             </div>
 
             <div className="space-y-2">
               <Label>Marital Status</Label>
-              <Select value={formData.maritalStatus} onValueChange={(value) => updateFormData({ maritalStatus: value })}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select marital status" />
-                </SelectTrigger>
-                <SelectContent>
-                  {maritalStatusOptions.map((option) => (
-                    <SelectItem key={option} value={option}>{option}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <SearchableSelect
+                options={toOptions(maritalStatusOptions)}
+                value={formData.maritalStatus}
+                onValueChange={(value) => updateFormData({ maritalStatus: value })}
+                placeholder="Select marital status"
+                searchPlaceholder="Search..."
+              />
             </div>
           </div>
         </div>
@@ -124,52 +119,37 @@ export const PersonalDetailsStep = ({ formData, updateFormData, onSubmit, onBack
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>Religion <span className="text-destructive">*</span></Label>
-              <Select value={formData.religion} onValueChange={handleReligionChange}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select religion" />
-                </SelectTrigger>
-                <SelectContent>
-                  {religionOptions.map((option) => (
-                    <SelectItem key={option} value={option}>{option}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <SearchableSelect
+                options={toOptions(religionOptions)}
+                value={formData.religion}
+                onValueChange={handleReligionChange}
+                placeholder="Select religion"
+                searchPlaceholder="Search religion..."
+              />
             </div>
 
             <div className="space-y-2">
               <Label>Caste</Label>
-              <Select 
-                value={formData.caste} 
+              <SearchableSelect
+                options={toOptions(casteOptions)}
+                value={formData.caste}
                 onValueChange={handleCasteChange}
+                placeholder={formData.religion ? "Select caste" : "Select religion first"}
+                searchPlaceholder="Search caste..."
                 disabled={!formData.religion}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder={formData.religion ? "Select caste" : "Select religion first"} />
-                </SelectTrigger>
-                <SelectContent>
-                  {casteOptions.map((option) => (
-                    <SelectItem key={option} value={option}>{option}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              />
             </div>
 
             <div className="space-y-2">
               <Label>Sub Caste</Label>
-              <Select 
-                value={formData.subCaste} 
+              <SearchableSelect
+                options={toOptions(subCasteOptions)}
+                value={formData.subCaste}
                 onValueChange={(value) => updateFormData({ subCaste: value })}
+                placeholder={formData.caste ? "Select sub caste" : "Select caste first"}
+                searchPlaceholder="Search sub caste..."
                 disabled={!formData.caste}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder={formData.caste ? "Select sub caste" : "Select caste first"} />
-                </SelectTrigger>
-                <SelectContent>
-                  {subCasteOptions.map((option) => (
-                    <SelectItem key={option} value={option}>{option}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              />
             </div>
 
             <div className="space-y-2">
@@ -183,30 +163,24 @@ export const PersonalDetailsStep = ({ formData, updateFormData, onSubmit, onBack
 
             <div className="space-y-2">
               <Label>Star (Nakshatra)</Label>
-              <Select value={formData.star} onValueChange={(value) => updateFormData({ star: value })}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select star" />
-                </SelectTrigger>
-                <SelectContent>
-                  {starOptions.map((option) => (
-                    <SelectItem key={option} value={option}>{option}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <SearchableSelect
+                options={toOptions(starOptions)}
+                value={formData.star}
+                onValueChange={(value) => updateFormData({ star: value })}
+                placeholder="Select star"
+                searchPlaceholder="Search star..."
+              />
             </div>
 
             <div className="space-y-2">
               <Label>Dosham</Label>
-              <Select value={formData.dosham} onValueChange={(value) => updateFormData({ dosham: value })}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select dosham" />
-                </SelectTrigger>
-                <SelectContent>
-                  {doshamOptions.map((option) => (
-                    <SelectItem key={option} value={option}>{option}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <SearchableSelect
+                options={toOptions(doshamOptions)}
+                value={formData.dosham}
+                onValueChange={(value) => updateFormData({ dosham: value })}
+                placeholder="Select dosham"
+                searchPlaceholder="Search..."
+              />
             </div>
           </div>
         </div>
@@ -218,30 +192,24 @@ export const PersonalDetailsStep = ({ formData, updateFormData, onSubmit, onBack
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>Family Status</Label>
-              <Select value={formData.familyStatus} onValueChange={(value) => updateFormData({ familyStatus: value })}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select family status" />
-                </SelectTrigger>
-                <SelectContent>
-                  {familyStatusOptions.map((option) => (
-                    <SelectItem key={option} value={option}>{option}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <SearchableSelect
+                options={toOptions(familyStatusOptions)}
+                value={formData.familyStatus}
+                onValueChange={(value) => updateFormData({ familyStatus: value })}
+                placeholder="Select family status"
+                searchPlaceholder="Search..."
+              />
             </div>
 
             <div className="space-y-2">
               <Label>Family Type</Label>
-              <Select value={formData.familyType} onValueChange={(value) => updateFormData({ familyType: value })}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select family type" />
-                </SelectTrigger>
-                <SelectContent>
-                  {familyTypeOptions.map((option) => (
-                    <SelectItem key={option} value={option}>{option}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <SearchableSelect
+                options={toOptions(familyTypeOptions)}
+                value={formData.familyType}
+                onValueChange={(value) => updateFormData({ familyType: value })}
+                placeholder="Select family type"
+                searchPlaceholder="Search..."
+              />
             </div>
           </div>
         </div>
@@ -253,52 +221,37 @@ export const PersonalDetailsStep = ({ formData, updateFormData, onSubmit, onBack
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="space-y-2">
               <Label>Country</Label>
-              <Select value={formData.country} onValueChange={handleCountryChange}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select country" />
-                </SelectTrigger>
-                <SelectContent>
-                  {countryOptions.map((option) => (
-                    <SelectItem key={option} value={option}>{option}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <SearchableSelect
+                options={toOptions(countryOptions)}
+                value={formData.country}
+                onValueChange={handleCountryChange}
+                placeholder="Select country"
+                searchPlaceholder="Search country..."
+              />
             </div>
 
             <div className="space-y-2">
               <Label>State</Label>
-              <Select 
-                value={formData.state} 
+              <SearchableSelect
+                options={toOptions(stateOptions)}
+                value={formData.state}
                 onValueChange={handleStateChange}
+                placeholder={formData.country ? "Select state" : "Select country first"}
+                searchPlaceholder="Search state..."
                 disabled={!formData.country}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder={formData.country ? "Select state" : "Select country first"} />
-                </SelectTrigger>
-                <SelectContent>
-                  {stateOptions.map((option) => (
-                    <SelectItem key={option} value={option}>{option}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              />
             </div>
 
             <div className="space-y-2">
               <Label>City</Label>
-              <Select 
-                value={formData.city} 
+              <SearchableSelect
+                options={toOptions(cityOptions)}
+                value={formData.city}
                 onValueChange={(value) => updateFormData({ city: value })}
+                placeholder={formData.state ? "Select city" : "Select state first"}
+                searchPlaceholder="Search city..."
                 disabled={!formData.state}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder={formData.state ? "Select city" : "Select state first"} />
-                </SelectTrigger>
-                <SelectContent>
-                  {cityOptions.map((option) => (
-                    <SelectItem key={option} value={option}>{option}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              />
             </div>
           </div>
         </div>
@@ -310,16 +263,13 @@ export const PersonalDetailsStep = ({ formData, updateFormData, onSubmit, onBack
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>Education</Label>
-              <Select value={formData.education} onValueChange={(value) => updateFormData({ education: value })}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select education" />
-                </SelectTrigger>
-                <SelectContent>
-                  {educationOptions.map((option) => (
-                    <SelectItem key={option} value={option}>{option}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <SearchableSelect
+                options={toOptions(educationOptions)}
+                value={formData.education}
+                onValueChange={(value) => updateFormData({ education: value })}
+                placeholder="Select education"
+                searchPlaceholder="Search education..."
+              />
             </div>
 
             <div className="space-y-2">
@@ -333,16 +283,13 @@ export const PersonalDetailsStep = ({ formData, updateFormData, onSubmit, onBack
 
             <div className="space-y-2">
               <Label>Employment Type</Label>
-              <Select value={formData.employmentType} onValueChange={(value) => updateFormData({ employmentType: value })}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select employment type" />
-                </SelectTrigger>
-                <SelectContent>
-                  {employmentOptions.map((option) => (
-                    <SelectItem key={option} value={option}>{option}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <SearchableSelect
+                options={toOptions(employmentOptions)}
+                value={formData.employmentType}
+                onValueChange={(value) => updateFormData({ employmentType: value })}
+                placeholder="Select employment type"
+                searchPlaceholder="Search..."
+              />
             </div>
 
             <div className="space-y-2">
@@ -365,16 +312,13 @@ export const PersonalDetailsStep = ({ formData, updateFormData, onSubmit, onBack
 
             <div className="space-y-2">
               <Label>Annual Income</Label>
-              <Select value={formData.annualIncome} onValueChange={(value) => updateFormData({ annualIncome: value })}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select income range" />
-                </SelectTrigger>
-                <SelectContent>
-                  {incomeOptions.map((option) => (
-                    <SelectItem key={option} value={option}>{option}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <SearchableSelect
+                options={toOptions(incomeOptions)}
+                value={formData.annualIncome}
+                onValueChange={(value) => updateFormData({ annualIncome: value })}
+                placeholder="Select income range"
+                searchPlaceholder="Search..."
+              />
             </div>
           </div>
         </div>
