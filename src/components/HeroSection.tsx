@@ -33,7 +33,7 @@ const HeroSection = () => {
               variant="primary" 
               size="lg" 
               className="text-lg px-8 py-6"
-              onClick={() => navigate("/register-v2")}
+              onClick={() => navigate("/register")}
             >
               Register Now - It's Free
             </Button>
