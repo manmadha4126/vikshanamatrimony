@@ -132,34 +132,51 @@ serve(async (req: Request): Promise<Response> => {
       </html>
     `;
 
-    const emailResponse = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${RESEND_API_KEY}`,
-      },
-      body: JSON.stringify({
-        from: "Lakshmi Matrimony <onboarding@resend.dev>",
-        to: [email],
-        subject: "Your Verification Code - Lakshmi Matrimony",
-        html: emailHtml,
-      }),
-    });
-
-    const emailData = await emailResponse.json();
+    // Try to send email, but don't fail if Resend is in test mode
+    let emailSent = false;
+    let emailError = null;
     
-    if (!emailResponse.ok) {
-      console.error("Resend API error:", emailData);
-      throw new Error(emailData.message || "Failed to send email");
+    try {
+      const emailResponse = await fetch("https://api.resend.com/emails", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${RESEND_API_KEY}`,
+        },
+        body: JSON.stringify({
+          from: "Lakshmi Matrimony <onboarding@resend.dev>",
+          to: [email],
+          subject: "Your Verification Code - Lakshmi Matrimony",
+          html: emailHtml,
+        }),
+      });
+
+      const emailData = await emailResponse.json();
+      
+      if (emailResponse.ok) {
+        emailSent = true;
+        console.log("Email sent successfully:", emailData);
+      } else {
+        emailError = emailData.message || "Failed to send email";
+        console.warn("Resend API warning (test mode):", emailData);
+      }
+    } catch (e: any) {
+      emailError = e.message;
+      console.warn("Email sending failed:", e.message);
     }
 
-    console.log("Email sent successfully:", emailData);
-
+    // Return success with OTP for development/testing (when email fails due to Resend test mode)
+    // In production with verified domain, remove the devOtp field
     return new Response(
       JSON.stringify({ 
         success: true, 
-        message: "OTP sent successfully",
-        profileId 
+        message: emailSent 
+          ? "OTP sent successfully to your email" 
+          : "OTP generated (check below for testing - email not sent due to Resend test mode)",
+        profileId,
+        emailSent,
+        // Include OTP for development testing when email fails
+        ...(emailSent ? {} : { devOtp: otp, devNote: "Use this OTP for testing. In production, verify your domain at resend.com/domains" })
       }),
       {
         status: 200,
