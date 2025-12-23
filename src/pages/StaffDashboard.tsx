@@ -327,7 +327,7 @@ const StaffDashboard = () => {
                 className="w-full"
                 onClick={(e) => {
                   e.stopPropagation();
-                  navigate("/register");
+                  navigate("/register?from=staff");
                 }}
               >
                 <UserPlus className="w-4 h-4 mr-2" />
@@ -529,7 +529,7 @@ const StaffDashboard = () => {
                 variant="primary" 
                 size="lg"
                 className="w-full"
-                onClick={() => navigate("/register")}
+                onClick={() => navigate("/register?from=staff")}
               >
                 <UserPlus className="w-5 h-5 mr-2" />
                 Start Registration
