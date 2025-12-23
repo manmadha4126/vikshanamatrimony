@@ -50,6 +50,9 @@ const Header = () => {
 
         {/* Desktop Auth Buttons */}
         <div className="hidden md:flex items-center gap-4">
+          <Button className="bg-primary hover:bg-primary/90 text-primary-foreground" asChild>
+            <Link to="/register">Register Now</Link>
+          </Button>
           <Button className="bg-red-600 hover:bg-red-700 text-white" asChild>
             <Link to="/staff-login">Staff Login</Link>
           </Button>
@@ -81,6 +84,9 @@ const Header = () => {
               </button>
             ))}
             <div className="flex flex-col gap-2 pt-4 border-t border-border">
+              <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground" asChild>
+                <Link to="/register">Register Now</Link>
+              </Button>
               <Button className="w-full bg-red-600 hover:bg-red-700 text-white" asChild>
                 <Link to="/staff-login">Staff Login</Link>
               </Button>
