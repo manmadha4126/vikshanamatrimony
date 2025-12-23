@@ -15,9 +15,10 @@ import {
   educationOptions,
   employmentOptions,
   incomeOptions,
-  stateOptions,
   starOptions,
 } from "@/data/registrationOptions";
+import { countryOptions, statesByCountry, citiesByState } from "@/data/locationOptions";
+import { castesByReligion, subCastesByCaste } from "@/data/casteOptions";
 
 interface PersonalDetailsStepProps {
   formData: RegistrationData;
@@ -28,6 +29,28 @@ interface PersonalDetailsStepProps {
 }
 
 export const PersonalDetailsStep = ({ formData, updateFormData, onSubmit, onBack, isLoading }: PersonalDetailsStepProps) => {
+  // Get cascading options based on selections
+  const casteOptions = formData.religion ? castesByReligion[formData.religion] || [] : [];
+  const subCasteOptions = formData.caste ? subCastesByCaste[formData.caste] || [] : [];
+  const stateOptions = formData.country ? statesByCountry[formData.country] || [] : [];
+  const cityOptions = formData.state ? citiesByState[formData.state] || [] : [];
+
+  // Reset dependent fields when parent changes
+  const handleReligionChange = (value: string) => {
+    updateFormData({ religion: value, caste: "", subCaste: "" });
+  };
+
+  const handleCasteChange = (value: string) => {
+    updateFormData({ caste: value, subCaste: "" });
+  };
+
+  const handleCountryChange = (value: string) => {
+    updateFormData({ country: value, state: "", city: "" });
+  };
+
+  const handleStateChange = (value: string) => {
+    updateFormData({ state: value, city: "" });
+  };
   return (
     <div className="space-y-6">
       <div className="text-center mb-6">
@@ -100,8 +123,8 @@ export const PersonalDetailsStep = ({ formData, updateFormData, onSubmit, onBack
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label>Religion</Label>
-              <Select value={formData.religion} onValueChange={(value) => updateFormData({ religion: value })}>
+              <Label>Religion <span className="text-destructive">*</span></Label>
+              <Select value={formData.religion} onValueChange={handleReligionChange}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select religion" />
                 </SelectTrigger>
@@ -115,20 +138,38 @@ export const PersonalDetailsStep = ({ formData, updateFormData, onSubmit, onBack
 
             <div className="space-y-2">
               <Label>Caste</Label>
-              <Input
-                placeholder="Enter caste"
-                value={formData.caste}
-                onChange={(e) => updateFormData({ caste: e.target.value })}
-              />
+              <Select 
+                value={formData.caste} 
+                onValueChange={handleCasteChange}
+                disabled={!formData.religion}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder={formData.religion ? "Select caste" : "Select religion first"} />
+                </SelectTrigger>
+                <SelectContent>
+                  {casteOptions.map((option) => (
+                    <SelectItem key={option} value={option}>{option}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="space-y-2">
               <Label>Sub Caste</Label>
-              <Input
-                placeholder="Enter sub caste"
-                value={formData.subCaste}
-                onChange={(e) => updateFormData({ subCaste: e.target.value })}
-              />
+              <Select 
+                value={formData.subCaste} 
+                onValueChange={(value) => updateFormData({ subCaste: value })}
+                disabled={!formData.caste}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder={formData.caste ? "Select sub caste" : "Select caste first"} />
+                </SelectTrigger>
+                <SelectContent>
+                  {subCasteOptions.map((option) => (
+                    <SelectItem key={option} value={option}>{option}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="space-y-2">
@@ -212,17 +253,27 @@ export const PersonalDetailsStep = ({ formData, updateFormData, onSubmit, onBack
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="space-y-2">
               <Label>Country</Label>
-              <Input
-                value={formData.country}
-                onChange={(e) => updateFormData({ country: e.target.value })}
-              />
+              <Select value={formData.country} onValueChange={handleCountryChange}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select country" />
+                </SelectTrigger>
+                <SelectContent>
+                  {countryOptions.map((option) => (
+                    <SelectItem key={option} value={option}>{option}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="space-y-2">
               <Label>State</Label>
-              <Select value={formData.state} onValueChange={(value) => updateFormData({ state: value })}>
+              <Select 
+                value={formData.state} 
+                onValueChange={handleStateChange}
+                disabled={!formData.country}
+              >
                 <SelectTrigger>
-                  <SelectValue placeholder="Select state" />
+                  <SelectValue placeholder={formData.country ? "Select state" : "Select country first"} />
                 </SelectTrigger>
                 <SelectContent>
                   {stateOptions.map((option) => (
@@ -234,11 +285,20 @@ export const PersonalDetailsStep = ({ formData, updateFormData, onSubmit, onBack
 
             <div className="space-y-2">
               <Label>City</Label>
-              <Input
-                placeholder="Enter city"
-                value={formData.city}
-                onChange={(e) => updateFormData({ city: e.target.value })}
-              />
+              <Select 
+                value={formData.city} 
+                onValueChange={(value) => updateFormData({ city: value })}
+                disabled={!formData.state}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder={formData.state ? "Select city" : "Select state first"} />
+                </SelectTrigger>
+                <SelectContent>
+                  {cityOptions.map((option) => (
+                    <SelectItem key={option} value={option}>{option}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
         </div>
