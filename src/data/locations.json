@@ -1,0 +1,121 @@
+{
+  "countries": [
+    { "code": "IN", "name": "India" },
+    { "code": "US", "name": "United States" },
+    { "code": "GB", "name": "United Kingdom" },
+    { "code": "CA", "name": "Canada" },
+    { "code": "AU", "name": "Australia" },
+    { "code": "AE", "name": "United Arab Emirates" },
+    { "code": "SG", "name": "Singapore" },
+    { "code": "DE", "name": "Germany" },
+    { "code": "FR", "name": "France" },
+    { "code": "NZ", "name": "New Zealand" },
+    { "code": "MY", "name": "Malaysia" },
+    { "code": "SA", "name": "Saudi Arabia" },
+    { "code": "QA", "name": "Qatar" },
+    { "code": "KW", "name": "Kuwait" },
+    { "code": "OM", "name": "Oman" },
+    { "code": "BH", "name": "Bahrain" }
+  ],
+  "states": {
+    "IN": [
+      { "code": "AP", "name": "Andhra Pradesh" },
+      { "code": "AR", "name": "Arunachal Pradesh" },
+      { "code": "AS", "name": "Assam" },
+      { "code": "BR", "name": "Bihar" },
+      { "code": "CG", "name": "Chhattisgarh" },
+      { "code": "GA", "name": "Goa" },
+      { "code": "GJ", "name": "Gujarat" },
+      { "code": "HR", "name": "Haryana" },
+      { "code": "HP", "name": "Himachal Pradesh" },
+      { "code": "JH", "name": "Jharkhand" },
+      { "code": "KA", "name": "Karnataka" },
+      { "code": "KL", "name": "Kerala" },
+      { "code": "MP", "name": "Madhya Pradesh" },
+      { "code": "MH", "name": "Maharashtra" },
+      { "code": "MN", "name": "Manipur" },
+      { "code": "ML", "name": "Meghalaya" },
+      { "code": "MZ", "name": "Mizoram" },
+      { "code": "NL", "name": "Nagaland" },
+      { "code": "OD", "name": "Odisha" },
+      { "code": "PB", "name": "Punjab" },
+      { "code": "RJ", "name": "Rajasthan" },
+      { "code": "SK", "name": "Sikkim" },
+      { "code": "TN", "name": "Tamil Nadu" },
+      { "code": "TS", "name": "Telangana" },
+      { "code": "TR", "name": "Tripura" },
+      { "code": "UP", "name": "Uttar Pradesh" },
+      { "code": "UK", "name": "Uttarakhand" },
+      { "code": "WB", "name": "West Bengal" },
+      { "code": "DL", "name": "Delhi" }
+    ],
+    "US": [
+      { "code": "CA", "name": "California" },
+      { "code": "TX", "name": "Texas" },
+      { "code": "NY", "name": "New York" },
+      { "code": "FL", "name": "Florida" },
+      { "code": "IL", "name": "Illinois" },
+      { "code": "NJ", "name": "New Jersey" },
+      { "code": "WA", "name": "Washington" },
+      { "code": "GA", "name": "Georgia" },
+      { "code": "PA", "name": "Pennsylvania" },
+      { "code": "MA", "name": "Massachusetts" }
+    ],
+    "GB": [
+      { "code": "ENG", "name": "England" },
+      { "code": "SCT", "name": "Scotland" },
+      { "code": "WLS", "name": "Wales" },
+      { "code": "NIR", "name": "Northern Ireland" }
+    ],
+    "CA": [
+      { "code": "ON", "name": "Ontario" },
+      { "code": "BC", "name": "British Columbia" },
+      { "code": "AB", "name": "Alberta" },
+      { "code": "QC", "name": "Quebec" }
+    ],
+    "AU": [
+      { "code": "NSW", "name": "New South Wales" },
+      { "code": "VIC", "name": "Victoria" },
+      { "code": "QLD", "name": "Queensland" },
+      { "code": "WA", "name": "Western Australia" }
+    ],
+    "AE": [
+      { "code": "DXB", "name": "Dubai" },
+      { "code": "AUH", "name": "Abu Dhabi" },
+      { "code": "SHJ", "name": "Sharjah" },
+      { "code": "AJM", "name": "Ajman" }
+    ],
+    "SG": [
+      { "code": "SG", "name": "Singapore" }
+    ]
+  },
+  "cities": {
+    "AP": ["Visakhapatnam", "Vijayawada", "Guntur", "Nellore", "Kurnool", "Tirupati", "Rajahmundry", "Kakinada", "Kadapa", "Anantapur"],
+    "TS": ["Hyderabad", "Warangal", "Nizamabad", "Karimnagar", "Khammam", "Ramagundam", "Mahbubnagar", "Nalgonda", "Adilabad", "Suryapet"],
+    "KA": ["Bangalore", "Mysore", "Hubli", "Mangalore", "Belgaum", "Gulbarga", "Davangere", "Bellary", "Shimoga", "Tumkur"],
+    "TN": ["Chennai", "Coimbatore", "Madurai", "Tiruchirappalli", "Salem", "Tirunelveli", "Tiruppur", "Vellore", "Erode", "Thanjavur"],
+    "KL": ["Thiruvananthapuram", "Kochi", "Kozhikode", "Thrissur", "Kollam", "Palakkad", "Alappuzha", "Kannur", "Kottayam", "Malappuram"],
+    "MH": ["Mumbai", "Pune", "Nagpur", "Thane", "Nashik", "Aurangabad", "Solapur", "Kolhapur", "Amravati", "Navi Mumbai"],
+    "GJ": ["Ahmedabad", "Surat", "Vadodara", "Rajkot", "Bhavnagar", "Jamnagar", "Junagadh", "Gandhinagar", "Anand", "Nadiad"],
+    "DL": ["New Delhi", "Delhi", "Dwarka", "Rohini", "Saket", "Janakpuri"],
+    "UP": ["Lucknow", "Kanpur", "Varanasi", "Agra", "Prayagraj", "Meerut", "Noida", "Ghaziabad", "Bareilly", "Aligarh"],
+    "RJ": ["Jaipur", "Jodhpur", "Udaipur", "Kota", "Bikaner", "Ajmer", "Bhilwara", "Alwar", "Sikar", "Pali"],
+    "WB": ["Kolkata", "Howrah", "Durgapur", "Asansol", "Siliguri", "Bardhaman", "Malda", "Kharagpur"],
+    "PB": ["Ludhiana", "Amritsar", "Jalandhar", "Patiala", "Bathinda", "Mohali"],
+    "HR": ["Gurugram", "Faridabad", "Panipat", "Ambala", "Hisar", "Rohtak", "Karnal"],
+    "BR": ["Patna", "Gaya", "Bhagalpur", "Muzaffarpur", "Darbhanga"],
+    "OD": ["Bhubaneswar", "Cuttack", "Rourkela", "Berhampur", "Sambalpur"],
+    "CA": ["Los Angeles", "San Francisco", "San Diego", "San Jose", "Sacramento"],
+    "TX": ["Houston", "Dallas", "Austin", "San Antonio", "Fort Worth"],
+    "NY": ["New York City", "Buffalo", "Rochester", "Albany", "Syracuse"],
+    "NJ": ["Newark", "Jersey City", "Paterson", "Edison", "Trenton"],
+    "ENG": ["London", "Birmingham", "Manchester", "Liverpool", "Leeds"],
+    "ON": ["Toronto", "Ottawa", "Mississauga", "Brampton", "Hamilton"],
+    "BC": ["Vancouver", "Victoria", "Burnaby", "Surrey", "Richmond"],
+    "NSW": ["Sydney", "Newcastle", "Wollongong", "Central Coast"],
+    "VIC": ["Melbourne", "Geelong", "Ballarat", "Bendigo"],
+    "DXB": ["Dubai", "Deira", "Bur Dubai", "Jumeirah"],
+    "AUH": ["Abu Dhabi", "Al Ain", "Khalifa City"],
+    "SG": ["Singapore", "Jurong", "Woodlands", "Tampines"]
+  }
+}
