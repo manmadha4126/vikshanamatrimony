@@ -13,7 +13,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { RefreshCw, Users, CheckCircle, Clock, Search, ChevronLeft, ChevronRight, X } from "lucide-react";
+import { RefreshCw, Users, CheckCircle, Clock, Search, ChevronLeft, ChevronRight, UserPlus, Edit, Trash2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -28,6 +28,17 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface Profile {
   id: string;
@@ -51,6 +62,9 @@ const StaffDashboard = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [selectedProfile, setSelectedProfile] = useState<Profile | null>(null);
+  const [activeSection, setActiveSection] = useState<"profiles" | "add">("profiles");
+  const [deleteProfile, setDeleteProfile] = useState<Profile | null>(null);
+  const [deleting, setDeleting] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -134,6 +148,40 @@ const StaffDashboard = () => {
       description: "You have been signed out successfully.",
     });
     navigate("/staff-login");
+  };
+
+  const handleDeleteProfile = async () => {
+    if (!deleteProfile) return;
+    setDeleting(true);
+    try {
+      const { error } = await supabase
+        .from("profiles")
+        .delete()
+        .eq("id", deleteProfile.id);
+      
+      if (error) throw error;
+      
+      toast({
+        title: "Profile Deleted",
+        description: `Profile ${deleteProfile.profile_id || deleteProfile.name} has been deleted.`,
+      });
+      setDeleteProfile(null);
+      fetchProfiles();
+    } catch (error: any) {
+      console.error("Error deleting profile:", error);
+      toast({
+        title: "Error",
+        description: "Failed to delete profile",
+        variant: "destructive",
+      });
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+  const handleEditProfile = (profile: Profile) => {
+    // Navigate to register page with profile data for editing
+    navigate(`/register?edit=${profile.id}`);
   };
 
   const formatDate = (dateString: string) => {
@@ -236,151 +284,259 @@ const StaffDashboard = () => {
           </div>
         </div>
 
-        {/* Profiles Table */}
-        <div className="bg-white rounded-xl shadow-md border border-gold/20 overflow-hidden">
-          <div className="p-6 border-b border-border space-y-4">
-            <div className="flex justify-between items-center">
-              <h2 className="text-xl font-bold text-maroon">Registered Profiles</h2>
-              <Button
-                onClick={fetchProfiles}
-                variant="outline"
-                size="sm"
-                disabled={loadingProfiles}
-              >
-                <RefreshCw className={`w-4 h-4 mr-2 ${loadingProfiles ? "animate-spin" : ""}`} />
-                Refresh
-              </Button>
-            </div>
-            
-            {/* Search Input */}
-            <div className="relative max-w-md">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <Input
-                type="text"
-                placeholder="Search by Profile ID, Name, or Email..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10"
-              />
-            </div>
-            {searchQuery && (
-              <p className="text-sm text-muted-foreground">
-                Showing {filteredProfiles.length} of {profiles.length} profiles
-              </p>
-            )}
-          </div>
-          
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Profile ID</TableHead>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Profile For</TableHead>
-                  <TableHead>Gender</TableHead>
-                  <TableHead>Email</TableHead>
-                  <TableHead>Phone</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Registered On</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {paginatedProfiles.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
-                      {searchQuery ? "No profiles match your search" : "No profiles found"}
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  paginatedProfiles.map((profile) => (
-                    <TableRow 
-                      key={profile.id} 
-                      className="cursor-pointer hover:bg-muted/50 transition-colors"
-                      onClick={() => setSelectedProfile(profile)}
-                    >
-                      <TableCell className="font-mono font-bold text-primary">{profile.profile_id || "-"}</TableCell>
-                      <TableCell className="font-medium">{profile.name}</TableCell>
-                      <TableCell className="capitalize">{profile.profile_for || "-"}</TableCell>
-                      <TableCell className="capitalize">{profile.gender}</TableCell>
-                      <TableCell>{profile.email}</TableCell>
-                      <TableCell>{profile.phone}</TableCell>
-                      <TableCell>
-                        {profile.email_verified ? (
-                          <Badge className="bg-green-100 text-green-700 hover:bg-green-100">
-                            Verified
-                          </Badge>
-                        ) : (
-                          <Badge variant="secondary" className="bg-yellow-100 text-yellow-700">
-                            Pending
-                          </Badge>
-                        )}
-                      </TableCell>
-                      <TableCell className="text-sm text-muted-foreground">
-                        {formatDate(profile.created_at)}
-                      </TableCell>
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </div>
-
-          {/* Pagination Controls */}
-          {filteredProfiles.length > 0 && (
-            <div className="p-4 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-4">
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <span>Show</span>
-                <Select
-                  value={itemsPerPage.toString()}
-                  onValueChange={(value) => {
-                    setItemsPerPage(Number(value));
-                    setCurrentPage(1);
-                  }}
-                >
-                  <SelectTrigger className="w-[70px] h-8">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="5">5</SelectItem>
-                    <SelectItem value="10">10</SelectItem>
-                    <SelectItem value="20">20</SelectItem>
-                    <SelectItem value="50">50</SelectItem>
-                  </SelectContent>
-                </Select>
-                <span>per page</span>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <span className="text-sm text-muted-foreground">
-                  {startIndex + 1}-{Math.min(endIndex, filteredProfiles.length)} of {filteredProfiles.length}
-                </span>
-                <div className="flex items-center gap-1">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                    disabled={currentPage === 1}
-                    className="h-8 w-8 p-0"
-                  >
-                    <ChevronLeft className="w-4 h-4" />
-                  </Button>
-                  <span className="text-sm px-2">
-                    Page {currentPage} of {totalPages || 1}
-                  </span>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-                    disabled={currentPage === totalPages || totalPages === 0}
-                    className="h-8 w-8 p-0"
-                  >
-                    <ChevronRight className="w-4 h-4" />
-                  </Button>
+        {/* Action Boxes */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+          <Card 
+            className={`cursor-pointer transition-all hover:shadow-lg ${activeSection === "profiles" ? "ring-2 ring-primary border-primary" : "border-gold/20"}`}
+            onClick={() => setActiveSection("profiles")}
+          >
+            <CardHeader className="pb-3">
+              <div className="flex items-center gap-4">
+                <div className="p-3 bg-primary/10 rounded-lg">
+                  <Users className="w-8 h-8 text-primary" />
+                </div>
+                <div>
+                  <CardTitle className="text-xl text-maroon">Registered Profiles</CardTitle>
+                  <CardDescription>View and manage all registered profiles</CardDescription>
                 </div>
               </div>
-            </div>
-          )}
+            </CardHeader>
+            <CardContent>
+              <p className="text-3xl font-bold text-foreground">{totalRegistrations} Profiles</p>
+            </CardContent>
+          </Card>
+
+          <Card 
+            className={`cursor-pointer transition-all hover:shadow-lg ${activeSection === "add" ? "ring-2 ring-primary border-primary" : "border-gold/20"}`}
+            onClick={() => setActiveSection("add")}
+          >
+            <CardHeader className="pb-3">
+              <div className="flex items-center gap-4">
+                <div className="p-3 bg-green-100 rounded-lg">
+                  <UserPlus className="w-8 h-8 text-green-600" />
+                </div>
+                <div>
+                  <CardTitle className="text-xl text-maroon">Add New Profile</CardTitle>
+                  <CardDescription>Create a new profile manually</CardDescription>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <Button 
+                variant="primary" 
+                className="w-full"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  navigate("/register");
+                }}
+              >
+                <UserPlus className="w-4 h-4 mr-2" />
+                Create New Profile
+              </Button>
+            </CardContent>
+          </Card>
         </div>
+
+        {/* Profiles Table - Only show when activeSection is "profiles" */}
+        {activeSection === "profiles" && (
+          <div className="bg-white rounded-xl shadow-md border border-gold/20 overflow-hidden">
+            <div className="p-6 border-b border-border space-y-4">
+              <div className="flex justify-between items-center">
+                <h2 className="text-xl font-bold text-maroon">Registered Profiles</h2>
+                <Button
+                  onClick={fetchProfiles}
+                  variant="outline"
+                  size="sm"
+                  disabled={loadingProfiles}
+                >
+                  <RefreshCw className={`w-4 h-4 mr-2 ${loadingProfiles ? "animate-spin" : ""}`} />
+                  Refresh
+                </Button>
+              </div>
+              
+              {/* Search Input */}
+              <div className="relative max-w-md">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Input
+                  type="text"
+                  placeholder="Search by Profile ID, Name, or Email..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+              {searchQuery && (
+                <p className="text-sm text-muted-foreground">
+                  Showing {filteredProfiles.length} of {profiles.length} profiles
+                </p>
+              )}
+            </div>
+            
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Profile ID</TableHead>
+                    <TableHead>Name</TableHead>
+                    <TableHead>Profile For</TableHead>
+                    <TableHead>Gender</TableHead>
+                    <TableHead>Email</TableHead>
+                    <TableHead>Phone</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Registered On</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {paginatedProfiles.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={9} className="text-center py-8 text-muted-foreground">
+                        {searchQuery ? "No profiles match your search" : "No profiles found"}
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    paginatedProfiles.map((profile) => (
+                      <TableRow 
+                        key={profile.id} 
+                        className="cursor-pointer hover:bg-muted/50 transition-colors"
+                        onClick={() => setSelectedProfile(profile)}
+                      >
+                        <TableCell className="font-mono font-bold text-primary">{profile.profile_id || "-"}</TableCell>
+                        <TableCell className="font-medium">{profile.name}</TableCell>
+                        <TableCell className="capitalize">{profile.profile_for || "-"}</TableCell>
+                        <TableCell className="capitalize">{profile.gender}</TableCell>
+                        <TableCell>{profile.email}</TableCell>
+                        <TableCell>{profile.phone}</TableCell>
+                        <TableCell>
+                          {profile.email_verified ? (
+                            <Badge className="bg-green-100 text-green-700 hover:bg-green-100">
+                              Verified
+                            </Badge>
+                          ) : (
+                            <Badge variant="secondary" className="bg-yellow-100 text-yellow-700">
+                              Pending
+                            </Badge>
+                          )}
+                        </TableCell>
+                        <TableCell className="text-sm text-muted-foreground">
+                          {formatDate(profile.created_at)}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex items-center justify-end gap-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="h-8 w-8 p-0"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleEditProfile(profile);
+                              }}
+                            >
+                              <Edit className="w-4 h-4" />
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="h-8 w-8 p-0 text-destructive hover:bg-destructive hover:text-destructive-foreground"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setDeleteProfile(profile);
+                              }}
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </div>
+
+            {/* Pagination Controls */}
+            {filteredProfiles.length > 0 && (
+              <div className="p-4 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <span>Show</span>
+                  <Select
+                    value={itemsPerPage.toString()}
+                    onValueChange={(value) => {
+                      setItemsPerPage(Number(value));
+                      setCurrentPage(1);
+                    }}
+                  >
+                    <SelectTrigger className="w-[70px] h-8">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="5">5</SelectItem>
+                      <SelectItem value="10">10</SelectItem>
+                      <SelectItem value="20">20</SelectItem>
+                      <SelectItem value="50">50</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <span>per page</span>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-muted-foreground">
+                    {startIndex + 1}-{Math.min(endIndex, filteredProfiles.length)} of {filteredProfiles.length}
+                  </span>
+                  <div className="flex items-center gap-1">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                      disabled={currentPage === 1}
+                      className="h-8 w-8 p-0"
+                    >
+                      <ChevronLeft className="w-4 h-4" />
+                    </Button>
+                    <span className="text-sm px-2">
+                      Page {currentPage} of {totalPages || 1}
+                    </span>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                      disabled={currentPage === totalPages || totalPages === 0}
+                      className="h-8 w-8 p-0"
+                    >
+                      <ChevronRight className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Add Profile Section - Show when activeSection is "add" */}
+        {activeSection === "add" && (
+          <div className="bg-white rounded-xl shadow-md border border-gold/20 p-8 text-center">
+            <div className="max-w-md mx-auto space-y-6">
+              <div className="p-4 bg-green-100 rounded-full w-20 h-20 mx-auto flex items-center justify-center">
+                <UserPlus className="w-10 h-10 text-green-600" />
+              </div>
+              <div>
+                <h2 className="text-2xl font-bold text-maroon mb-2">Create New Profile</h2>
+                <p className="text-muted-foreground">
+                  Click the button below to add a new profile to the system. You'll be redirected to the registration form.
+                </p>
+              </div>
+              <Button 
+                variant="primary" 
+                size="lg"
+                className="w-full"
+                onClick={() => navigate("/register")}
+              >
+                <UserPlus className="w-5 h-5 mr-2" />
+                Start Registration
+              </Button>
+            </div>
+          </div>
+        )}
       </main>
 
       {/* Profile Detail Modal */}
@@ -446,6 +602,28 @@ const StaffDashboard = () => {
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={!!deleteProfile} onOpenChange={(open) => !open && setDeleteProfile(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Profile</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete the profile for <strong>{deleteProfile?.name}</strong> ({deleteProfile?.profile_id || deleteProfile?.email})? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleting}>Cancel</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleDeleteProfile}
+              disabled={deleting}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {deleting ? "Deleting..." : "Delete"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
