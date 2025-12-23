@@ -41,15 +41,15 @@ const ContactSection = () => {
           </p>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-12">
+        <div className="grid lg:grid-cols-2 gap-8 max-w-5xl mx-auto">
           {/* Contact Form */}
-          <div className="bg-card rounded-xl shadow-card p-8 border border-border/50">
-            <h3 className="font-display text-2xl font-bold text-foreground mb-6">
+          <div className="bg-card rounded-xl shadow-card p-6 border border-border/50">
+            <h3 className="font-display text-xl font-bold text-foreground mb-4">
               Send Us a Message
             </h3>
-            <form onSubmit={handleSubmit} className="space-y-5">
-              <div className="space-y-2">
-                <Label htmlFor="contact-name">Full Name</Label>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="space-y-1.5">
+                <Label htmlFor="contact-name" className="text-sm">Full Name</Label>
                 <Input
                   id="contact-name"
                   type="text"
@@ -57,12 +57,12 @@ const ContactSection = () => {
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   required
-                  className="h-12"
+                  className="h-10"
                 />
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="contact-email">Email Address</Label>
+              <div className="space-y-1.5">
+                <Label htmlFor="contact-email" className="text-sm">Email Address</Label>
                 <Input
                   id="contact-email"
                   type="email"
@@ -70,56 +70,56 @@ const ContactSection = () => {
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   required
-                  className="h-12"
+                  className="h-10"
                 />
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="contact-phone">Phone Number</Label>
+              <div className="space-y-1.5">
+                <Label htmlFor="contact-phone" className="text-sm">Phone Number</Label>
                 <Input
                   id="contact-phone"
                   type="tel"
                   placeholder="+91 98765 43210"
                   value={formData.phone}
                   onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                  className="h-12"
+                  className="h-10"
                 />
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="contact-message">Your Message</Label>
+              <div className="space-y-1.5">
+                <Label htmlFor="contact-message" className="text-sm">Your Message</Label>
                 <Textarea
                   id="contact-message"
                   placeholder="How can we help you?"
                   value={formData.message}
                   onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                   required
-                  className="min-h-[120px] resize-none"
+                  className="min-h-[100px] resize-none"
                 />
               </div>
 
-              <Button type="submit" variant="primary" size="lg" className="w-full">
+              <Button type="submit" variant="primary" className="w-full">
                 Send Message
               </Button>
             </form>
           </div>
 
           {/* Contact Info */}
-          <div className="space-y-8">
+          <div className="space-y-6">
             {/* Office Info Card */}
-            <div className="bg-card rounded-xl shadow-card p-8 border border-border/50">
-              <h3 className="font-display text-2xl font-bold text-foreground mb-6">
+            <div className="bg-card rounded-xl shadow-card p-6 border border-border/50">
+              <h3 className="font-display text-xl font-bold text-foreground mb-4">
                 Our Office
               </h3>
               
-              <div className="space-y-6">
-                <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-lg gradient-primary flex items-center justify-center flex-shrink-0">
-                    <MapPin className="w-5 h-5 text-primary-foreground" />
+              <div className="space-y-4">
+                <div className="flex items-start gap-3">
+                  <div className="w-8 h-8 rounded-lg gradient-primary flex items-center justify-center flex-shrink-0">
+                    <MapPin className="w-4 h-4 text-primary-foreground" />
                   </div>
                   <div>
-                    <h4 className="font-semibold text-foreground mb-1">Address</h4>
-                    <p className="text-muted-foreground text-sm">
+                    <h4 className="font-semibold text-foreground text-sm mb-0.5">Address</h4>
+                    <p className="text-muted-foreground text-xs">
                       123 Marriage Lane, T. Nagar<br />
                       Chennai, Tamil Nadu 600017<br />
                       India
@@ -127,39 +127,39 @@ const ContactSection = () => {
                   </div>
                 </div>
 
-                <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-lg gradient-primary flex items-center justify-center flex-shrink-0">
-                    <Phone className="w-5 h-5 text-primary-foreground" />
+                <div className="flex items-start gap-3">
+                  <div className="w-8 h-8 rounded-lg gradient-primary flex items-center justify-center flex-shrink-0">
+                    <Phone className="w-4 h-4 text-primary-foreground" />
                   </div>
                   <div>
-                    <h4 className="font-semibold text-foreground mb-1">Phone</h4>
-                    <p className="text-muted-foreground text-sm">
+                    <h4 className="font-semibold text-foreground text-sm mb-0.5">Phone</h4>
+                    <p className="text-muted-foreground text-xs">
                       +91 98765 43210<br />
                       +91 44 2345 6789
                     </p>
                   </div>
                 </div>
 
-                <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-lg gradient-primary flex items-center justify-center flex-shrink-0">
-                    <Mail className="w-5 h-5 text-primary-foreground" />
+                <div className="flex items-start gap-3">
+                  <div className="w-8 h-8 rounded-lg gradient-primary flex items-center justify-center flex-shrink-0">
+                    <Mail className="w-4 h-4 text-primary-foreground" />
                   </div>
                   <div>
-                    <h4 className="font-semibold text-foreground mb-1">Email</h4>
-                    <p className="text-muted-foreground text-sm">
+                    <h4 className="font-semibold text-foreground text-sm mb-0.5">Email</h4>
+                    <p className="text-muted-foreground text-xs">
                       info@lakshmimatrimony.com<br />
                       support@lakshmimatrimony.com
                     </p>
                   </div>
                 </div>
 
-                <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-lg gradient-primary flex items-center justify-center flex-shrink-0">
-                    <Clock className="w-5 h-5 text-primary-foreground" />
+                <div className="flex items-start gap-3">
+                  <div className="w-8 h-8 rounded-lg gradient-primary flex items-center justify-center flex-shrink-0">
+                    <Clock className="w-4 h-4 text-primary-foreground" />
                   </div>
                   <div>
-                    <h4 className="font-semibold text-foreground mb-1">Working Hours</h4>
-                    <p className="text-muted-foreground text-sm">
+                    <h4 className="font-semibold text-foreground text-sm mb-0.5">Working Hours</h4>
+                    <p className="text-muted-foreground text-xs">
                       Monday - Saturday: 9:00 AM - 7:00 PM<br />
                       Sunday: 10:00 AM - 5:00 PM
                     </p>
@@ -169,31 +169,31 @@ const ContactSection = () => {
             </div>
 
             {/* Social Media Card */}
-            <div className="bg-card rounded-xl shadow-card p-8 border border-border/50">
-              <h3 className="font-display text-xl font-bold text-foreground mb-4">
+            <div className="bg-card rounded-xl shadow-card p-6 border border-border/50">
+              <h3 className="font-display text-lg font-bold text-foreground mb-3">
                 Connect With Us
               </h3>
-              <p className="text-muted-foreground text-sm mb-6">
+              <p className="text-muted-foreground text-xs mb-4">
                 Follow us on social media for updates, success stories, and more.
               </p>
-              <div className="flex gap-4">
+              <div className="flex gap-3">
                 <a 
                   href="#" 
-                  className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center text-primary hover:bg-primary hover:text-primary-foreground transition-colors"
+                  className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary hover:bg-primary hover:text-primary-foreground transition-colors"
                 >
-                  <Facebook size={22} />
+                  <Facebook size={18} />
                 </a>
                 <a 
                   href="#" 
-                  className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center text-primary hover:bg-primary hover:text-primary-foreground transition-colors"
+                  className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary hover:bg-primary hover:text-primary-foreground transition-colors"
                 >
-                  <Instagram size={22} />
+                  <Instagram size={18} />
                 </a>
                 <a 
                   href="#" 
-                  className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center text-primary hover:bg-primary hover:text-primary-foreground transition-colors"
+                  className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary hover:bg-primary hover:text-primary-foreground transition-colors"
                 >
-                  <MessageCircle size={22} />
+                  <MessageCircle size={18} />
                 </a>
               </div>
             </div>
