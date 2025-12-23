@@ -128,27 +128,20 @@ const EmailOTPStep = ({ onComplete }: EmailOTPStepProps) => {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="email">Email Address *</Label>
-          <Input
-            id="email"
-            type="email"
-            placeholder="your.email@example.com"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="h-12"
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="phone">Phone Number *</Label>
-          <Input
-            id="phone"
-            type="tel"
-            placeholder="Enter your phone number"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-            className="h-12"
-          />
+          <Label>Profile For *</Label>
+          <select
+            value={profileFor}
+            onChange={(e) => setProfileFor(e.target.value)}
+            className="w-full h-12 px-3 rounded-md border border-input bg-background text-foreground"
+          >
+            <option value="myself">Myself</option>
+            <option value="son">Son</option>
+            <option value="daughter">Daughter</option>
+            <option value="brother">Brother</option>
+            <option value="sister">Sister</option>
+            <option value="relative">Relative</option>
+            <option value="friend">Friend</option>
+          </select>
         </div>
 
         <div className="space-y-2">
@@ -180,20 +173,27 @@ const EmailOTPStep = ({ onComplete }: EmailOTPStepProps) => {
         </div>
 
         <div className="space-y-2">
-          <Label>Profile For *</Label>
-          <select
-            value={profileFor}
-            onChange={(e) => setProfileFor(e.target.value)}
-            className="w-full h-12 px-3 rounded-md border border-input bg-background text-foreground"
-          >
-            <option value="myself">Myself</option>
-            <option value="son">Son</option>
-            <option value="daughter">Daughter</option>
-            <option value="brother">Brother</option>
-            <option value="sister">Sister</option>
-            <option value="relative">Relative</option>
-            <option value="friend">Friend</option>
-          </select>
+          <Label htmlFor="email">Email Address *</Label>
+          <Input
+            id="email"
+            type="email"
+            placeholder="your.email@example.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="h-12"
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="phone">Phone Number *</Label>
+          <Input
+            id="phone"
+            type="tel"
+            placeholder="Enter your phone number"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            className="h-12"
+          />
         </div>
 
         <Button
