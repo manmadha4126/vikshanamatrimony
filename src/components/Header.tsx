@@ -1,4 +1,4 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
 import { useState } from "react";
@@ -6,6 +6,7 @@ import { useState } from "react";
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
 
   const navLinks = [
     { name: "Home", href: "#hero" },
@@ -53,6 +54,9 @@ const Header = () => {
 
         {/* Desktop Auth Buttons */}
         <div className="hidden md:flex items-center gap-4">
+          <Button variant="primary" onClick={() => navigate("/register-v2")}>
+            Register Now
+          </Button>
           <Button className="bg-red-600 hover:bg-red-700 text-white" asChild>
             <Link to="/staff-login">Staff Login</Link>
           </Button>
@@ -84,6 +88,9 @@ const Header = () => {
               </button>
             ))}
             <div className="flex flex-col gap-2 pt-4 border-t border-border">
+              <Button variant="primary" className="w-full" onClick={() => { navigate("/register-v2"); setIsMenuOpen(false); }}>
+                Register Now
+              </Button>
               <Button className="w-full bg-red-600 hover:bg-red-700 text-white" asChild>
                 <Link to="/staff-login">Staff Login</Link>
               </Button>
