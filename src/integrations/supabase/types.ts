@@ -16,53 +16,125 @@ export type Database = {
     Tables: {
       profiles: {
         Row: {
+          annual_income: string | null
+          caste: string | null
+          city: string | null
+          company_name: string | null
+          country: string | null
           created_at: string
+          date_of_birth: string | null
+          dosham: string | null
+          education: string | null
+          education_detail: string | null
           email: string
           email_otp: string | null
           email_verified: boolean | null
+          employment_type: string | null
+          family_status: string | null
+          family_type: string | null
           gender: string
+          gothram: string | null
+          height: string | null
           id: string
+          is_complete: boolean | null
+          marital_status: string | null
+          mother_tongue: string | null
           name: string
+          occupation: string | null
           otp_expires_at: string | null
           phone: string
           phone_otp: string | null
           phone_verified: boolean | null
+          photo_url: string | null
           profile_for: string | null
           profile_id: string | null
+          registration_step: number | null
+          religion: string | null
+          star: string | null
+          state: string | null
+          sub_caste: string | null
           updated_at: string
           user_id: string | null
         }
         Insert: {
+          annual_income?: string | null
+          caste?: string | null
+          city?: string | null
+          company_name?: string | null
+          country?: string | null
           created_at?: string
+          date_of_birth?: string | null
+          dosham?: string | null
+          education?: string | null
+          education_detail?: string | null
           email: string
           email_otp?: string | null
           email_verified?: boolean | null
+          employment_type?: string | null
+          family_status?: string | null
+          family_type?: string | null
           gender: string
+          gothram?: string | null
+          height?: string | null
           id?: string
+          is_complete?: boolean | null
+          marital_status?: string | null
+          mother_tongue?: string | null
           name: string
+          occupation?: string | null
           otp_expires_at?: string | null
           phone: string
           phone_otp?: string | null
           phone_verified?: boolean | null
+          photo_url?: string | null
           profile_for?: string | null
           profile_id?: string | null
+          registration_step?: number | null
+          religion?: string | null
+          star?: string | null
+          state?: string | null
+          sub_caste?: string | null
           updated_at?: string
           user_id?: string | null
         }
         Update: {
+          annual_income?: string | null
+          caste?: string | null
+          city?: string | null
+          company_name?: string | null
+          country?: string | null
           created_at?: string
+          date_of_birth?: string | null
+          dosham?: string | null
+          education?: string | null
+          education_detail?: string | null
           email?: string
           email_otp?: string | null
           email_verified?: boolean | null
+          employment_type?: string | null
+          family_status?: string | null
+          family_type?: string | null
           gender?: string
+          gothram?: string | null
+          height?: string | null
           id?: string
+          is_complete?: boolean | null
+          marital_status?: string | null
+          mother_tongue?: string | null
           name?: string
+          occupation?: string | null
           otp_expires_at?: string | null
           phone?: string
           phone_otp?: string | null
           phone_verified?: boolean | null
+          photo_url?: string | null
           profile_for?: string | null
           profile_id?: string | null
+          registration_step?: number | null
+          religion?: string | null
+          star?: string | null
+          state?: string | null
+          sub_caste?: string | null
           updated_at?: string
           user_id?: string | null
         }
