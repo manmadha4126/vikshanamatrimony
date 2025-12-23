@@ -2,8 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
-import { Mail, ArrowRight, Loader2, RefreshCw } from "lucide-react";
+import { Mail, ArrowRight, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
@@ -14,18 +13,17 @@ interface EmailOTPStepProps {
 const EmailOTPStep = ({ onComplete }: EmailOTPStepProps) => {
   const { toast } = useToast();
   const [email, setEmail] = useState("");
-  const [otp, setOtp] = useState("");
-  const [otpSent, setOtpSent] = useState(false);
-  const [profileId, setProfileId] = useState("");
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [gender, setGender] = useState("male");
+  const [profileFor, setProfileFor] = useState("myself");
   const [isLoading, setIsLoading] = useState(false);
-  const [isVerifying, setIsVerifying] = useState(false);
-  const [devOtp, setDevOtp] = useState<string | null>(null);
 
   const validateEmail = (email: string) => {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   };
 
-  const sendOTP = async () => {
+  const handleSubmit = async () => {
     if (!validateEmail(email)) {
       toast({
         title: "Invalid Email",
@@ -35,90 +33,71 @@ const EmailOTPStep = ({ onComplete }: EmailOTPStepProps) => {
       return;
     }
 
-    setIsLoading(true);
-    setDevOtp(null);
-    try {
-      const { data, error } = await supabase.functions.invoke("send-email-otp", {
-        body: {
-          email,
-          name: "User",
-          gender: "other",
-          phone: "",
-          profileFor: "myself",
-        },
-      });
-
-      if (error) throw error;
-
-      setProfileId(data.profileId);
-      setOtpSent(true);
-      
-      // If in dev mode (Resend test mode), show the OTP
-      if (data.devOtp) {
-        setDevOtp(data.devOtp);
-        toast({
-          title: "Development Mode",
-          description: `OTP: ${data.devOtp} (Email not sent - Resend test mode)`,
-          duration: 15000,
-        });
-      } else {
-        toast({
-          title: "OTP Sent!",
-          description: "Please check your email for the verification code.",
-        });
-      }
-    } catch (error: any) {
+    if (!name.trim()) {
       toast({
-        title: "Error",
-        description: error.message || "Failed to send OTP. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const verifyOTP = async () => {
-    if (otp.length !== 6) {
-      toast({
-        title: "Invalid OTP",
-        description: "Please enter the 6-digit code.",
+        title: "Name Required",
+        description: "Please enter your name.",
         variant: "destructive",
       });
       return;
     }
 
-    setIsVerifying(true);
-    try {
-      const { data, error } = await supabase.functions.invoke("verify-email-otp", {
-        body: { email, otp, profileId },
+    if (!phone.trim()) {
+      toast({
+        title: "Phone Required",
+        description: "Please enter your phone number.",
+        variant: "destructive",
       });
+      return;
+    }
 
-      if (error) throw error;
+    setIsLoading(true);
+    try {
+      // Check if profile exists or create new one
+      const { data: existingProfile } = await supabase
+        .from("profiles")
+        .select("id")
+        .eq("email", email)
+        .maybeSingle();
 
-      if (data.success) {
-        toast({
-          title: "Email Verified!",
-          description: "Your email has been verified successfully.",
-        });
-        onComplete({ email, profileId });
+      let profileId: string;
+
+      if (existingProfile) {
+        // Update existing profile
+        const { error: updateError } = await supabase
+          .from("profiles")
+          .update({ name, gender, phone, profile_for: profileFor })
+          .eq("id", existingProfile.id);
+
+        if (updateError) throw updateError;
+        profileId = existingProfile.id;
       } else {
-        throw new Error(data.message || "Invalid OTP");
+        // Create new profile
+        const { data: newProfile, error: insertError } = await supabase
+          .from("profiles")
+          .insert({ email, name, gender, phone, profile_for: profileFor })
+          .select("id")
+          .single();
+
+        if (insertError) throw insertError;
+        profileId = newProfile.id;
       }
+
+      toast({
+        title: "Profile Created!",
+        description: "Proceeding to the next step.",
+      });
+      
+      onComplete({ email, profileId });
     } catch (error: any) {
       toast({
-        title: "Verification Failed",
-        description: error.message || "Invalid or expired OTP.",
+        title: "Error",
+        description: error.message || "Failed to create profile. Please try again.",
         variant: "destructive",
       });
     } finally {
-      setIsVerifying(false);
+      setIsLoading(false);
     }
-  };
-
-  const resendOTP = async () => {
-    setOtp("");
-    await sendOTP();
   };
 
   return (
@@ -128,109 +107,114 @@ const EmailOTPStep = ({ onComplete }: EmailOTPStepProps) => {
           <Mail className="w-8 h-8 text-primary" />
         </div>
         <h2 className="text-2xl font-display font-bold text-foreground">
-          {otpSent ? "Verify Your Email" : "Enter Your Email"}
+          Basic Details
         </h2>
         <p className="text-muted-foreground">
-          {otpSent
-            ? `We've sent a 6-digit code to ${email}`
-            : "We'll send you a verification code"}
+          Let's start with your basic information
         </p>
       </div>
 
-      {!otpSent ? (
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="email">Email Address *</Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="your.email@example.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="h-12"
-            />
-          </div>
-          <Button
-            onClick={sendOTP}
-            disabled={isLoading || !email}
-            className="w-full h-12"
-            variant="primary"
-          >
-            {isLoading ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Sending...
-              </>
-            ) : (
-              <>
-                Send Verification Code
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </>
-            )}
-          </Button>
+      <div className="space-y-4">
+        <div className="space-y-2">
+          <Label htmlFor="name">Full Name *</Label>
+          <Input
+            id="name"
+            type="text"
+            placeholder="Enter your full name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className="h-12"
+          />
         </div>
-      ) : (
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <Label>Enter 6-Digit Code</Label>
-            <div className="flex justify-center">
-              <InputOTP
-                maxLength={6}
-                value={otp}
-                onChange={(value) => setOtp(value)}
-              >
-                <InputOTPGroup>
-                  <InputOTPSlot index={0} />
-                  <InputOTPSlot index={1} />
-                  <InputOTPSlot index={2} />
-                  <InputOTPSlot index={3} />
-                  <InputOTPSlot index={4} />
-                  <InputOTPSlot index={5} />
-                </InputOTPGroup>
-              </InputOTP>
-            </div>
-          </div>
 
-          {devOtp && (
-            <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 text-center">
-              <p className="text-xs text-amber-600 font-medium">Development Mode - OTP:</p>
-              <p className="text-2xl font-bold text-amber-700 tracking-widest">{devOtp}</p>
-              <p className="text-xs text-amber-500 mt-1">Verify domain at resend.com for production</p>
-            </div>
+        <div className="space-y-2">
+          <Label htmlFor="email">Email Address *</Label>
+          <Input
+            id="email"
+            type="email"
+            placeholder="your.email@example.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="h-12"
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="phone">Phone Number *</Label>
+          <Input
+            id="phone"
+            type="tel"
+            placeholder="Enter your phone number"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            className="h-12"
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label>Gender *</Label>
+          <div className="flex gap-4">
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="radio"
+                name="gender"
+                value="male"
+                checked={gender === "male"}
+                onChange={(e) => setGender(e.target.value)}
+                className="w-4 h-4 text-primary"
+              />
+              <span>Male</span>
+            </label>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="radio"
+                name="gender"
+                value="female"
+                checked={gender === "female"}
+                onChange={(e) => setGender(e.target.value)}
+                className="w-4 h-4 text-primary"
+              />
+              <span>Female</span>
+            </label>
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <Label>Profile For *</Label>
+          <select
+            value={profileFor}
+            onChange={(e) => setProfileFor(e.target.value)}
+            className="w-full h-12 px-3 rounded-md border border-input bg-background text-foreground"
+          >
+            <option value="myself">Myself</option>
+            <option value="son">Son</option>
+            <option value="daughter">Daughter</option>
+            <option value="brother">Brother</option>
+            <option value="sister">Sister</option>
+            <option value="relative">Relative</option>
+            <option value="friend">Friend</option>
+          </select>
+        </div>
+
+        <Button
+          onClick={handleSubmit}
+          disabled={isLoading || !email || !name || !phone}
+          className="w-full h-12"
+          variant="primary"
+        >
+          {isLoading ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Creating Profile...
+            </>
+          ) : (
+            <>
+              Continue
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </>
           )}
-
-          <Button
-            onClick={verifyOTP}
-            disabled={isVerifying || otp.length !== 6}
-            className="w-full h-12"
-            variant="primary"
-          >
-            {isVerifying ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Verifying...
-              </>
-            ) : (
-              <>
-                Verify Email
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </>
-            )}
-          </Button>
-
-          <div className="text-center">
-            <Button
-              variant="ghost"
-              onClick={resendOTP}
-              disabled={isLoading}
-              className="text-sm"
-            >
-              <RefreshCw className="mr-2 h-4 w-4" />
-              Resend Code
-            </Button>
-          </div>
-        </div>
-      )}
+        </Button>
+      </div>
     </div>
   );
 };
