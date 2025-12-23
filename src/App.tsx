@@ -9,8 +9,6 @@ import Contact from "./pages/Contact";
 import Login from "./pages/Login";
 import StaffLogin from "./pages/StaffLogin";
 import StaffDashboard from "./pages/StaffDashboard";
-
-import RegisterV2 from "./pages/RegisterV2";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -28,8 +26,6 @@ const App = () => (
           <Route path="/login" element={<Login />} />
           <Route path="/staff-login" element={<StaffLogin />} />
           <Route path="/staff-dashboard" element={<StaffDashboard />} />
-          
-          <Route path="/register-v2" element={<RegisterV2 />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
