@@ -41,14 +41,14 @@ const AboutFullSection = () => {
         <div className="container">
           <div className="max-w-3xl mx-auto text-center">
             <span className="inline-block px-4 py-2 bg-primary/10 text-primary rounded-full text-sm font-medium mb-6">
-              About Lakshmi Matrimony
+              About Vikshana Matrimony
             </span>
             <h2 className="font-display text-4xl md:text-5xl font-bold text-foreground mb-6">
               Where <span className="text-primary">Traditions</span> Meet{" "}
               <span className="text-secondary">Modern Love</span>
             </h2>
             <p className="text-lg text-muted-foreground leading-relaxed">
-              For over 15 years, Lakshmi Matrimony has been the trusted bridge connecting 
+              For over 15 years, Vikshana Matrimony has been the trusted bridge connecting 
               hearts and families. We understand that finding a life partner is one of life's 
               most important decisions, and we're honored to be part of your journey.
             </p>
@@ -65,7 +65,7 @@ const AboutFullSection = () => {
                 Our Story
               </h3>
               <p className="text-muted-foreground leading-relaxed">
-                Lakshmi Matrimony was founded with a simple yet profound vision: to help 
+                Vikshana Matrimony was founded with a simple yet profound vision: to help 
                 individuals find their soulmates while honoring the rich traditions that 
                 make Indian marriages so special.
               </p>
@@ -112,7 +112,7 @@ const AboutFullSection = () => {
               Our Core Values
             </h3>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              These principles guide everything we do at Lakshmi Matrimony
+              These principles guide everything we do at Vikshana Matrimony
             </p>
           </div>
 
@@ -144,7 +144,7 @@ const AboutFullSection = () => {
             Ready to Find Your Perfect Match?
           </h3>
           <p className="text-primary-foreground/80 mb-8 max-w-xl mx-auto">
-            Join thousands of families who have trusted Lakshmi Matrimony to find their 
+            Join thousands of families who have trusted Vikshana Matrimony to find their 
             life partner. Your beautiful journey begins here.
           </p>
           <a

@@ -41,7 +41,7 @@ const Login = () => {
       const isEmail = identifier.includes("@");
       
       const { error } = await supabase.auth.signInWithPassword({
-        email: isEmail ? identifier : `${identifier}@phone.lakshmimatrimony.com`,
+        email: isEmail ? identifier : `${identifier}@phone.vikshanamatrimony.com`,
         password,
       });
 
@@ -210,7 +210,7 @@ const Login = () => {
             </h2>
             <p className="mt-4 text-slate-400 text-lg">
               Find your perfect match with<br />
-              <span className="text-secondary font-semibold">Lakshmi Matrimony</span>
+              <span className="text-secondary font-semibold">Vikshana Matrimony</span>
             </p>
           </div>
         </div>

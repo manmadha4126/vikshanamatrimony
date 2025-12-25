@@ -27,7 +27,7 @@ const Header = () => {
         <Link to="/" className="flex items-center gap-3">
           <div className="flex items-center">
             <span className="font-display text-2xl font-bold text-primary">
-              Lakshmi
+              Vikshana
             </span>
             <span className="font-display text-2xl font-medium text-secondary">
               {" "}Matrimony

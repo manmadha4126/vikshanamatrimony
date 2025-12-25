@@ -10,7 +10,7 @@ const Footer = () => {
           <div className="space-y-4">
             <div className="flex items-center">
               <span className="font-display text-xl font-bold text-primary-foreground">
-                Lakshmi
+                Vikshana
               </span>
               <span className="font-display text-xl font-medium text-secondary">
                 {" "}Matrimony
@@ -52,7 +52,7 @@ const Footer = () => {
               </div>
               <div className="flex items-center gap-3 text-sm text-primary-foreground/80">
                 <Mail size={16} className="text-secondary" />
-                <span>info@lakshmimatrimony.com</span>
+                <span>info@vikshanamatrimony.com</span>
               </div>
             </div>
           </div>
@@ -89,7 +89,7 @@ const Footer = () => {
         <div className="container py-6">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-center">
             <p className="text-sm text-primary-foreground/70">
-              © {new Date().getFullYear()} Lakshmi Matrimony. All Rights Reserved.
+              © {new Date().getFullYear()} Vikshana Matrimony. All Rights Reserved.
             </p>
             <p className="text-xs text-primary-foreground/60 italic">
               Disclaimer: This website is strictly for matrimonial purposes only and not a dating website.

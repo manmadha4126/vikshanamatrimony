@@ -40,7 +40,7 @@ const FeaturesSection = () => {
         <div className="text-center mb-16">
           <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-4">
             Why Choose{" "}
-            <span className="text-primary">Lakshmi</span>
+            <span className="text-primary">Vikshana</span>
             <span className="text-secondary"> Matrimony</span>?
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">

@@ -38,11 +38,11 @@ serve(async (req: Request): Promise<Response> => {
       <body style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; background-color: #f9f5f2;">
         <div style="max-width: 600px; margin: 0 auto; padding: 40px 20px;">
           <div style="background: linear-gradient(135deg, #722f37 0%, #8b4513 100%); padding: 30px; border-radius: 16px 16px 0 0; text-align: center;">
-            <h1 style="color: #ffffff; margin: 0; font-size: 28px;">Lakshmi Matrimony</h1>
+            <h1 style="color: #ffffff; margin: 0; font-size: 28px;">Vikshana Matrimony</h1>
             <p style="color: #f0e6d3; margin: 10px 0 0 0; font-size: 14px;">Finding your perfect match</p>
           </div>
           <div style="background-color: #ffffff; padding: 40px 30px; border-radius: 0 0 16px 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.1);">
-            <h2 style="color: #722f37; margin: 0 0 20px 0; font-size: 24px;">Welcome to Lakshmi Matrimony, ${name}!</h2>
+            <h2 style="color: #722f37; margin: 0 0 20px 0; font-size: 24px;">Welcome to Vikshana Matrimony, ${name}!</h2>
             <p style="color: #666; line-height: 1.6; margin: 0 0 25px 0;">
               Congratulations! Your account has been successfully created. We're excited to help you find your perfect life partner.
             </p>
@@ -62,14 +62,14 @@ serve(async (req: Request): Promise<Response> => {
               <li>Quick login assistance</li>
             </ul>
             <div style="text-align: center; margin-top: 30px;">
-              <a href="${Deno.env.get("SUPABASE_URL")?.replace('.supabase.co', '.lovable.app') || 'https://lakshmimatrimony.com'}/login" 
+              <a href="${Deno.env.get("SUPABASE_URL")?.replace('.supabase.co', '.lovable.app') || 'https://vikshanamatrimony.com'}/login" 
                  style="display: inline-block; background: linear-gradient(135deg, #722f37 0%, #8b4513 100%); color: #ffffff; text-decoration: none; padding: 15px 40px; border-radius: 8px; font-weight: bold; font-size: 16px;">
                 Login to Your Account
               </a>
             </div>
           </div>
           <div style="text-align: center; padding: 20px; color: #999; font-size: 12px;">
-            <p style="margin: 0;">© 2024 Lakshmi Matrimony. All rights reserved.</p>
+            <p style="margin: 0;">© 2024 Vikshana Matrimony. All rights reserved.</p>
             <p style="margin: 5px 0 0 0;">This website is strictly for matrimonial purpose only.</p>
           </div>
         </div>
@@ -84,9 +84,9 @@ serve(async (req: Request): Promise<Response> => {
         Authorization: `Bearer ${RESEND_API_KEY}`,
       },
       body: JSON.stringify({
-        from: "Lakshmi Matrimony <onboarding@resend.dev>",
+        from: "Vikshana Matrimony <onboarding@resend.dev>",
         to: [email],
-        subject: `Welcome to Lakshmi Matrimony - Your Profile ID: ${profileId}`,
+        subject: `Welcome to Vikshana Matrimony - Your Profile ID: ${profileId}`,
         html: emailHtml,
       }),
     });
