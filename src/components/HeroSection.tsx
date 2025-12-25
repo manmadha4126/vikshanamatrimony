@@ -26,7 +26,7 @@ const HeroSection = () => {
               <span className="text-secondary">Life Partner</span>
             </h1>
             <p className="text-lg text-muted-foreground leading-relaxed max-w-2xl mx-auto mb-8">
-              Join thousands of families who have found their perfect match through Lakshmi Matrimony. 
+              Join thousands of families who have found their perfect match through Vikshana Matrimony. 
               Your journey to a beautiful marriage begins here, rooted in tradition and trust.
             </p>
             <Button 

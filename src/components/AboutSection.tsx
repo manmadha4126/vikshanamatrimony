@@ -14,7 +14,7 @@ const AboutSection = () => {
               <span className="text-secondary">Families</span>
             </h2>
             <p className="text-muted-foreground leading-relaxed">
-              At Lakshmi Matrimony, we understand that marriage is not just a union of two individuals, 
+              At Vikshana Matrimony, we understand that marriage is not just a union of two individuals, 
               but a sacred bond that brings two families together. For over 15 years, we have been 
               the trusted partner for thousands of families seeking to find the perfect life partner 
               for their loved ones.
