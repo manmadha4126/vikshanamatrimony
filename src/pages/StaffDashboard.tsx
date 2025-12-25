@@ -13,7 +13,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { RefreshCw, Users, CheckCircle, Clock, Search, ChevronLeft, ChevronRight, UserPlus, Edit, Trash2 } from "lucide-react";
+import { RefreshCw, Users, CheckCircle, Clock, Search, ChevronLeft, ChevronRight, UserPlus, Edit, Trash2, Home } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -227,11 +227,22 @@ const StaffDashboard = () => {
       {/* Header */}
       <header className="bg-white shadow-sm border-b border-gold/20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-          <div>
-            <h1 className="text-2xl font-bold text-maroon">Staff Dashboard</h1>
-            <p className="text-sm text-muted-foreground">
-              Welcome, {user?.email} • <span className="capitalize font-medium">{userRole}</span>
-            </p>
+          <div className="flex items-center gap-4">
+            <Button
+              onClick={() => navigate("/")}
+              variant="outline"
+              size="sm"
+              className="border-primary text-primary hover:bg-primary hover:text-primary-foreground"
+            >
+              <Home className="w-4 h-4 mr-2" />
+              Back to Home
+            </Button>
+            <div>
+              <h1 className="text-2xl font-bold text-maroon">Staff Dashboard</h1>
+              <p className="text-sm text-muted-foreground">
+                Welcome, {user?.email} • <span className="capitalize font-medium">{userRole}</span>
+              </p>
+            </div>
           </div>
           <Button
             onClick={handleLogout}
