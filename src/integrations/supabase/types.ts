@@ -16,6 +16,7 @@ export type Database = {
     Tables: {
       profiles: {
         Row: {
+          admin_notes: string | null
           annual_income: string | null
           caste: string | null
           city: string | null
@@ -55,8 +56,10 @@ export type Database = {
           sub_caste: string | null
           updated_at: string
           user_id: string | null
+          verification_status: string | null
         }
         Insert: {
+          admin_notes?: string | null
           annual_income?: string | null
           caste?: string | null
           city?: string | null
@@ -96,8 +99,10 @@ export type Database = {
           sub_caste?: string | null
           updated_at?: string
           user_id?: string | null
+          verification_status?: string | null
         }
         Update: {
+          admin_notes?: string | null
           annual_income?: string | null
           caste?: string | null
           city?: string | null
@@ -137,6 +142,7 @@ export type Database = {
           sub_caste?: string | null
           updated_at?: string
           user_id?: string | null
+          verification_status?: string | null
         }
         Relationships: []
       }

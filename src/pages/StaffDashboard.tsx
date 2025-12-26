@@ -13,7 +13,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { RefreshCw, Users, CheckCircle, Clock, Search, ChevronLeft, ChevronRight, UserPlus, Edit, Trash2, Home } from "lucide-react";
+import { RefreshCw, Users, CheckCircle, Clock, Search, ChevronLeft, ChevronRight, UserPlus, Edit, Trash2, Home, XCircle, Phone, Mail, MapPin, Briefcase, GraduationCap, User as UserIcon, Calendar, Heart } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -39,6 +39,11 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Textarea } from "@/components/ui/textarea";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Separator } from "@/components/ui/separator";
 
 interface Profile {
   id: string;
@@ -49,8 +54,35 @@ interface Profile {
   gender: string;
   profile_for: string | null;
   email_verified: boolean;
+  verification_status: string | null;
+  admin_notes: string | null;
   created_at: string;
+  // Full profile details
+  date_of_birth: string | null;
+  mother_tongue: string | null;
+  height: string | null;
+  marital_status: string | null;
+  religion: string | null;
+  caste: string | null;
+  sub_caste: string | null;
+  gothram: string | null;
+  star: string | null;
+  dosham: string | null;
+  family_status: string | null;
+  family_type: string | null;
+  country: string | null;
+  state: string | null;
+  city: string | null;
+  education: string | null;
+  education_detail: string | null;
+  employment_type: string | null;
+  occupation: string | null;
+  company_name: string | null;
+  annual_income: string | null;
+  photo_url: string | null;
 }
+
+type VerificationFilter = "all" | "pending" | "verified" | "rejected";
 
 const StaffDashboard = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -65,13 +97,16 @@ const StaffDashboard = () => {
   const [activeSection, setActiveSection] = useState<"profiles" | "add">("profiles");
   const [deleteProfile, setDeleteProfile] = useState<Profile | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [verificationFilter, setVerificationFilter] = useState<VerificationFilter>("all");
+  const [verifyingProfile, setVerifyingProfile] = useState(false);
+  const [adminNotes, setAdminNotes] = useState("");
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  // Reset to page 1 when search changes
+  // Reset to page 1 when search or filter changes
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchQuery]);
+  }, [searchQuery, verificationFilter]);
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
@@ -124,7 +159,7 @@ const StaffDashboard = () => {
     try {
       const { data, error } = await supabase
         .from("profiles")
-        .select("id, profile_id, name, email, phone, gender, profile_for, email_verified, created_at")
+        .select("*")
         .order("created_at", { ascending: false });
 
       if (error) throw error;
@@ -180,8 +215,41 @@ const StaffDashboard = () => {
   };
 
   const handleEditProfile = (profile: Profile) => {
-    // Navigate to register page with profile data for editing
     navigate(`/register?edit=${profile.id}`);
+  };
+
+  const handleVerifyProfile = async (status: "verified" | "rejected") => {
+    if (!selectedProfile) return;
+    setVerifyingProfile(true);
+    try {
+      const { error } = await supabase
+        .from("profiles")
+        .update({ 
+          verification_status: status,
+          email_verified: status === "verified",
+          admin_notes: adminNotes || null
+        })
+        .eq("id", selectedProfile.id);
+      
+      if (error) throw error;
+      
+      toast({
+        title: status === "verified" ? "Profile Verified" : "Profile Rejected",
+        description: `Profile ${selectedProfile.profile_id || selectedProfile.name} has been ${status}.`,
+      });
+      setSelectedProfile(null);
+      setAdminNotes("");
+      fetchProfiles();
+    } catch (error: any) {
+      console.error("Error updating profile:", error);
+      toast({
+        title: "Error",
+        description: "Failed to update profile status",
+        variant: "destructive",
+      });
+    } finally {
+      setVerifyingProfile(false);
+    }
   };
 
   const formatDate = (dateString: string) => {
@@ -194,6 +262,38 @@ const StaffDashboard = () => {
     });
   };
 
+  const formatDOB = (dateString: string | null) => {
+    if (!dateString) return "-";
+    return new Date(dateString).toLocaleDateString("en-IN", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    });
+  };
+
+  const calculateAge = (dateString: string | null) => {
+    if (!dateString) return null;
+    const today = new Date();
+    const birthDate = new Date(dateString);
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const m = today.getMonth() - birthDate.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    return age;
+  };
+
+  const getStatusBadge = (status: string | null) => {
+    switch (status) {
+      case "verified":
+        return <Badge className="bg-green-100 text-green-700 hover:bg-green-100">Verified</Badge>;
+      case "rejected":
+        return <Badge className="bg-red-100 text-red-700 hover:bg-red-100">Rejected</Badge>;
+      default:
+        return <Badge variant="secondary" className="bg-yellow-100 text-yellow-700">Pending</Badge>;
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-cream via-white to-cream">
@@ -202,7 +302,15 @@ const StaffDashboard = () => {
     );
   }
 
-  const filteredProfiles = profiles.filter((profile) => {
+  // Filter profiles based on verification status
+  const statusFilteredProfiles = profiles.filter((profile) => {
+    if (verificationFilter === "all") return true;
+    const status = profile.verification_status || "pending";
+    return status === verificationFilter;
+  });
+
+  // Then apply search filter
+  const filteredProfiles = statusFilteredProfiles.filter((profile) => {
     const query = searchQuery.toLowerCase();
     return (
       (profile.profile_id?.toLowerCase() || "").includes(query) ||
@@ -217,10 +325,10 @@ const StaffDashboard = () => {
   const endIndex = startIndex + itemsPerPage;
   const paginatedProfiles = filteredProfiles.slice(startIndex, endIndex);
 
-
   const totalRegistrations = profiles.length;
-  const verifiedProfiles = profiles.filter(p => p.email_verified).length;
-  const pendingVerification = profiles.filter(p => !p.email_verified).length;
+  const verifiedProfiles = profiles.filter(p => p.verification_status === "verified").length;
+  const pendingVerification = profiles.filter(p => !p.verification_status || p.verification_status === "pending").length;
+  const rejectedProfiles = profiles.filter(p => p.verification_status === "rejected").length;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-cream via-white to-cream">
@@ -257,7 +365,7 @@ const StaffDashboard = () => {
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <div className="bg-white rounded-xl shadow-md p-6 border border-gold/20">
             <div className="flex items-center gap-4">
               <div className="p-3 bg-primary/10 rounded-lg">
@@ -290,6 +398,18 @@ const StaffDashboard = () => {
               <div>
                 <h3 className="text-sm font-medium text-muted-foreground">Pending Verification</h3>
                 <p className="text-3xl font-bold text-foreground">{pendingVerification}</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-xl shadow-md p-6 border border-gold/20">
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-red-100 rounded-lg">
+                <XCircle className="w-6 h-6 text-red-600" />
+              </div>
+              <div>
+                <h3 className="text-sm font-medium text-muted-foreground">Rejected Profiles</h3>
+                <p className="text-3xl font-bold text-foreground">{rejectedProfiles}</p>
               </div>
             </div>
           </div>
@@ -366,19 +486,32 @@ const StaffDashboard = () => {
               </div>
               
               {/* Search Input */}
-              <div className="relative max-w-md">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                <Input
-                  type="text"
-                  placeholder="Search by Profile ID, Name, or Email..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10"
-                />
+              <div className="flex flex-col sm:flex-row gap-4">
+                <div className="relative flex-1 max-w-md">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <Input
+                    type="text"
+                    placeholder="Search by Profile ID, Name, or Email..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pl-10"
+                  />
+                </div>
+
+                {/* Status Filter Tabs */}
+                <Tabs value={verificationFilter} onValueChange={(v) => setVerificationFilter(v as VerificationFilter)}>
+                  <TabsList className="grid grid-cols-4 w-full sm:w-auto">
+                    <TabsTrigger value="all" className="text-xs sm:text-sm">All ({profiles.length})</TabsTrigger>
+                    <TabsTrigger value="verified" className="text-xs sm:text-sm text-green-700">Verified ({verifiedProfiles})</TabsTrigger>
+                    <TabsTrigger value="pending" className="text-xs sm:text-sm text-yellow-700">Pending ({pendingVerification})</TabsTrigger>
+                    <TabsTrigger value="rejected" className="text-xs sm:text-sm text-red-700">Rejected ({rejectedProfiles})</TabsTrigger>
+                  </TabsList>
+                </Tabs>
               </div>
+
               {searchQuery && (
                 <p className="text-sm text-muted-foreground">
-                  Showing {filteredProfiles.length} of {profiles.length} profiles
+                  Showing {filteredProfiles.length} of {statusFilteredProfiles.length} profiles
                 </p>
               )}
             </div>
@@ -410,7 +543,10 @@ const StaffDashboard = () => {
                       <TableRow 
                         key={profile.id} 
                         className="cursor-pointer hover:bg-muted/50 transition-colors"
-                        onClick={() => setSelectedProfile(profile)}
+                        onClick={() => {
+                          setSelectedProfile(profile);
+                          setAdminNotes(profile.admin_notes || "");
+                        }}
                       >
                         <TableCell className="font-mono font-bold text-primary">{profile.profile_id || "-"}</TableCell>
                         <TableCell className="font-medium">{profile.name}</TableCell>
@@ -419,15 +555,7 @@ const StaffDashboard = () => {
                         <TableCell>{profile.email}</TableCell>
                         <TableCell>{profile.phone}</TableCell>
                         <TableCell>
-                          {profile.email_verified ? (
-                            <Badge className="bg-green-100 text-green-700 hover:bg-green-100">
-                              Verified
-                            </Badge>
-                          ) : (
-                            <Badge variant="secondary" className="bg-yellow-100 text-yellow-700">
-                              Pending
-                            </Badge>
-                          )}
+                          {getStatusBadge(profile.verification_status)}
                         </TableCell>
                         <TableCell className="text-sm text-muted-foreground">
                           {formatDate(profile.created_at)}
@@ -550,66 +678,267 @@ const StaffDashboard = () => {
         )}
       </main>
 
-      {/* Profile Detail Modal */}
+      {/* Full Profile Detail Modal */}
       <Dialog open={!!selectedProfile} onOpenChange={(open) => !open && setSelectedProfile(null)}>
-        <DialogContent className="max-w-lg">
-          <DialogHeader>
-            <DialogTitle className="text-maroon flex items-center gap-2">
-              Profile Details
-              {selectedProfile?.profile_id && (
-                <span className="font-mono text-sm bg-primary/10 text-primary px-2 py-1 rounded">
-                  {selectedProfile.profile_id}
-                </span>
-              )}
+        <DialogContent className="max-w-3xl max-h-[90vh] p-0">
+          <DialogHeader className="p-6 pb-0">
+            <DialogTitle className="text-maroon flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                Profile Details
+                {selectedProfile?.profile_id && (
+                  <span className="font-mono text-sm bg-primary/10 text-primary px-2 py-1 rounded">
+                    {selectedProfile.profile_id}
+                  </span>
+                )}
+              </div>
+              {selectedProfile && getStatusBadge(selectedProfile.verification_status)}
             </DialogTitle>
           </DialogHeader>
           
           {selectedProfile && (
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1">
-                  <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Name</label>
-                  <p className="font-medium">{selectedProfile.name}</p>
-                </div>
-                <div className="space-y-1">
-                  <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Gender</label>
-                  <p className="capitalize">{selectedProfile.gender}</p>
-                </div>
-                <div className="space-y-1">
-                  <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Profile For</label>
-                  <p className="capitalize">{selectedProfile.profile_for || "-"}</p>
-                </div>
-                <div className="space-y-1">
-                  <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Status</label>
-                  <div>
-                    {selectedProfile.email_verified ? (
-                      <Badge className="bg-green-100 text-green-700 hover:bg-green-100">
-                        Verified
-                      </Badge>
-                    ) : (
-                      <Badge variant="secondary" className="bg-yellow-100 text-yellow-700">
-                        Pending Verification
-                      </Badge>
-                    )}
+            <ScrollArea className="max-h-[calc(90vh-180px)]">
+              <div className="p-6 space-y-6">
+                {/* Profile Header with Photo */}
+                <div className="flex items-start gap-6">
+                  <Avatar className="w-24 h-24 border-2 border-primary/20">
+                    <AvatarImage src={selectedProfile.photo_url || undefined} alt={selectedProfile.name} />
+                    <AvatarFallback className="text-2xl bg-primary/10 text-primary">
+                      {selectedProfile.name.charAt(0).toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1 space-y-2">
+                    <h3 className="text-2xl font-bold text-foreground">{selectedProfile.name}</h3>
+                    <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
+                      <span className="flex items-center gap-1">
+                        <Mail className="w-4 h-4" />
+                        {selectedProfile.email}
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <Phone className="w-4 h-4" />
+                        {selectedProfile.phone}
+                      </span>
+                    </div>
+                    <p className="text-sm">
+                      <span className="text-muted-foreground">Profile For:</span>{" "}
+                      <span className="capitalize font-medium">{selectedProfile.profile_for || "-"}</span>
+                    </p>
                   </div>
                 </div>
+
+                <Separator />
+
+                {/* Personal Details */}
+                <div className="space-y-3">
+                  <h4 className="font-semibold text-maroon flex items-center gap-2">
+                    <UserIcon className="w-4 h-4" />
+                    Personal Details
+                  </h4>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
+                    <div>
+                      <label className="text-xs text-muted-foreground uppercase">Gender</label>
+                      <p className="capitalize font-medium">{selectedProfile.gender}</p>
+                    </div>
+                    <div>
+                      <label className="text-xs text-muted-foreground uppercase">Date of Birth</label>
+                      <p className="font-medium">{formatDOB(selectedProfile.date_of_birth)}</p>
+                    </div>
+                    <div>
+                      <label className="text-xs text-muted-foreground uppercase">Age</label>
+                      <p className="font-medium">{calculateAge(selectedProfile.date_of_birth) || "-"} years</p>
+                    </div>
+                    <div>
+                      <label className="text-xs text-muted-foreground uppercase">Height</label>
+                      <p className="font-medium">{selectedProfile.height || "-"}</p>
+                    </div>
+                    <div>
+                      <label className="text-xs text-muted-foreground uppercase">Mother Tongue</label>
+                      <p className="font-medium">{selectedProfile.mother_tongue || "-"}</p>
+                    </div>
+                    <div>
+                      <label className="text-xs text-muted-foreground uppercase">Marital Status</label>
+                      <p className="capitalize font-medium">{selectedProfile.marital_status || "-"}</p>
+                    </div>
+                  </div>
+                </div>
+
+                <Separator />
+
+                {/* Religion & Caste */}
+                <div className="space-y-3">
+                  <h4 className="font-semibold text-maroon flex items-center gap-2">
+                    <Heart className="w-4 h-4" />
+                    Religion & Caste
+                  </h4>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
+                    <div>
+                      <label className="text-xs text-muted-foreground uppercase">Religion</label>
+                      <p className="font-medium">{selectedProfile.religion || "-"}</p>
+                    </div>
+                    <div>
+                      <label className="text-xs text-muted-foreground uppercase">Caste</label>
+                      <p className="font-medium">{selectedProfile.caste || "-"}</p>
+                    </div>
+                    <div>
+                      <label className="text-xs text-muted-foreground uppercase">Sub Caste</label>
+                      <p className="font-medium">{selectedProfile.sub_caste || "-"}</p>
+                    </div>
+                    <div>
+                      <label className="text-xs text-muted-foreground uppercase">Gothram</label>
+                      <p className="font-medium">{selectedProfile.gothram || "-"}</p>
+                    </div>
+                    <div>
+                      <label className="text-xs text-muted-foreground uppercase">Star</label>
+                      <p className="font-medium">{selectedProfile.star || "-"}</p>
+                    </div>
+                    <div>
+                      <label className="text-xs text-muted-foreground uppercase">Dosham</label>
+                      <p className="font-medium">{selectedProfile.dosham || "-"}</p>
+                    </div>
+                  </div>
+                </div>
+
+                <Separator />
+
+                {/* Family Details */}
+                <div className="space-y-3">
+                  <h4 className="font-semibold text-maroon flex items-center gap-2">
+                    <Users className="w-4 h-4" />
+                    Family Details
+                  </h4>
+                  <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div>
+                      <label className="text-xs text-muted-foreground uppercase">Family Status</label>
+                      <p className="font-medium">{selectedProfile.family_status || "-"}</p>
+                    </div>
+                    <div>
+                      <label className="text-xs text-muted-foreground uppercase">Family Type</label>
+                      <p className="font-medium">{selectedProfile.family_type || "-"}</p>
+                    </div>
+                  </div>
+                </div>
+
+                <Separator />
+
+                {/* Location */}
+                <div className="space-y-3">
+                  <h4 className="font-semibold text-maroon flex items-center gap-2">
+                    <MapPin className="w-4 h-4" />
+                    Location
+                  </h4>
+                  <div className="grid grid-cols-3 gap-4 text-sm">
+                    <div>
+                      <label className="text-xs text-muted-foreground uppercase">Country</label>
+                      <p className="font-medium">{selectedProfile.country || "-"}</p>
+                    </div>
+                    <div>
+                      <label className="text-xs text-muted-foreground uppercase">State</label>
+                      <p className="font-medium">{selectedProfile.state || "-"}</p>
+                    </div>
+                    <div>
+                      <label className="text-xs text-muted-foreground uppercase">City</label>
+                      <p className="font-medium">{selectedProfile.city || "-"}</p>
+                    </div>
+                  </div>
+                </div>
+
+                <Separator />
+
+                {/* Education & Career */}
+                <div className="space-y-3">
+                  <h4 className="font-semibold text-maroon flex items-center gap-2">
+                    <GraduationCap className="w-4 h-4" />
+                    Education & Career
+                  </h4>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
+                    <div>
+                      <label className="text-xs text-muted-foreground uppercase">Education</label>
+                      <p className="font-medium">{selectedProfile.education || "-"}</p>
+                    </div>
+                    <div>
+                      <label className="text-xs text-muted-foreground uppercase">Education Detail</label>
+                      <p className="font-medium">{selectedProfile.education_detail || "-"}</p>
+                    </div>
+                    <div>
+                      <label className="text-xs text-muted-foreground uppercase">Employment Type</label>
+                      <p className="font-medium">{selectedProfile.employment_type || "-"}</p>
+                    </div>
+                    <div>
+                      <label className="text-xs text-muted-foreground uppercase">Occupation</label>
+                      <p className="font-medium">{selectedProfile.occupation || "-"}</p>
+                    </div>
+                    <div>
+                      <label className="text-xs text-muted-foreground uppercase">Company</label>
+                      <p className="font-medium">{selectedProfile.company_name || "-"}</p>
+                    </div>
+                    <div>
+                      <label className="text-xs text-muted-foreground uppercase">Annual Income</label>
+                      <p className="font-medium">{selectedProfile.annual_income || "-"}</p>
+                    </div>
+                  </div>
+                </div>
+
+                <Separator />
+
+                {/* Registration Info */}
+                <div className="space-y-3">
+                  <h4 className="font-semibold text-maroon flex items-center gap-2">
+                    <Calendar className="w-4 h-4" />
+                    Registration Info
+                  </h4>
+                  <div className="text-sm">
+                    <label className="text-xs text-muted-foreground uppercase">Registered On</label>
+                    <p className="font-medium">{formatDate(selectedProfile.created_at)}</p>
+                  </div>
+                </div>
+
+                <Separator />
+
+                {/* Verification Section */}
+                <div className="space-y-4 bg-muted/30 p-4 rounded-lg">
+                  <h4 className="font-semibold text-maroon flex items-center gap-2">
+                    <Briefcase className="w-4 h-4" />
+                    Verification (Admin Action)
+                  </h4>
+                  <p className="text-sm text-muted-foreground">
+                    Call the customer to verify their details, then approve or reject the profile.
+                  </p>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Admin Notes (Optional)</label>
+                    <Textarea 
+                      placeholder="Add notes about the verification call..."
+                      value={adminNotes}
+                      onChange={(e) => setAdminNotes(e.target.value)}
+                      className="min-h-[80px]"
+                    />
+                  </div>
+                  <div className="flex gap-3">
+                    <Button 
+                      onClick={() => handleVerifyProfile("verified")}
+                      disabled={verifyingProfile}
+                      className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+                    >
+                      <CheckCircle className="w-4 h-4 mr-2" />
+                      {verifyingProfile ? "Processing..." : "Verify Profile"}
+                    </Button>
+                    <Button 
+                      onClick={() => handleVerifyProfile("rejected")}
+                      disabled={verifyingProfile}
+                      variant="destructive"
+                      className="flex-1"
+                    >
+                      <XCircle className="w-4 h-4 mr-2" />
+                      {verifyingProfile ? "Processing..." : "Reject Profile"}
+                    </Button>
+                  </div>
+                  {selectedProfile.admin_notes && (
+                    <div className="mt-3 p-3 bg-muted rounded-md">
+                      <label className="text-xs text-muted-foreground uppercase">Previous Admin Notes</label>
+                      <p className="text-sm mt-1">{selectedProfile.admin_notes}</p>
+                    </div>
+                  )}
+                </div>
               </div>
-              
-              <div className="border-t pt-4 space-y-3">
-                <div className="space-y-1">
-                  <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Email</label>
-                  <p className="font-medium">{selectedProfile.email}</p>
-                </div>
-                <div className="space-y-1">
-                  <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Phone</label>
-                  <p className="font-medium">{selectedProfile.phone}</p>
-                </div>
-                <div className="space-y-1">
-                  <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Registered On</label>
-                  <p className="text-sm text-muted-foreground">{formatDate(selectedProfile.created_at)}</p>
-                </div>
-              </div>
-            </div>
+            </ScrollArea>
           )}
         </DialogContent>
       </Dialog>
