@@ -277,12 +277,28 @@ const StaffDashboard = () => {
     if (!dateString) return null;
     const today = new Date();
     const birthDate = new Date(dateString);
-    let age = today.getFullYear() - birthDate.getFullYear();
-    const m = today.getMonth() - birthDate.getMonth();
-    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-      age--;
+    
+    let years = today.getFullYear() - birthDate.getFullYear();
+    let months = today.getMonth() - birthDate.getMonth();
+    
+    if (months < 0 || (months === 0 && today.getDate() < birthDate.getDate())) {
+      years--;
+      months += 12;
     }
-    return age;
+    
+    if (today.getDate() < birthDate.getDate()) {
+      months--;
+      if (months < 0) months += 12;
+    }
+    
+    return { years, months };
+  };
+
+  const formatAge = (dateString: string | null) => {
+    const age = calculateAge(dateString);
+    if (!age) return "-";
+    if (age.months === 0) return `${age.years} years`;
+    return `${age.years} years ${age.months} months`;
   };
 
   const getStatusBadge = (status: string | null) => {
@@ -746,7 +762,7 @@ const StaffDashboard = () => {
                     </div>
                     <div>
                       <label className="text-xs text-muted-foreground uppercase">Age</label>
-                      <p className="font-medium">{calculateAge(selectedProfile.date_of_birth) || "-"} years</p>
+                      <p className="font-medium">{formatAge(selectedProfile.date_of_birth)}</p>
                     </div>
                     <div>
                       <label className="text-xs text-muted-foreground uppercase">Height</label>
