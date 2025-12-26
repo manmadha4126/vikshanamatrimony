@@ -92,8 +92,11 @@ const StaffDashboard = () => {
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [loadingProfiles, setLoadingProfiles] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [totalCount, setTotalCount] = useState(0);
+  const [statusCounts, setStatusCounts] = useState({ all: 0, verified: 0, pending: 0, rejected: 0 });
   const [selectedProfile, setSelectedProfile] = useState<Profile | null>(null);
   const [activeSection, setActiveSection] = useState<"profiles" | "add">("profiles");
   const [deleteProfile, setDeleteProfile] = useState<Profile | null>(null);
@@ -105,10 +108,19 @@ const StaffDashboard = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  // Reset to page 1 when search or filter changes
+  // Debounce search query
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchQuery);
+      setCurrentPage(1);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  // Reset to page 1 when filter changes
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchQuery, verificationFilter]);
+  }, [verificationFilter]);
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
@@ -146,7 +158,7 @@ const StaffDashboard = () => {
       const hasAccess = roles.some(r => r.role === "admin" || r.role === "staff");
       if (hasAccess) {
         setUserRole(roles.find(r => r.role === "admin")?.role || roles[0].role);
-        fetchProfiles();
+        // fetchProfiles is handled by useEffect when userRole changes
       } else {
         navigate("/staff-login");
       }
@@ -156,16 +168,64 @@ const StaffDashboard = () => {
     setLoading(false);
   };
 
+  // Fetch status counts for dashboard stats
+  const fetchStatusCounts = async () => {
+    try {
+      const [allCount, verifiedCount, pendingCount, rejectedCount] = await Promise.all([
+        supabase.from("profiles").select("*", { count: "exact", head: true }),
+        supabase.from("profiles").select("*", { count: "exact", head: true }).eq("verification_status", "verified"),
+        supabase.from("profiles").select("*", { count: "exact", head: true }).or("verification_status.is.null,verification_status.eq.pending"),
+        supabase.from("profiles").select("*", { count: "exact", head: true }).eq("verification_status", "rejected"),
+      ]);
+      
+      setStatusCounts({
+        all: allCount.count || 0,
+        verified: verifiedCount.count || 0,
+        pending: pendingCount.count || 0,
+        rejected: rejectedCount.count || 0,
+      });
+    } catch (error) {
+      console.error("Error fetching status counts:", error);
+    }
+  };
+
   const fetchProfiles = async () => {
     setLoadingProfiles(true);
     try {
-      const { data, error } = await supabase
+      const from = (currentPage - 1) * itemsPerPage;
+      const to = from + itemsPerPage - 1;
+
+      // Build query with server-side filtering
+      let query = supabase
         .from("profiles")
-        .select("*")
-        .order("created_at", { ascending: false });
+        .select("*", { count: "exact" });
+
+      // Apply verification filter
+      if (verificationFilter === "verified") {
+        query = query.eq("verification_status", "verified");
+      } else if (verificationFilter === "pending") {
+        query = query.or("verification_status.is.null,verification_status.eq.pending");
+      } else if (verificationFilter === "rejected") {
+        query = query.eq("verification_status", "rejected");
+      }
+
+      // Apply search filter (server-side)
+      if (debouncedSearch) {
+        query = query.or(`profile_id.ilike.%${debouncedSearch}%,name.ilike.%${debouncedSearch}%,email.ilike.%${debouncedSearch}%`);
+      }
+
+      // Order and paginate
+      const { data, error, count } = await query
+        .order("created_at", { ascending: false })
+        .range(from, to);
 
       if (error) throw error;
+      
       setProfiles(data || []);
+      setTotalCount(count || 0);
+      
+      // Also refresh status counts
+      await fetchStatusCounts();
     } catch (error: any) {
       console.error("Error fetching profiles:", error);
       toast({
@@ -177,6 +237,13 @@ const StaffDashboard = () => {
       setLoadingProfiles(false);
     }
   };
+
+  // Fetch profiles when pagination, filter, or search changes
+  useEffect(() => {
+    if (userRole) {
+      fetchProfiles();
+    }
+  }, [currentPage, itemsPerPage, verificationFilter, debouncedSearch, userRole]);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -320,33 +387,16 @@ const StaffDashboard = () => {
     );
   }
 
-  // Filter profiles based on verification status
-  const statusFilteredProfiles = profiles.filter((profile) => {
-    if (verificationFilter === "all") return true;
-    const status = profile.verification_status || "pending";
-    return status === verificationFilter;
-  });
-
-  // Then apply search filter
-  const filteredProfiles = statusFilteredProfiles.filter((profile) => {
-    const query = searchQuery.toLowerCase();
-    return (
-      (profile.profile_id?.toLowerCase() || "").includes(query) ||
-      profile.name.toLowerCase().includes(query) ||
-      profile.email.toLowerCase().includes(query)
-    );
-  });
-
-  // Pagination calculations
-  const totalPages = Math.ceil(filteredProfiles.length / itemsPerPage);
+  // Server-side pagination - profiles are already filtered and paginated
+  const totalPages = Math.ceil(totalCount / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const paginatedProfiles = filteredProfiles.slice(startIndex, endIndex);
+  const endIndex = Math.min(startIndex + itemsPerPage, totalCount);
 
-  const totalRegistrations = profiles.length;
-  const verifiedProfiles = profiles.filter(p => p.verification_status === "verified").length;
-  const pendingVerification = profiles.filter(p => !p.verification_status || p.verification_status === "pending").length;
-  const rejectedProfiles = profiles.filter(p => p.verification_status === "rejected").length;
+  // Use server-side counts for stats
+  const totalRegistrations = statusCounts.all;
+  const verifiedProfiles = statusCounts.verified;
+  const pendingVerification = statusCounts.pending;
+  const rejectedProfiles = statusCounts.rejected;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-cream via-white to-cream">
@@ -519,7 +569,7 @@ const StaffDashboard = () => {
                 {/* Status Filter Tabs */}
                 <Tabs value={verificationFilter} onValueChange={(v) => setVerificationFilter(v as VerificationFilter)}>
                   <TabsList className="grid grid-cols-4 w-full sm:w-auto">
-                    <TabsTrigger value="all" className="text-xs sm:text-sm">All ({profiles.length})</TabsTrigger>
+                    <TabsTrigger value="all" className="text-xs sm:text-sm">All ({statusCounts.all})</TabsTrigger>
                     <TabsTrigger value="verified" className="text-xs sm:text-sm text-green-700">Verified ({verifiedProfiles})</TabsTrigger>
                     <TabsTrigger value="pending" className="text-xs sm:text-sm text-yellow-700">Pending ({pendingVerification})</TabsTrigger>
                     <TabsTrigger value="rejected" className="text-xs sm:text-sm text-red-700">Rejected ({rejectedProfiles})</TabsTrigger>
@@ -527,9 +577,9 @@ const StaffDashboard = () => {
                 </Tabs>
               </div>
 
-              {searchQuery && (
+              {debouncedSearch && (
                 <p className="text-sm text-muted-foreground">
-                  Showing {filteredProfiles.length} of {statusFilteredProfiles.length} profiles
+                  Showing {profiles.length} results for "{debouncedSearch}"
                 </p>
               )}
             </div>
@@ -550,14 +600,14 @@ const StaffDashboard = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {paginatedProfiles.length === 0 ? (
+                  {profiles.length === 0 ? (
                     <TableRow>
                       <TableCell colSpan={9} className="text-center py-8 text-muted-foreground">
-                        {searchQuery ? "No profiles match your search" : "No profiles found"}
+                        {loadingProfiles ? "Loading profiles..." : (debouncedSearch ? "No profiles match your search" : "No profiles found")}
                       </TableCell>
                     </TableRow>
                   ) : (
-                    paginatedProfiles.map((profile) => (
+                    profiles.map((profile) => (
                       <TableRow 
                         key={profile.id} 
                         className="cursor-pointer hover:bg-muted/50 transition-colors"
@@ -612,7 +662,7 @@ const StaffDashboard = () => {
             </div>
 
             {/* Pagination Controls */}
-            {filteredProfiles.length > 0 && (
+            {totalCount > 0 && (
               <div className="p-4 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-4">
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <span>Show</span>
@@ -638,7 +688,7 @@ const StaffDashboard = () => {
 
                 <div className="flex items-center gap-2">
                   <span className="text-sm text-muted-foreground">
-                    {startIndex + 1}-{Math.min(endIndex, filteredProfiles.length)} of {filteredProfiles.length}
+                    {startIndex + 1}-{endIndex} of {totalCount}
                   </span>
                   <div className="flex items-center gap-1">
                     <Button
