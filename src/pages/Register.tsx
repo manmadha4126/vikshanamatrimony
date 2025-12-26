@@ -97,16 +97,26 @@ const Register = () => {
     <div className="min-h-screen bg-background">
       <Header />
       <main className="container max-w-2xl mx-auto px-4 py-8">
-        {fromStaff && (
+        <div className="flex gap-2 mb-6">
           <Button
             variant="ghost"
-            className="mb-4 text-muted-foreground hover:text-foreground"
-            onClick={() => navigate("/staff-dashboard")}
+            className="text-muted-foreground hover:text-foreground"
+            onClick={() => navigate("/")}
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Staff Dashboard
+            Back to Home
           </Button>
-        )}
+          {fromStaff && (
+            <Button
+              variant="ghost"
+              className="text-muted-foreground hover:text-foreground"
+              onClick={() => navigate("/staff-dashboard")}
+            >
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Back to Staff Dashboard
+            </Button>
+          )}
+        </div>
         <StepIndicator
           currentStep={currentStep}
           totalSteps={5}
