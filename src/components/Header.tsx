@@ -8,6 +8,7 @@ const Header = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const isHomePage = location.pathname === "/";
+  const isRegisterPage = location.pathname === "/register";
 
   const navLinks = [
     { name: "Home", href: "#hero" },
@@ -67,7 +68,7 @@ const Header = () => {
 
         {/* Desktop Auth Buttons */}
         <div className="hidden md:flex items-center gap-4">
-          {!isHomePage && (
+          {!isHomePage && !isRegisterPage && (
             <Button variant="outline" className="border-primary text-primary hover:bg-primary hover:text-primary-foreground" onClick={() => navigate("/")}>
               <Home className="w-4 h-4 mr-2" />
               Back to Home
@@ -109,7 +110,7 @@ const Header = () => {
               </button>
             ))}
             <div className="flex flex-col gap-2 pt-4 border-t border-border">
-              {!isHomePage && (
+              {!isHomePage && !isRegisterPage && (
                 <Button variant="outline" className="w-full border-primary text-primary" onClick={() => { navigate("/"); setIsMenuOpen(false); }}>
                   <Home className="w-4 h-4 mr-2" />
                   Back to Home
