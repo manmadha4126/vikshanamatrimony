@@ -44,6 +44,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
+import { EditProfileDialog } from "@/components/staff/EditProfileDialog";
 
 interface Profile {
   id: string;
@@ -100,6 +101,7 @@ const StaffDashboard = () => {
   const [verificationFilter, setVerificationFilter] = useState<VerificationFilter>("all");
   const [verifyingProfile, setVerifyingProfile] = useState(false);
   const [adminNotes, setAdminNotes] = useState("");
+  const [editProfile, setEditProfile] = useState<Profile | null>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -215,7 +217,7 @@ const StaffDashboard = () => {
   };
 
   const handleEditProfile = (profile: Profile) => {
-    navigate(`/register?edit=${profile.id}`);
+    setEditProfile(profile);
   };
 
   const handleVerifyProfile = async (status: "verified" | "rejected") => {
@@ -964,6 +966,14 @@ const StaffDashboard = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Edit Profile Dialog */}
+      <EditProfileDialog
+        profile={editProfile}
+        open={!!editProfile}
+        onOpenChange={(open) => !open && setEditProfile(null)}
+        onSaved={fetchProfiles}
+      />
     </div>
   );
 };
