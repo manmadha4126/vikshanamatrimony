@@ -14,8 +14,207 @@ export type Database = {
   }
   public: {
     Tables: {
+      interests: {
+        Row: {
+          created_at: string
+          from_user_id: string
+          id: string
+          status: string | null
+          to_profile_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          from_user_id: string
+          id?: string
+          status?: string | null
+          to_profile_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          from_user_id?: string
+          id?: string
+          status?: string | null
+          to_profile_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "interests_to_profile_id_fkey"
+            columns: ["to_profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      messages: {
+        Row: {
+          content: string
+          created_at: string
+          from_user_id: string
+          id: string
+          is_read: boolean | null
+          to_user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          from_user_id: string
+          id?: string
+          is_read?: boolean | null
+          to_user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          from_user_id?: string
+          id?: string
+          is_read?: boolean | null
+          to_user_id?: string
+        }
+        Relationships: []
+      }
+      notifications: {
+        Row: {
+          created_at: string
+          id: string
+          is_read: boolean | null
+          message: string | null
+          related_profile_id: string | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_read?: boolean | null
+          message?: string | null
+          related_profile_id?: string | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_read?: boolean | null
+          message?: string | null
+          related_profile_id?: string | null
+          title?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_related_profile_id_fkey"
+            columns: ["related_profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      partner_preferences: {
+        Row: {
+          age_from: number | null
+          age_to: number | null
+          annual_income: string | null
+          caste: string[] | null
+          country: string[] | null
+          created_at: string
+          dosham: string | null
+          drinking_habits: string | null
+          eating_habits: string[] | null
+          education: string[] | null
+          employed_in: string | null
+          height_from: string | null
+          height_to: string | null
+          id: string
+          is_compulsory: boolean | null
+          marital_status: string[] | null
+          mother_tongue: string[] | null
+          occupation: string | null
+          physical_status: string | null
+          profile_id: string | null
+          religion: string[] | null
+          residing_state: string[] | null
+          smoking_habits: string | null
+          star: string[] | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          age_from?: number | null
+          age_to?: number | null
+          annual_income?: string | null
+          caste?: string[] | null
+          country?: string[] | null
+          created_at?: string
+          dosham?: string | null
+          drinking_habits?: string | null
+          eating_habits?: string[] | null
+          education?: string[] | null
+          employed_in?: string | null
+          height_from?: string | null
+          height_to?: string | null
+          id?: string
+          is_compulsory?: boolean | null
+          marital_status?: string[] | null
+          mother_tongue?: string[] | null
+          occupation?: string | null
+          physical_status?: string | null
+          profile_id?: string | null
+          religion?: string[] | null
+          residing_state?: string[] | null
+          smoking_habits?: string | null
+          star?: string[] | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          age_from?: number | null
+          age_to?: number | null
+          annual_income?: string | null
+          caste?: string[] | null
+          country?: string[] | null
+          created_at?: string
+          dosham?: string | null
+          drinking_habits?: string | null
+          eating_habits?: string[] | null
+          education?: string[] | null
+          employed_in?: string | null
+          height_from?: string | null
+          height_to?: string | null
+          id?: string
+          is_compulsory?: boolean | null
+          marital_status?: string[] | null
+          mother_tongue?: string[] | null
+          occupation?: string | null
+          physical_status?: string | null
+          profile_id?: string | null
+          religion?: string[] | null
+          residing_state?: string[] | null
+          smoking_habits?: string | null
+          star?: string[] | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "partner_preferences_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
+          about_me: string | null
           admin_notes: string | null
           annual_income: string | null
           caste: string | null
@@ -36,8 +235,11 @@ export type Database = {
           gender: string
           gothram: string | null
           height: string | null
+          hobbies: string[] | null
+          horoscope_url: string | null
           id: string
           is_complete: boolean | null
+          is_prime: boolean | null
           marital_status: string | null
           mother_tongue: string | null
           name: string
@@ -47,6 +249,8 @@ export type Database = {
           phone_otp: string | null
           phone_verified: boolean | null
           photo_url: string | null
+          prime_expires_at: string | null
+          profile_completion_percentage: number | null
           profile_for: string | null
           profile_id: string | null
           registration_step: number | null
@@ -59,6 +263,7 @@ export type Database = {
           verification_status: string | null
         }
         Insert: {
+          about_me?: string | null
           admin_notes?: string | null
           annual_income?: string | null
           caste?: string | null
@@ -79,8 +284,11 @@ export type Database = {
           gender: string
           gothram?: string | null
           height?: string | null
+          hobbies?: string[] | null
+          horoscope_url?: string | null
           id?: string
           is_complete?: boolean | null
+          is_prime?: boolean | null
           marital_status?: string | null
           mother_tongue?: string | null
           name: string
@@ -90,6 +298,8 @@ export type Database = {
           phone_otp?: string | null
           phone_verified?: boolean | null
           photo_url?: string | null
+          prime_expires_at?: string | null
+          profile_completion_percentage?: number | null
           profile_for?: string | null
           profile_id?: string | null
           registration_step?: number | null
@@ -102,6 +312,7 @@ export type Database = {
           verification_status?: string | null
         }
         Update: {
+          about_me?: string | null
           admin_notes?: string | null
           annual_income?: string | null
           caste?: string | null
@@ -122,8 +333,11 @@ export type Database = {
           gender?: string
           gothram?: string | null
           height?: string | null
+          hobbies?: string[] | null
+          horoscope_url?: string | null
           id?: string
           is_complete?: boolean | null
+          is_prime?: boolean | null
           marital_status?: string | null
           mother_tongue?: string | null
           name?: string
@@ -133,6 +347,8 @@ export type Database = {
           phone_otp?: string | null
           phone_verified?: boolean | null
           photo_url?: string | null
+          prime_expires_at?: string | null
+          profile_completion_percentage?: number | null
           profile_for?: string | null
           profile_id?: string | null
           registration_step?: number | null
@@ -145,6 +361,35 @@ export type Database = {
           verification_status?: string | null
         }
         Relationships: []
+      }
+      shortlisted_profiles: {
+        Row: {
+          created_at: string
+          id: string
+          profile_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          profile_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          profile_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shortlisted_profiles_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {
@@ -172,6 +417,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      calculate_profile_completion: {
+        Args: { p_profile_id: string }
+        Returns: number
+      }
       generate_profile_id: { Args: { p_gender: string }; Returns: string }
       has_role: {
         Args: {
