@@ -56,7 +56,7 @@ const Login = () => {
           title: "Welcome Back!",
           description: "You have successfully logged in.",
         });
-        navigate("/dashboard");
+        navigate("/my-dashboard");
       }
     } catch (error) {
       toast({
