@@ -48,12 +48,35 @@ export const useAuth = () => {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const fetchProfile = async (userId: string) => {
-    const { data, error } = await supabase
+  const fetchProfile = async (userId: string, userEmail?: string) => {
+    // First try to find by user_id
+    let { data, error } = await supabase
       .from('profiles')
       .select('*')
       .eq('user_id', userId)
       .single();
+
+    // If not found by user_id, try to find by email and link the profile
+    if (error && userEmail) {
+      const { data: emailData, error: emailError } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('email', userEmail)
+        .single();
+
+      if (!emailError && emailData) {
+        // Update the profile to link it with the auth user
+        const { error: updateError } = await supabase
+          .from('profiles')
+          .update({ user_id: userId })
+          .eq('id', emailData.id);
+
+        if (!updateError) {
+          data = { ...emailData, user_id: userId };
+          error = null;
+        }
+      }
+    }
 
     if (!error && data) {
       setProfile(data as Profile);
@@ -70,7 +93,7 @@ export const useAuth = () => {
         // Defer profile fetch with setTimeout
         if (session?.user) {
           setTimeout(() => {
-            fetchProfile(session.user.id);
+            fetchProfile(session.user.id, session.user.email);
           }, 0);
         } else {
           setProfile(null);
@@ -84,7 +107,7 @@ export const useAuth = () => {
       setSession(session);
       setUser(session?.user ?? null);
       if (session?.user) {
-        fetchProfile(session.user.id);
+        fetchProfile(session.user.id, session.user.email);
       }
       setLoading(false);
     });
