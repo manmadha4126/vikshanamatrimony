@@ -48,38 +48,18 @@ export const useAuth = () => {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const fetchProfile = async (userId: string, userEmail?: string) => {
-    // First try to find by user_id
-    let { data, error } = await supabase
+  const fetchProfile = async (userEmail: string) => {
+    // Find profile by email directly
+    const { data, error } = await supabase
       .from('profiles')
       .select('*')
-      .eq('user_id', userId)
-      .single();
-
-    // If not found by user_id, try to find by email and link the profile
-    if (error && userEmail) {
-      const { data: emailData, error: emailError } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('email', userEmail)
-        .single();
-
-      if (!emailError && emailData) {
-        // Update the profile to link it with the auth user
-        const { error: updateError } = await supabase
-          .from('profiles')
-          .update({ user_id: userId })
-          .eq('id', emailData.id);
-
-        if (!updateError) {
-          data = { ...emailData, user_id: userId };
-          error = null;
-        }
-      }
-    }
+      .eq('email', userEmail)
+      .maybeSingle();
 
     if (!error && data) {
       setProfile(data as Profile);
+    } else {
+      setProfile(null);
     }
   };
 
@@ -90,10 +70,9 @@ export const useAuth = () => {
         setSession(session);
         setUser(session?.user ?? null);
         
-        // Defer profile fetch with setTimeout
-        if (session?.user) {
+        if (session?.user?.email) {
           setTimeout(() => {
-            fetchProfile(session.user.id, session.user.email);
+            fetchProfile(session.user.email!);
           }, 0);
         } else {
           setProfile(null);
@@ -106,8 +85,8 @@ export const useAuth = () => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
-      if (session?.user) {
-        fetchProfile(session.user.id, session.user.email);
+      if (session?.user?.email) {
+        fetchProfile(session.user.email);
       }
       setLoading(false);
     });
@@ -123,8 +102,8 @@ export const useAuth = () => {
   };
 
   const refreshProfile = async () => {
-    if (user) {
-      await fetchProfile(user.id);
+    if (user?.email) {
+      await fetchProfile(user.email);
     }
   };
 
