@@ -121,6 +121,24 @@ const EditProfileSection = ({ userId, profile, onProfileUpdate }: EditProfileSec
     }
   };
 
+  const sections = [
+    { id: 'basic', label: 'Basic Info', icon: User },
+    { id: 'religious', label: 'Religious', icon: Heart },
+    { id: 'professional', label: 'Professional', icon: Briefcase },
+    { id: 'family', label: 'Family', icon: MapPin },
+    { id: 'about', label: 'About Me', icon: GraduationCap },
+  ] as const;
+
+  const getNextSection = () => {
+    const currentIndex = sections.findIndex(s => s.id === activeSection);
+    if (currentIndex < sections.length - 1) {
+      return sections[currentIndex + 1].id;
+    }
+    return null; // Already on last section
+  };
+
+  const isLastSection = activeSection === 'about';
+
   const handleSave = async () => {
     setIsSaving(true);
     try {
@@ -155,11 +173,21 @@ const EditProfileSection = ({ userId, profile, onProfileUpdate }: EditProfileSec
 
       if (error) throw error;
 
+      const nextSection = getNextSection();
+      
       toast({
         title: "Profile Updated",
-        description: "Your profile has been saved successfully.",
+        description: nextSection 
+          ? `Saved! Moving to ${sections.find(s => s.id === nextSection)?.label}...`
+          : "All sections completed successfully!",
       });
+      
       onProfileUpdate();
+      
+      // Auto-advance to next section if not on last
+      if (nextSection) {
+        setActiveSection(nextSection);
+      }
     } catch (error: any) {
       toast({
         title: "Update Failed",
@@ -170,14 +198,6 @@ const EditProfileSection = ({ userId, profile, onProfileUpdate }: EditProfileSec
       setIsSaving(false);
     }
   };
-
-  const sections = [
-    { id: 'basic', label: 'Basic Info', icon: User },
-    { id: 'religious', label: 'Religious', icon: Heart },
-    { id: 'professional', label: 'Professional', icon: Briefcase },
-    { id: 'family', label: 'Family', icon: MapPin },
-    { id: 'about', label: 'About Me', icon: GraduationCap },
-  ] as const;
 
   return (
     <div className="space-y-4">
@@ -511,14 +531,14 @@ const EditProfileSection = ({ userId, profile, onProfileUpdate }: EditProfileSec
       )}
 
       {/* Save Button */}
-      <div className="flex justify-end">
+      <div className="flex justify-end gap-3">
         <Button onClick={handleSave} disabled={isSaving} className="gap-2">
           {isSaving ? (
             <Loader2 className="h-4 w-4 animate-spin" />
           ) : (
             <Save className="h-4 w-4" />
           )}
-          {isSaving ? 'Saving...' : 'Save Changes'}
+          {isSaving ? 'Saving...' : isLastSection ? 'Save & Finish' : 'Save & Continue'}
         </Button>
       </div>
     </div>
