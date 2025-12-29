@@ -22,7 +22,7 @@ const HeroSection = () => {
         <div className="absolute bottom-20 right-10 w-80 h-80 bg-primary/10 rounded-full blur-3xl" />
       </div>
 
-      <div className="container relative z-10 py-8 lg:py-12">
+      <div className="container relative z-10 pt-0 pb-8 lg:pb-12">
         <div className="flex flex-col items-center text-center space-y-8">
           {/* Text Content */}
           <div className="animate-fade-up max-w-4xl">
