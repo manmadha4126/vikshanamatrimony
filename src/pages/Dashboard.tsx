@@ -6,6 +6,7 @@ import ProfileSidebar from '@/components/dashboard/ProfileSidebar';
 import AccountTypeSection from '@/components/dashboard/AccountTypeSection';
 import ProfileCompletionSection from '@/components/dashboard/ProfileCompletionSection';
 import DailyRecommendations from '@/components/dashboard/DailyRecommendations';
+import MatchesPreview from '@/components/dashboard/MatchesPreview';
 import AssistedServiceSection from '@/components/dashboard/AssistedServiceSection';
 import PartnerPreferencesSection from '@/components/dashboard/PartnerPreferencesSection';
 import EditProfileSection from '@/components/dashboard/EditProfileSection';
@@ -302,6 +303,12 @@ const Dashboard = () => {
                 <DailyRecommendations
                   userGender={profile.gender}
                   userId={user.id}
+                />
+
+                <MatchesPreview
+                  userId={user.id}
+                  userGender={profile.gender}
+                  onViewAllClick={() => handleViewChange('matches')}
                 />
 
                 <AssistedServiceSection />
