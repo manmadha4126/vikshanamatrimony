@@ -1,6 +1,6 @@
-import wedding1 from "@/assets/wedding-1-enhanced.jpg";
+import wedding1 from "@/assets/wedding-1-new.jpg";
 import wedding2 from "@/assets/wedding-2-enhanced.jpg";
-import wedding3 from "@/assets/wedding-3-enhanced.jpg";
+import wedding3 from "@/assets/wedding-3-new.jpg";
 import wedding4 from "@/assets/wedding-4.jpg";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
