@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -34,18 +34,25 @@ interface DashboardHeaderProps {
   } | null;
   notificationCount?: number;
   onSignOut: () => void;
+  onSearchClick?: () => void;
+  onPreferencesClick?: () => void;
 }
 
-const DashboardHeader = ({ profile, notificationCount = 0, onSignOut }: DashboardHeaderProps) => {
-  const navigate = useNavigate();
+const DashboardHeader = ({ 
+  profile, 
+  notificationCount = 0, 
+  onSignOut,
+  onSearchClick,
+  onPreferencesClick,
+}: DashboardHeaderProps) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const navItems = [
-    { icon: Home, label: 'Home', path: '/my-dashboard' },
-    { icon: Heart, label: 'Interests', path: '/dashboard/interests' },
-    { icon: Gem, label: 'Matches', path: '/dashboard/matches' },
-    { icon: MessageCircle, label: 'Messages', path: '/dashboard/messages' },
-    { icon: Search, label: 'Search', path: '/dashboard/search' },
+    { icon: Home, label: 'Home', action: () => window.location.href = '/my-dashboard' },
+    { icon: Heart, label: 'Interests', action: () => {} },
+    { icon: Gem, label: 'Matches', action: () => {} },
+    { icon: MessageCircle, label: 'Messages', action: () => {} },
+    { icon: Search, label: 'Search', action: onSearchClick },
   ];
 
   const getInitials = (name: string) => {
@@ -62,7 +69,7 @@ const DashboardHeader = ({ profile, notificationCount = 0, onSignOut }: Dashboar
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
-          <Link to="/dashboard" className="flex items-center gap-2">
+          <Link to="/my-dashboard" className="flex items-center gap-2">
             <div className="w-10 h-10 rounded-full gradient-primary flex items-center justify-center">
               <span className="text-primary-foreground font-display font-bold text-lg">V</span>
             </div>
@@ -77,12 +84,16 @@ const DashboardHeader = ({ profile, notificationCount = 0, onSignOut }: Dashboar
           {/* Desktop Navigation */}
           <nav className="hidden lg:flex items-center gap-1">
             {navItems.map((item) => (
-              <Link key={item.path} to={item.path}>
-                <Button variant="ghost" size="sm" className="gap-2">
-                  <item.icon className="h-4 w-4" />
-                  <span>{item.label}</span>
-                </Button>
-              </Link>
+              <Button 
+                key={item.label} 
+                variant="ghost" 
+                size="sm" 
+                className="gap-2"
+                onClick={item.action}
+              >
+                <item.icon className="h-4 w-4" />
+                <span>{item.label}</span>
+              </Button>
             ))}
           </nav>
 
@@ -121,19 +132,19 @@ const DashboardHeader = ({ profile, notificationCount = 0, onSignOut }: Dashboar
                   <p className="text-xs text-muted-foreground">{profile?.profile_id}</p>
                 </div>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => navigate('/dashboard/profile')}>
+                <DropdownMenuItem>
                   <User className="mr-2 h-4 w-4" />
                   View Profile
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => navigate('/dashboard/edit-profile')}>
+                <DropdownMenuItem>
                   <Edit className="mr-2 h-4 w-4" />
                   Edit Profile
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => navigate('/dashboard/preferences')}>
+                <DropdownMenuItem onClick={onPreferencesClick}>
                   <Settings className="mr-2 h-4 w-4" />
                   Edit Preferences
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => navigate('/dashboard/verify')}>
+                <DropdownMenuItem>
                   <Shield className="mr-2 h-4 w-4" />
                   Verify Profile
                 </DropdownMenuItem>
@@ -162,16 +173,18 @@ const DashboardHeader = ({ profile, notificationCount = 0, onSignOut }: Dashboar
           <nav className="lg:hidden py-4 border-t border-border">
             <div className="flex flex-col gap-1">
               {navItems.map((item) => (
-                <Link
-                  key={item.path}
-                  to={item.path}
-                  onClick={() => setIsMobileMenuOpen(false)}
+                <Button 
+                  key={item.label} 
+                  variant="ghost" 
+                  className="w-full justify-start gap-2"
+                  onClick={() => {
+                    item.action?.();
+                    setIsMobileMenuOpen(false);
+                  }}
                 >
-                  <Button variant="ghost" className="w-full justify-start gap-2">
-                    <item.icon className="h-4 w-4" />
-                    <span>{item.label}</span>
-                  </Button>
-                </Link>
+                  <item.icon className="h-4 w-4" />
+                  <span>{item.label}</span>
+                </Button>
               ))}
             </div>
           </nav>

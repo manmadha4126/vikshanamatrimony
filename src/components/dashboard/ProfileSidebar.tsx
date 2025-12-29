@@ -1,9 +1,10 @@
-import { Link } from 'react-router-dom';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Camera, Edit, Settings, Crown, User, LogOut, BadgeCheck } from 'lucide-react';
+import { Camera, Edit, Settings, Crown, User, LogOut, BadgeCheck, Home } from 'lucide-react';
+
+type DashboardView = 'home' | 'preferences' | 'search';
 
 interface ProfileSidebarProps {
   profile: {
@@ -14,9 +15,11 @@ interface ProfileSidebarProps {
     verification_status?: string | null;
   };
   onSignOut: () => void;
+  onPreferencesClick?: () => void;
+  activeView?: DashboardView;
 }
 
-const ProfileSidebar = ({ profile, onSignOut }: ProfileSidebarProps) => {
+const ProfileSidebar = ({ profile, onSignOut, onPreferencesClick, activeView = 'home' }: ProfileSidebarProps) => {
   const getInitials = (name: string) => {
     return name
       .split(' ')
@@ -100,29 +103,35 @@ const ProfileSidebar = ({ profile, onSignOut }: ProfileSidebarProps) => {
         {/* Divider */}
         <div className="my-6 border-t border-border" />
 
+        {/* Dashboard Home */}
+        <button 
+          onClick={() => window.location.reload()}
+          className={`w-full flex items-center gap-3 py-3 px-2 hover:bg-muted/50 rounded-lg transition-colors ${activeView === 'home' ? 'bg-muted' : ''}`}
+        >
+          <Home className="h-5 w-5 text-muted-foreground" />
+          <span className="text-sm font-medium text-foreground">Dashboard</span>
+        </button>
+
         {/* View Profile */}
-        <Link to="/dashboard/profile">
-          <button className="w-full flex items-center gap-3 py-3 px-2 hover:bg-muted/50 rounded-lg transition-colors">
-            <User className="h-5 w-5 text-muted-foreground" />
-            <span className="text-sm font-medium text-foreground">View profile</span>
-          </button>
-        </Link>
+        <button className="w-full flex items-center gap-3 py-3 px-2 hover:bg-muted/50 rounded-lg transition-colors">
+          <User className="h-5 w-5 text-muted-foreground" />
+          <span className="text-sm font-medium text-foreground">View profile</span>
+        </button>
 
         {/* Edit Profile */}
-        <Link to="/dashboard/edit-profile">
-          <button className="w-full flex items-center gap-3 py-3 px-2 hover:bg-muted/50 rounded-lg transition-colors">
-            <Edit className="h-5 w-5 text-muted-foreground" />
-            <span className="text-sm font-medium text-foreground">Edit profile</span>
-          </button>
-        </Link>
+        <button className="w-full flex items-center gap-3 py-3 px-2 hover:bg-muted/50 rounded-lg transition-colors">
+          <Edit className="h-5 w-5 text-muted-foreground" />
+          <span className="text-sm font-medium text-foreground">Edit profile</span>
+        </button>
 
         {/* Edit Preferences */}
-        <Link to="/dashboard/preferences">
-          <button className="w-full flex items-center gap-3 py-3 px-2 hover:bg-muted/50 rounded-lg transition-colors">
-            <Settings className="h-5 w-5 text-muted-foreground" />
-            <span className="text-sm font-medium text-foreground">Edit preferences</span>
-          </button>
-        </Link>
+        <button 
+          onClick={onPreferencesClick}
+          className={`w-full flex items-center gap-3 py-3 px-2 hover:bg-muted/50 rounded-lg transition-colors ${activeView === 'preferences' ? 'bg-muted' : ''}`}
+        >
+          <Settings className="h-5 w-5 text-muted-foreground" />
+          <span className="text-sm font-medium text-foreground">Edit preferences</span>
+        </button>
 
         {/* Log Out */}
         <button
