@@ -212,6 +212,35 @@ export type Database = {
           },
         ]
       }
+      profile_views: {
+        Row: {
+          id: string
+          viewed_at: string
+          viewed_profile_id: string
+          viewer_id: string
+        }
+        Insert: {
+          id?: string
+          viewed_at?: string
+          viewed_profile_id: string
+          viewer_id: string
+        }
+        Update: {
+          id?: string
+          viewed_at?: string
+          viewed_profile_id?: string
+          viewer_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profile_views_viewed_profile_id_fkey"
+            columns: ["viewed_profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           about_me: string | null

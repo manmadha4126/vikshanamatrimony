@@ -7,6 +7,8 @@ import AccountTypeSection from '@/components/dashboard/AccountTypeSection';
 import ProfileCompletionSection from '@/components/dashboard/ProfileCompletionSection';
 import DailyRecommendations from '@/components/dashboard/DailyRecommendations';
 import MatchesPreview from '@/components/dashboard/MatchesPreview';
+import ShortlistedProfilesSection from '@/components/dashboard/ShortlistedProfilesSection';
+import ProfileViewsSection from '@/components/dashboard/ProfileViewsSection';
 import AssistedServiceSection from '@/components/dashboard/AssistedServiceSection';
 import PartnerPreferencesSection from '@/components/dashboard/PartnerPreferencesSection';
 import EditProfileSection from '@/components/dashboard/EditProfileSection';
@@ -310,6 +312,15 @@ const Dashboard = () => {
                   userGender={profile.gender}
                   onViewAllClick={() => handleViewChange('matches')}
                 />
+
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                  <div className="lg:col-span-2">
+                    <ShortlistedProfilesSection userId={user.id} />
+                  </div>
+                  <div>
+                    <ProfileViewsSection profileId={profile.id} />
+                  </div>
+                </div>
 
                 <AssistedServiceSection />
               </>
