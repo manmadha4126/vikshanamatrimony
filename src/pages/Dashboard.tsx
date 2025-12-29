@@ -9,6 +9,7 @@ import DailyRecommendations from '@/components/dashboard/DailyRecommendations';
 import MatchesPreview from '@/components/dashboard/MatchesPreview';
 import ShortlistedProfilesSection from '@/components/dashboard/ShortlistedProfilesSection';
 import ProfileViewsSection from '@/components/dashboard/ProfileViewsSection';
+import WhoViewedMeSection from '@/components/dashboard/WhoViewedMeSection';
 import AssistedServiceSection from '@/components/dashboard/AssistedServiceSection';
 import PartnerPreferencesSection from '@/components/dashboard/PartnerPreferencesSection';
 import EditProfileSection from '@/components/dashboard/EditProfileSection';
@@ -35,7 +36,7 @@ import {
   stateOptions,
 } from '@/data/registrationOptions';
 
-type DashboardView = 'home' | 'preferences' | 'search' | 'edit-profile' | 'view-profile' | 'interests' | 'messages' | 'notifications' | 'matches';
+type DashboardView = 'home' | 'preferences' | 'search' | 'edit-profile' | 'view-profile' | 'interests' | 'messages' | 'notifications' | 'matches' | 'who-viewed-me';
 
 interface SearchFilters {
   age_from: number;
@@ -276,6 +277,7 @@ const Dashboard = () => {
               onMessagesClick={() => handleViewChange('messages')}
               onNotificationsClick={() => handleViewChange('notifications')}
               onMatchesClick={() => handleViewChange('matches')}
+              onWhoViewedMeClick={() => handleViewChange('who-viewed-me')}
               activeView={activeView}
             />
           </div>
@@ -429,6 +431,13 @@ const Dashboard = () => {
               <MatchesSection
                 userId={user.id}
                 userGender={profile.gender}
+              />
+            )}
+
+            {activeView === 'who-viewed-me' && (
+              <WhoViewedMeSection
+                profileId={profile.id}
+                userId={user.id}
               />
             )}
 

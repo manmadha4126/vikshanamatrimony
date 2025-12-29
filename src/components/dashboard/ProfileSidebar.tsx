@@ -2,9 +2,9 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Camera, Edit, Settings, Crown, User, LogOut, BadgeCheck, Home, Eye, Heart, MessageCircle, Bell, Gem } from 'lucide-react';
+import { Camera, Edit, Settings, Crown, User, LogOut, BadgeCheck, Home, Eye, Heart, MessageCircle, Bell, Gem, Users } from 'lucide-react';
 
-type DashboardView = 'home' | 'preferences' | 'search' | 'edit-profile' | 'view-profile' | 'interests' | 'messages' | 'notifications' | 'matches';
+type DashboardView = 'home' | 'preferences' | 'search' | 'edit-profile' | 'view-profile' | 'interests' | 'messages' | 'notifications' | 'matches' | 'who-viewed-me';
 
 interface ProfileSidebarProps {
   profile: {
@@ -23,10 +23,11 @@ interface ProfileSidebarProps {
   onMessagesClick?: () => void;
   onNotificationsClick?: () => void;
   onMatchesClick?: () => void;
+  onWhoViewedMeClick?: () => void;
   activeView?: DashboardView;
 }
 
-const ProfileSidebar = ({ profile, onSignOut, onPreferencesClick, onEditProfileClick, onViewProfileClick, onHomeClick, onInterestsClick, onMessagesClick, onNotificationsClick, onMatchesClick, activeView = 'home' }: ProfileSidebarProps) => {
+const ProfileSidebar = ({ profile, onSignOut, onPreferencesClick, onEditProfileClick, onViewProfileClick, onHomeClick, onInterestsClick, onMessagesClick, onNotificationsClick, onMatchesClick, onWhoViewedMeClick, activeView = 'home' }: ProfileSidebarProps) => {
   const getInitials = (name: string) => {
     return name
       .split(' ')
@@ -171,6 +172,15 @@ const ProfileSidebar = ({ profile, onSignOut, onPreferencesClick, onEditProfileC
         >
           <MessageCircle className="h-5 w-5 text-muted-foreground" />
           <span className="text-sm font-medium text-foreground">Messages</span>
+        </button>
+
+        {/* Who Viewed Me */}
+        <button 
+          onClick={onWhoViewedMeClick}
+          className={`w-full flex items-center gap-3 py-3 px-2 hover:bg-muted/50 rounded-lg transition-colors ${activeView === 'who-viewed-me' ? 'bg-muted' : ''}`}
+        >
+          <Users className="h-5 w-5 text-muted-foreground" />
+          <span className="text-sm font-medium text-foreground">Who Viewed Me</span>
         </button>
 
         {/* Notifications */}
