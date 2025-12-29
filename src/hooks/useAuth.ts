@@ -41,6 +41,8 @@ interface Profile {
   company_name: string | null;
   annual_income: string | null;
   verification_status: string | null;
+  created_at: string;
+  updated_at: string;
 }
 
 export const useAuth = () => {
