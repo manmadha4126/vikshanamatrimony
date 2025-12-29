@@ -40,6 +40,7 @@ interface Profile {
   occupation: string | null;
   company_name: string | null;
   annual_income: string | null;
+  verification_status: string | null;
 }
 
 export const useAuth = () => {
