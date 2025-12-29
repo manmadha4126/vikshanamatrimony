@@ -52,8 +52,10 @@ const ProfileSidebar = ({ profile, onSignOut }: ProfileSidebarProps) => {
           {/* User Name with Verification Badge */}
           <div className="mt-4 flex items-center gap-1.5">
             <h3 className="text-xl font-semibold text-foreground">{profile.name}</h3>
-            {isVerified && (
-              <BadgeCheck className="h-5 w-5 text-primary fill-primary/20" />
+            {isVerified ? (
+              <BadgeCheck className="h-5 w-5 text-green-600 fill-green-100" />
+            ) : (
+              <BadgeCheck className="h-5 w-5 text-red-500 fill-red-100" />
             )}
           </div>
 
