@@ -55,8 +55,8 @@ const HeroSection = () => {
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
 
               {/* Text Overlay on Image */}
-              <div className="absolute inset-0 flex items-end justify-center pb-32">
-                <h2 className="font-display text-3xl md:text-5xl lg:text-6xl font-bold text-foreground text-center px-4">
+              <div className="absolute inset-0 flex items-center justify-center">
+                <h2 className="font-display text-3xl md:text-5xl lg:text-6xl font-bold text-white text-center px-4 drop-shadow-lg">
                   Find Your Perfect Life Partner
                 </h2>
               </div>
