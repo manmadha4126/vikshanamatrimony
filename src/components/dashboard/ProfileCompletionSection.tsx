@@ -227,17 +227,17 @@ const ProfileCompletionSection = ({ profile, onProfileUpdate }: ProfileCompletio
   ];
 
   return (
-    <div className="container mx-auto px-4 py-6">
+    <div className="container mx-auto px-4 py-3">
       <Card className="shadow-card">
-        <CardHeader>
+        <CardHeader className="py-3 px-4">
           <div className="flex items-center justify-between">
-            <CardTitle className="font-display text-xl">Complete Your Profile</CardTitle>
-            <span className="text-2xl font-bold text-primary">{completionPercentage}%</span>
+            <CardTitle className="font-display text-base">Complete Your Profile</CardTitle>
+            <span className="text-lg font-bold text-primary">{completionPercentage}%</span>
           </div>
-          <Progress value={completionPercentage} className="h-3 mt-2" />
+          <Progress value={completionPercentage} className="h-2 mt-1.5" />
         </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <CardContent className="py-3 px-4">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
             {completionCards.map((card, index) => (
               <Card
                 key={index}
@@ -246,20 +246,20 @@ const ProfileCompletionSection = ({ profile, onProfileUpdate }: ProfileCompletio
                 }`}
                 onClick={card.onClick}
               >
-                <CardContent className="p-4">
-                  <div className="flex items-start gap-3">
-                    <div className={`p-2 rounded-full ${
+                <CardContent className="p-3">
+                  <div className="flex items-start gap-2">
+                    <div className={`p-1.5 rounded-full ${
                       card.isComplete ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'
                     }`}>
-                      <card.icon className="h-5 w-5" />
+                      <card.icon className="h-4 w-4" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold text-sm">{card.title}</h3>
-                      <p className="text-xs text-muted-foreground truncate">{card.description}</p>
+                      <h3 className="font-semibold text-xs">{card.title}</h3>
+                      <p className="text-[10px] text-muted-foreground truncate">{card.description}</p>
                       <Button
                         variant={card.isComplete ? 'outline' : 'default'}
                         size="sm"
-                        className="mt-2 w-full text-xs"
+                        className="mt-1.5 w-full text-[10px] h-7"
                       >
                         {card.isComplete && <Check className="h-3 w-3 mr-1" />}
                         {card.action}
