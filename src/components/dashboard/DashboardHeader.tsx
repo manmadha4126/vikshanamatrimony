@@ -40,6 +40,9 @@ interface DashboardHeaderProps {
   onViewProfileClick?: () => void;
   onHomeClick?: () => void;
   onInterestsClick?: () => void;
+  onMessagesClick?: () => void;
+  onNotificationsClick?: () => void;
+  onMatchesClick?: () => void;
 }
 
 const DashboardHeader = ({ 
@@ -52,14 +55,17 @@ const DashboardHeader = ({
   onViewProfileClick,
   onHomeClick,
   onInterestsClick,
+  onMessagesClick,
+  onNotificationsClick,
+  onMatchesClick,
 }: DashboardHeaderProps) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const navItems = [
     { icon: Home, label: 'Home', action: onHomeClick },
     { icon: Heart, label: 'Interests', action: onInterestsClick },
-    { icon: Gem, label: 'Matches', action: () => {} },
-    { icon: MessageCircle, label: 'Messages', action: () => {} },
+    { icon: Gem, label: 'Matches', action: onMatchesClick },
+    { icon: MessageCircle, label: 'Messages', action: onMessagesClick },
     { icon: Search, label: 'Search', action: onSearchClick },
   ];
 
@@ -108,7 +114,7 @@ const DashboardHeader = ({
           {/* Right Section */}
           <div className="flex items-center gap-2">
             {/* Notifications */}
-            <Button variant="ghost" size="icon" className="relative">
+            <Button variant="ghost" size="icon" className="relative" onClick={onNotificationsClick}>
               <Bell className="h-5 w-5" />
               {notificationCount > 0 && (
                 <Badge
