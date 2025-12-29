@@ -8,6 +8,7 @@ import ProfileCompletionSection from '@/components/dashboard/ProfileCompletionSe
 import DailyRecommendations from '@/components/dashboard/DailyRecommendations';
 import AssistedServiceSection from '@/components/dashboard/AssistedServiceSection';
 import PartnerPreferencesSection from '@/components/dashboard/PartnerPreferencesSection';
+import EditProfileSection from '@/components/dashboard/EditProfileSection';
 import Footer from '@/components/Footer';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -26,7 +27,7 @@ import {
   stateOptions,
 } from '@/data/registrationOptions';
 
-type DashboardView = 'home' | 'preferences' | 'search';
+type DashboardView = 'home' | 'preferences' | 'search' | 'edit-profile';
 
 interface SearchFilters {
   age_from: number;
@@ -236,6 +237,9 @@ const Dashboard = () => {
         notificationCount={0}
         onSignOut={handleSignOut}
         onSearchClick={() => handleViewChange('search')}
+        onPreferencesClick={() => handleViewChange('preferences')}
+        onEditProfileClick={() => handleViewChange('edit-profile')}
+        onHomeClick={() => handleViewChange('home')}
       />
 
       <div className="container mx-auto px-4 py-6">
@@ -252,6 +256,8 @@ const Dashboard = () => {
               }}
               onSignOut={handleSignOut}
               onPreferencesClick={() => handleViewChange('preferences')}
+              onEditProfileClick={() => handleViewChange('edit-profile')}
+              onHomeClick={() => handleViewChange('home')}
               activeView={activeView}
             />
           </div>
@@ -289,6 +295,39 @@ const Dashboard = () => {
 
             {activeView === 'preferences' && (
               <PartnerPreferencesSection userId={user.id} />
+            )}
+
+            {activeView === 'edit-profile' && (
+              <EditProfileSection
+                userId={user.id}
+                profile={{
+                  id: profile.id,
+                  name: profile.name,
+                  date_of_birth: profile.date_of_birth,
+                  height: profile.height,
+                  marital_status: profile.marital_status,
+                  mother_tongue: profile.mother_tongue,
+                  religion: profile.religion,
+                  caste: profile.caste,
+                  sub_caste: profile.sub_caste,
+                  gothram: profile.gothram,
+                  star: profile.star,
+                  dosham: profile.dosham,
+                  education: profile.education,
+                  education_detail: profile.education_detail,
+                  employment_type: profile.employment_type,
+                  occupation: profile.occupation,
+                  company_name: profile.company_name,
+                  annual_income: profile.annual_income,
+                  country: profile.country,
+                  state: profile.state,
+                  city: profile.city,
+                  family_status: profile.family_status,
+                  family_type: profile.family_type,
+                  about_me: profile.about_me,
+                }}
+                onProfileUpdate={refreshProfile}
+              />
             )}
 
             {activeView === 'search' && (

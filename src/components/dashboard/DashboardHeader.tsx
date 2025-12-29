@@ -36,6 +36,8 @@ interface DashboardHeaderProps {
   onSignOut: () => void;
   onSearchClick?: () => void;
   onPreferencesClick?: () => void;
+  onEditProfileClick?: () => void;
+  onHomeClick?: () => void;
 }
 
 const DashboardHeader = ({ 
@@ -44,6 +46,8 @@ const DashboardHeader = ({
   onSignOut,
   onSearchClick,
   onPreferencesClick,
+  onEditProfileClick,
+  onHomeClick,
 }: DashboardHeaderProps) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -136,7 +140,7 @@ const DashboardHeader = ({
                   <User className="mr-2 h-4 w-4" />
                   View Profile
                 </DropdownMenuItem>
-                <DropdownMenuItem>
+                <DropdownMenuItem onClick={onEditProfileClick}>
                   <Edit className="mr-2 h-4 w-4" />
                   Edit Profile
                 </DropdownMenuItem>
