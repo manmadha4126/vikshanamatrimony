@@ -10,6 +10,7 @@ import AssistedServiceSection from '@/components/dashboard/AssistedServiceSectio
 import PartnerPreferencesSection from '@/components/dashboard/PartnerPreferencesSection';
 import EditProfileSection from '@/components/dashboard/EditProfileSection';
 import ViewProfileSection from '@/components/dashboard/ViewProfileSection';
+import InterestsSection from '@/components/dashboard/InterestsSection';
 import Footer from '@/components/Footer';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -28,7 +29,7 @@ import {
   stateOptions,
 } from '@/data/registrationOptions';
 
-type DashboardView = 'home' | 'preferences' | 'search' | 'edit-profile' | 'view-profile';
+type DashboardView = 'home' | 'preferences' | 'search' | 'edit-profile' | 'view-profile' | 'interests';
 
 interface SearchFilters {
   age_from: number;
@@ -242,6 +243,7 @@ const Dashboard = () => {
         onEditProfileClick={() => handleViewChange('edit-profile')}
         onViewProfileClick={() => handleViewChange('view-profile')}
         onHomeClick={() => handleViewChange('home')}
+        onInterestsClick={() => handleViewChange('interests')}
       />
 
       <div className="container mx-auto px-4 py-6">
@@ -261,6 +263,7 @@ const Dashboard = () => {
               onEditProfileClick={() => handleViewChange('edit-profile')}
               onViewProfileClick={() => handleViewChange('view-profile')}
               onHomeClick={() => handleViewChange('home')}
+              onInterestsClick={() => handleViewChange('interests')}
               activeView={activeView}
             />
           </div>
@@ -374,6 +377,13 @@ const Dashboard = () => {
                   updated_at: profile.updated_at,
                   created_at: profile.created_at,
                 }}
+              />
+            )}
+
+            {activeView === 'interests' && (
+              <InterestsSection
+                userId={user.id}
+                profileId={profile.id}
               />
             )}
 
