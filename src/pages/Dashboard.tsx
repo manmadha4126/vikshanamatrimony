@@ -5,7 +5,6 @@ import DashboardHeader from '@/components/dashboard/DashboardHeader';
 import ProfileSidebar from '@/components/dashboard/ProfileSidebar';
 import AccountTypeSection from '@/components/dashboard/AccountTypeSection';
 import ProfileCompletionSection from '@/components/dashboard/ProfileCompletionSection';
-import PartnerPreferencesSection from '@/components/dashboard/PartnerPreferencesSection';
 import DailyRecommendations from '@/components/dashboard/DailyRecommendations';
 import AssistedServiceSection from '@/components/dashboard/AssistedServiceSection';
 import Footer from '@/components/Footer';
@@ -97,8 +96,6 @@ const Dashboard = () => {
               }}
               onProfileUpdate={refreshProfile}
             />
-
-            <PartnerPreferencesSection userId={user.id} />
 
             <DailyRecommendations
               userGender={profile.gender}

@@ -41,7 +41,7 @@ const DashboardHeader = ({ profile, notificationCount = 0, onSignOut }: Dashboar
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const navItems = [
-    { icon: Home, label: 'Home', path: '/dashboard' },
+    { icon: Home, label: 'Home', path: '/my-dashboard' },
     { icon: Heart, label: 'Interests', path: '/dashboard/interests' },
     { icon: Gem, label: 'Matches', path: '/dashboard/matches' },
     { icon: MessageCircle, label: 'Messages', path: '/dashboard/messages' },
