@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import DashboardHeader from '@/components/dashboard/DashboardHeader';
+import ProfileSidebar from '@/components/dashboard/ProfileSidebar';
 import AccountTypeSection from '@/components/dashboard/AccountTypeSection';
 import ProfileCompletionSection from '@/components/dashboard/ProfileCompletionSection';
 import PartnerPreferencesSection from '@/components/dashboard/PartnerPreferencesSection';
@@ -61,34 +62,51 @@ const Dashboard = () => {
         onSignOut={handleSignOut}
       />
 
-      <main className="pb-12">
-        <AccountTypeSection
-          isPrime={profile.is_prime || false}
-          primeExpiresAt={null}
-        />
+      <div className="container mx-auto px-4 py-6">
+        <div className="flex gap-6">
+          {/* Left Sidebar - Profile */}
+          <div className="hidden lg:block flex-shrink-0">
+            <ProfileSidebar
+              profile={{
+                name: profile.name,
+                photo_url: profile.photo_url,
+                profile_id: profile.profile_id,
+                is_prime: profile.is_prime || false,
+              }}
+            />
+          </div>
 
-        <ProfileCompletionSection
-          profile={{
-            id: profile.id,
-            phone: profile.phone,
-            phone_verified: profile.phone_verified,
-            about_me: profile.about_me,
-            hobbies: profile.hobbies,
-            horoscope_url: profile.horoscope_url,
-            profile_completion_percentage: profile.profile_completion_percentage,
-          }}
-          onProfileUpdate={refreshProfile}
-        />
+          {/* Main Content */}
+          <main className="flex-1 min-w-0 pb-12 space-y-6">
+            <AccountTypeSection
+              isPrime={profile.is_prime || false}
+              primeExpiresAt={null}
+            />
 
-        <PartnerPreferencesSection userId={user.id} />
+            <ProfileCompletionSection
+              profile={{
+                id: profile.id,
+                phone: profile.phone,
+                phone_verified: profile.phone_verified,
+                about_me: profile.about_me,
+                hobbies: profile.hobbies,
+                horoscope_url: profile.horoscope_url,
+                profile_completion_percentage: profile.profile_completion_percentage,
+              }}
+              onProfileUpdate={refreshProfile}
+            />
 
-        <DailyRecommendations
-          userGender={profile.gender}
-          userId={user.id}
-        />
+            <PartnerPreferencesSection userId={user.id} />
 
-        <AssistedServiceSection />
-      </main>
+            <DailyRecommendations
+              userGender={profile.gender}
+              userId={user.id}
+            />
+
+            <AssistedServiceSection />
+          </main>
+        </div>
+      </div>
 
       <Footer />
     </div>
