@@ -72,6 +72,7 @@ const Dashboard = () => {
                 photo_url: profile.photo_url,
                 profile_id: profile.profile_id,
                 is_prime: profile.is_prime || false,
+                verification_status: profile.verification_status,
               }}
               onSignOut={handleSignOut}
             />
