@@ -316,23 +316,6 @@ const StaffLogin = () => {
                 {loading ? "Signing in..." : "Sign In"}
               </Button>
 
-              <div className="relative my-4">
-                <div className="absolute inset-0 flex items-center">
-                  <span className="w-full border-t border-border" />
-                </div>
-                <div className="relative flex justify-center text-xs uppercase">
-                  <span className="bg-white px-2 text-muted-foreground">Or</span>
-                </div>
-              </div>
-
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setShowSignup(true)}
-                className="w-full border-primary text-primary hover:bg-primary hover:text-primary-foreground py-6 text-lg font-semibold"
-              >
-                Create Admin Account
-              </Button>
             </form>
           )}
 
