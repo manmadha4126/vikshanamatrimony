@@ -66,8 +66,11 @@ const DashboardHeader = ({ profile, notificationCount = 0, onSignOut }: Dashboar
             <div className="w-10 h-10 rounded-full gradient-primary flex items-center justify-center">
               <span className="text-primary-foreground font-display font-bold text-lg">V</span>
             </div>
-            <span className="font-display font-bold text-xl text-foreground hidden sm:block">
-              Vikshana Matrimony
+            <span className="font-display font-bold text-xl hidden sm:block">
+              <span className="bg-gradient-to-r from-primary via-primary/80 to-amber-500 bg-clip-text text-transparent">
+                Vikshana
+              </span>
+              <span className="text-foreground ml-1">Matrimony</span>
             </span>
           </Link>
 
