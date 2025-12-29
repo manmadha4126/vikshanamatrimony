@@ -11,6 +11,7 @@ import ShortlistedProfilesSection from '@/components/dashboard/ShortlistedProfil
 import ProfileViewsSection from '@/components/dashboard/ProfileViewsSection';
 import WhoViewedMeSection from '@/components/dashboard/WhoViewedMeSection';
 import AssistedServiceSection from '@/components/dashboard/AssistedServiceSection';
+import SuccessStoriesSection from '@/components/dashboard/SuccessStoriesSection';
 import PartnerPreferencesSection from '@/components/dashboard/PartnerPreferencesSection';
 import EditProfileSection from '@/components/dashboard/EditProfileSection';
 import ViewProfileSection from '@/components/dashboard/ViewProfileSection';
@@ -325,6 +326,8 @@ const Dashboard = () => {
                 </div>
 
                 <AssistedServiceSection />
+
+                <SuccessStoriesSection />
               </>
             )}
 
