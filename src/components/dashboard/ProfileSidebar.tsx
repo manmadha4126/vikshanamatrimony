@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Camera, Edit, Settings, Crown, ChevronDown } from 'lucide-react';
+import { Camera, Edit, Settings, Crown, User, LogOut } from 'lucide-react';
 
 interface ProfileSidebarProps {
   profile: {
@@ -11,9 +11,10 @@ interface ProfileSidebarProps {
     profile_id: string | null;
     is_prime?: boolean;
   };
+  onSignOut: () => void;
 }
 
-const ProfileSidebar = ({ profile }: ProfileSidebarProps) => {
+const ProfileSidebar = ({ profile, onSignOut }: ProfileSidebarProps) => {
   const getInitials = (name: string) => {
     return name
       .split(' ')
@@ -87,18 +88,13 @@ const ProfileSidebar = ({ profile }: ProfileSidebarProps) => {
       {/* Divider */}
       <div className="my-6 border-t border-border" />
 
-      {/* Switch Account */}
-      <button className="w-full flex items-center justify-between py-3 px-2 hover:bg-muted/50 rounded-lg transition-colors">
-        <span className="text-sm font-medium text-foreground">Switch account</span>
-        <div className="flex items-center gap-2">
-          <div className="flex -space-x-2">
-            <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center text-xs font-medium">
-              V
-            </div>
-          </div>
-          <ChevronDown className="h-4 w-4 text-muted-foreground" />
-        </div>
-      </button>
+      {/* View Profile */}
+      <Link to="/dashboard/profile">
+        <button className="w-full flex items-center gap-3 py-3 px-2 hover:bg-muted/50 rounded-lg transition-colors">
+          <User className="h-5 w-5 text-muted-foreground" />
+          <span className="text-sm font-medium text-foreground">View profile</span>
+        </button>
+      </Link>
 
       {/* Edit Profile */}
       <Link to="/dashboard/edit-profile">
@@ -115,6 +111,15 @@ const ProfileSidebar = ({ profile }: ProfileSidebarProps) => {
           <span className="text-sm font-medium text-foreground">Edit preferences</span>
         </button>
       </Link>
+
+      {/* Log Out */}
+      <button
+        onClick={onSignOut}
+        className="w-full flex items-center gap-3 py-3 px-2 hover:bg-destructive/10 rounded-lg transition-colors text-destructive"
+      >
+        <LogOut className="h-5 w-5" />
+        <span className="text-sm font-medium">Log out</span>
+      </button>
     </aside>
   );
 };

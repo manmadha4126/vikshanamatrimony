@@ -73,6 +73,7 @@ const Dashboard = () => {
                 profile_id: profile.profile_id,
                 is_prime: profile.is_prime || false,
               }}
+              onSignOut={handleSignOut}
             />
           </div>
 
