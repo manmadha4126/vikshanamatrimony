@@ -27,7 +27,6 @@ const HeroSection = () => {
         <div className="flex flex-col items-center text-center space-y-8">
           {/* Text Content */}
           <div className="animate-fade-up max-w-4xl">
-            <span className="inline-block px-4 py-2 bg-secondary/20 text-secondary-foreground rounded-full text-sm font-medium mb-6"></span>
             <h1 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold text-foreground leading-tight mb-6">
               Waiting for <span className="text-primary">Someone</span>{" "}
               <span className="text-secondary"> Special...!</span>
