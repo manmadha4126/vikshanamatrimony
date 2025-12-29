@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Camera, Edit, Settings, Crown, User, LogOut, BadgeCheck, Home } from 'lucide-react';
 
-type DashboardView = 'home' | 'preferences' | 'search';
+type DashboardView = 'home' | 'preferences' | 'search' | 'edit-profile';
 
 interface ProfileSidebarProps {
   profile: {
@@ -16,10 +16,12 @@ interface ProfileSidebarProps {
   };
   onSignOut: () => void;
   onPreferencesClick?: () => void;
+  onEditProfileClick?: () => void;
+  onHomeClick?: () => void;
   activeView?: DashboardView;
 }
 
-const ProfileSidebar = ({ profile, onSignOut, onPreferencesClick, activeView = 'home' }: ProfileSidebarProps) => {
+const ProfileSidebar = ({ profile, onSignOut, onPreferencesClick, onEditProfileClick, onHomeClick, activeView = 'home' }: ProfileSidebarProps) => {
   const getInitials = (name: string) => {
     return name
       .split(' ')
@@ -105,7 +107,7 @@ const ProfileSidebar = ({ profile, onSignOut, onPreferencesClick, activeView = '
 
         {/* Dashboard Home */}
         <button 
-          onClick={() => window.location.reload()}
+          onClick={onHomeClick}
           className={`w-full flex items-center gap-3 py-3 px-2 hover:bg-muted/50 rounded-lg transition-colors ${activeView === 'home' ? 'bg-muted' : ''}`}
         >
           <Home className="h-5 w-5 text-muted-foreground" />
@@ -119,7 +121,10 @@ const ProfileSidebar = ({ profile, onSignOut, onPreferencesClick, activeView = '
         </button>
 
         {/* Edit Profile */}
-        <button className="w-full flex items-center gap-3 py-3 px-2 hover:bg-muted/50 rounded-lg transition-colors">
+        <button 
+          onClick={onEditProfileClick}
+          className={`w-full flex items-center gap-3 py-3 px-2 hover:bg-muted/50 rounded-lg transition-colors ${activeView === 'edit-profile' ? 'bg-muted' : ''}`}
+        >
           <Edit className="h-5 w-5 text-muted-foreground" />
           <span className="text-sm font-medium text-foreground">Edit profile</span>
         </button>
