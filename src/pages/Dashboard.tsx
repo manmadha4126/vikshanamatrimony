@@ -11,6 +11,9 @@ import PartnerPreferencesSection from '@/components/dashboard/PartnerPreferences
 import EditProfileSection from '@/components/dashboard/EditProfileSection';
 import ViewProfileSection from '@/components/dashboard/ViewProfileSection';
 import InterestsSection from '@/components/dashboard/InterestsSection';
+import MessagesSection from '@/components/dashboard/MessagesSection';
+import NotificationsSection from '@/components/dashboard/NotificationsSection';
+import MatchesSection from '@/components/dashboard/MatchesSection';
 import Footer from '@/components/Footer';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -29,7 +32,7 @@ import {
   stateOptions,
 } from '@/data/registrationOptions';
 
-type DashboardView = 'home' | 'preferences' | 'search' | 'edit-profile' | 'view-profile' | 'interests';
+type DashboardView = 'home' | 'preferences' | 'search' | 'edit-profile' | 'view-profile' | 'interests' | 'messages' | 'notifications' | 'matches';
 
 interface SearchFilters {
   age_from: number;
@@ -244,6 +247,9 @@ const Dashboard = () => {
         onViewProfileClick={() => handleViewChange('view-profile')}
         onHomeClick={() => handleViewChange('home')}
         onInterestsClick={() => handleViewChange('interests')}
+        onMessagesClick={() => handleViewChange('messages')}
+        onNotificationsClick={() => handleViewChange('notifications')}
+        onMatchesClick={() => handleViewChange('matches')}
       />
 
       <div className="container mx-auto px-4 py-6">
@@ -264,6 +270,9 @@ const Dashboard = () => {
               onViewProfileClick={() => handleViewChange('view-profile')}
               onHomeClick={() => handleViewChange('home')}
               onInterestsClick={() => handleViewChange('interests')}
+              onMessagesClick={() => handleViewChange('messages')}
+              onNotificationsClick={() => handleViewChange('notifications')}
+              onMatchesClick={() => handleViewChange('matches')}
               activeView={activeView}
             />
           </div>
@@ -384,6 +393,24 @@ const Dashboard = () => {
               <InterestsSection
                 userId={user.id}
                 profileId={profile.id}
+              />
+            )}
+
+            {activeView === 'messages' && (
+              <MessagesSection
+                userId={user.id}
+                profileId={profile.id}
+              />
+            )}
+
+            {activeView === 'notifications' && (
+              <NotificationsSection userId={user.id} />
+            )}
+
+            {activeView === 'matches' && (
+              <MatchesSection
+                userId={user.id}
+                userGender={profile.gender}
               />
             )}
 
