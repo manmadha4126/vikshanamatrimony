@@ -2,9 +2,9 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Camera, Edit, Settings, Crown, User, LogOut, BadgeCheck, Home, Eye } from 'lucide-react';
+import { Camera, Edit, Settings, Crown, User, LogOut, BadgeCheck, Home, Eye, Heart } from 'lucide-react';
 
-type DashboardView = 'home' | 'preferences' | 'search' | 'edit-profile' | 'view-profile';
+type DashboardView = 'home' | 'preferences' | 'search' | 'edit-profile' | 'view-profile' | 'interests';
 
 interface ProfileSidebarProps {
   profile: {
@@ -19,10 +19,11 @@ interface ProfileSidebarProps {
   onEditProfileClick?: () => void;
   onViewProfileClick?: () => void;
   onHomeClick?: () => void;
+  onInterestsClick?: () => void;
   activeView?: DashboardView;
 }
 
-const ProfileSidebar = ({ profile, onSignOut, onPreferencesClick, onEditProfileClick, onViewProfileClick, onHomeClick, activeView = 'home' }: ProfileSidebarProps) => {
+const ProfileSidebar = ({ profile, onSignOut, onPreferencesClick, onEditProfileClick, onViewProfileClick, onHomeClick, onInterestsClick, activeView = 'home' }: ProfileSidebarProps) => {
   const getInitials = (name: string) => {
     return name
       .split(' ')
@@ -140,6 +141,15 @@ const ProfileSidebar = ({ profile, onSignOut, onPreferencesClick, onEditProfileC
         >
           <Settings className="h-5 w-5 text-muted-foreground" />
           <span className="text-sm font-medium text-foreground">Edit preferences</span>
+        </button>
+
+        {/* Interests */}
+        <button 
+          onClick={onInterestsClick}
+          className={`w-full flex items-center gap-3 py-3 px-2 hover:bg-muted/50 rounded-lg transition-colors ${activeView === 'interests' ? 'bg-muted' : ''}`}
+        >
+          <Heart className="h-5 w-5 text-muted-foreground" />
+          <span className="text-sm font-medium text-foreground">Interests</span>
         </button>
 
         {/* Log Out */}

@@ -39,6 +39,7 @@ interface DashboardHeaderProps {
   onEditProfileClick?: () => void;
   onViewProfileClick?: () => void;
   onHomeClick?: () => void;
+  onInterestsClick?: () => void;
 }
 
 const DashboardHeader = ({ 
@@ -50,12 +51,13 @@ const DashboardHeader = ({
   onEditProfileClick,
   onViewProfileClick,
   onHomeClick,
+  onInterestsClick,
 }: DashboardHeaderProps) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const navItems = [
-    { icon: Home, label: 'Home', action: () => window.location.href = '/my-dashboard' },
-    { icon: Heart, label: 'Interests', action: () => {} },
+    { icon: Home, label: 'Home', action: onHomeClick },
+    { icon: Heart, label: 'Interests', action: onInterestsClick },
     { icon: Gem, label: 'Matches', action: () => {} },
     { icon: MessageCircle, label: 'Messages', action: () => {} },
     { icon: Search, label: 'Search', action: onSearchClick },
