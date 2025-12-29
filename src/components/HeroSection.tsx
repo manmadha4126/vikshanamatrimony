@@ -1,8 +1,4 @@
-import weddingNew1 from "@/assets/wedding-1-new.jpg";
-import weddingNew3 from "@/assets/wedding-3-new.jpg";
-import weddingCarousel1 from "@/assets/wedding-carousel-1.jpg";
 import weddingCarousel2 from "@/assets/wedding-carousel-2.jpg";
-import weddingCarousel3 from "@/assets/wedding-carousel-3.jpg";
 import weddingCarousel4 from "@/assets/wedding-carousel-4.jpg";
 import weddingCarousel6 from "@/assets/wedding-carousel-6.jpg";
 import { Button } from "@/components/ui/button";
@@ -10,11 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 
 const weddingImages = [
-  weddingNew1,
-  weddingNew3,
-  weddingCarousel1,
   weddingCarousel2,
-  weddingCarousel3,
   weddingCarousel4,
   weddingCarousel6,
 ];
