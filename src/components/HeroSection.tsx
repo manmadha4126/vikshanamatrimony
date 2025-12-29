@@ -11,12 +11,11 @@ const HeroSection = () => {
   const [currentImage, setCurrentImage] = useState(0);
   useEffect(() => {
     const timer = setInterval(() => {
-      setCurrentImage((prev) => (prev + 1) % weddingImages.length);
+      setCurrentImage(prev => (prev + 1) % weddingImages.length);
     }, 4000);
     return () => clearInterval(timer);
   }, []);
-  return (
-    <section className="relative min-h-[90vh] gradient-hero overflow-hidden">
+  return <section className="relative min-h-[90vh] gradient-hero overflow-hidden">
       {/* Decorative elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-20 left-10 w-64 h-64 bg-secondary/10 rounded-full blur-3xl" />
@@ -27,6 +26,9 @@ const HeroSection = () => {
         <div className="flex flex-col items-center text-center space-y-8">
           {/* Text Content */}
           <div className="animate-fade-up max-w-4xl">
+            <span className="inline-block px-4 py-2 bg-secondary/20 text-secondary-foreground rounded-full text-sm font-medium mb-6">
+              #1 Trusted Matrimony Service
+            </span>
             <h1 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold text-foreground leading-tight mb-6">
               Waiting for <span className="text-primary">Someone</span>{" "}
               <span className="text-secondary"> Special...!</span>
@@ -41,21 +43,11 @@ const HeroSection = () => {
           </div>
 
           {/* Hero Image Carousel */}
-          <div
-            className="relative animate-fade-up w-full max-w-5xl"
-            style={{
-              animationDelay: "0.2s",
-            }}
-          >
+          <div className="relative animate-fade-up w-full max-w-5xl" style={{
+          animationDelay: "0.2s"
+        }}>
             <div className="relative rounded-2xl overflow-hidden shadow-card">
-              {weddingImages.map((img, index) => (
-                <img
-                  key={index}
-                  src={img}
-                  alt={`Happy Indian Wedding Couple ${index + 1}`}
-                  className={`w-full h-[500px] lg:h-[600px] object-cover transition-opacity duration-1000 ${index === currentImage ? "opacity-100" : "opacity-0 absolute inset-0"}`}
-                />
-              ))}
+              {weddingImages.map((img, index) => <img key={index} src={img} alt={`Happy Indian Wedding Couple ${index + 1}`} className={`w-full h-[500px] lg:h-[600px] object-cover transition-opacity duration-1000 ${index === currentImage ? "opacity-100" : "opacity-0 absolute inset-0"}`} />)}
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
 
               {/* Text Overlay on Image */}
@@ -68,13 +60,7 @@ const HeroSection = () => {
 
             {/* Image Indicators */}
             <div className="absolute bottom-20 left-1/2 -translate-x-1/2 flex gap-2 z-10">
-              {weddingImages.map((_, index) => (
-                <button
-                  key={index}
-                  onClick={() => setCurrentImage(index)}
-                  className={`w-2 h-2 rounded-full transition-all ${index === currentImage ? "bg-primary w-6" : "bg-white/60"}`}
-                />
-              ))}
+              {weddingImages.map((_, index) => <button key={index} onClick={() => setCurrentImage(index)} className={`w-2 h-2 rounded-full transition-all ${index === currentImage ? "bg-primary w-6" : "bg-white/60"}`} />)}
             </div>
 
             {/* Floating Stats */}
@@ -95,7 +81,6 @@ const HeroSection = () => {
           </div>
         </div>
       </div>
-    </section>
-  );
+    </section>;
 };
 export default HeroSection;
