@@ -1,9 +1,23 @@
-import heroWedding from "@/assets/hero-wedding.jpg";
+import wedding1 from "@/assets/wedding-1.jpg";
+import wedding2 from "@/assets/wedding-2.jpg";
+import wedding3 from "@/assets/wedding-3.jpg";
+import wedding4 from "@/assets/wedding-4.jpg";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+
+const weddingImages = [wedding1, wedding2, wedding3, wedding4];
 
 const HeroSection = () => {
   const navigate = useNavigate();
+  const [currentImage, setCurrentImage] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentImage((prev) => (prev + 1) % weddingImages.length);
+    }, 4000);
+    return () => clearInterval(timer);
+  }, []);
 
   return (
     <section className="relative min-h-[90vh] gradient-hero overflow-hidden">
@@ -39,15 +53,33 @@ const HeroSection = () => {
             </Button>
           </div>
 
-          {/* Hero Image - Extended */}
+          {/* Hero Image Carousel */}
           <div className="relative animate-fade-up w-full max-w-5xl" style={{ animationDelay: "0.2s" }}>
             <div className="relative rounded-2xl overflow-hidden shadow-card">
-              <img 
-                src={heroWedding} 
-                alt="Happy Indian Wedding Couple" 
-                className="w-full h-[500px] lg:h-[600px] object-cover" 
-              />
+              {weddingImages.map((img, index) => (
+                <img 
+                  key={index}
+                  src={img} 
+                  alt={`Happy Indian Wedding Couple ${index + 1}`} 
+                  className={`w-full h-[500px] lg:h-[600px] object-cover transition-opacity duration-1000 ${
+                    index === currentImage ? 'opacity-100' : 'opacity-0 absolute inset-0'
+                  }`}
+                />
+              ))}
               <div className="absolute inset-0 bg-gradient-to-t from-primary/30 to-transparent" />
+            </div>
+            
+            {/* Image Indicators */}
+            <div className="absolute bottom-20 left-1/2 -translate-x-1/2 flex gap-2 z-10">
+              {weddingImages.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => setCurrentImage(index)}
+                  className={`w-2 h-2 rounded-full transition-all ${
+                    index === currentImage ? 'bg-primary w-6' : 'bg-white/60'
+                  }`}
+                />
+              ))}
             </div>
             
             {/* Floating Stats */}
