@@ -327,7 +327,7 @@ const Dashboard = () => {
 
                 <AssistedServiceSection />
 
-                <SuccessStoriesSection />
+                <SuccessStoriesSection userId={user.id} userName={profile.name} />
               </>
             )}
 

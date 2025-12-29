@@ -420,6 +420,51 @@ export type Database = {
           },
         ]
       }
+      success_stories: {
+        Row: {
+          approved_at: string | null
+          approved_by: string | null
+          created_at: string
+          id: string
+          partner_name: string
+          photo_url: string | null
+          status: string
+          story: string
+          updated_at: string
+          user_id: string
+          wedding_date: string
+          wedding_location: string
+        }
+        Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
+          created_at?: string
+          id?: string
+          partner_name: string
+          photo_url?: string | null
+          status?: string
+          story: string
+          updated_at?: string
+          user_id: string
+          wedding_date: string
+          wedding_location: string
+        }
+        Update: {
+          approved_at?: string | null
+          approved_by?: string | null
+          created_at?: string
+          id?: string
+          partner_name?: string
+          photo_url?: string | null
+          status?: string
+          story?: string
+          updated_at?: string
+          user_id?: string
+          wedding_date?: string
+          wedding_location?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
