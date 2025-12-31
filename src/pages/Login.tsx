@@ -241,6 +241,9 @@ const Login = () => {
               Find your perfect match with{" "}
               <span className="text-secondary font-semibold">Vikshana Matrimony</span>
             </p>
+            <p className="mt-2 text-cyan-400/80 text-base italic animate-pulse">
+              Waiting for someone special...!
+            </p>
           </div>
 
           {/* Auto-Scrolling Image Gallery */}
