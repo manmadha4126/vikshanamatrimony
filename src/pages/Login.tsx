@@ -199,19 +199,111 @@ const Login = () => {
           </div>
         </div>
 
-        {/* Welcome Back Section - Desktop Only */}
+        {/* Welcome Back Section - Desktop Only with 3D Design */}
         <div className="hidden lg:flex flex-1 items-center justify-center pl-12">
-          <div className="text-right">
-            <h2 className="text-5xl font-display font-bold text-white leading-tight">
-              WELCOME
-            </h2>
-            <h2 className="text-5xl font-display font-bold bg-gradient-to-r from-cyan-400 to-teal-300 bg-clip-text text-transparent leading-tight">
-              BACK!
-            </h2>
-            <p className="mt-4 text-slate-400 text-lg">
-              Find your perfect match with<br />
-              <span className="text-secondary font-semibold">Vikshana Matrimony</span>
-            </p>
+          <div className="relative" style={{ perspective: "1000px" }}>
+            {/* 3D Image Stack */}
+            <div 
+              className="relative w-80 h-96"
+              style={{ 
+                transformStyle: "preserve-3d",
+                transform: "rotateY(-15deg) rotateX(5deg)"
+              }}
+            >
+              {/* Back Image */}
+              <div 
+                className="absolute inset-0 rounded-2xl overflow-hidden shadow-2xl"
+                style={{ 
+                  transform: "translateZ(-60px) translateX(40px) translateY(-20px) rotateZ(8deg)",
+                  boxShadow: "0 25px 50px -12px rgba(0,0,0,0.5)"
+                }}
+              >
+                <img 
+                  src="/src/assets/wedding-carousel-2.jpg" 
+                  alt="Wedding couple" 
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent" />
+              </div>
+
+              {/* Middle Image */}
+              <div 
+                className="absolute inset-0 rounded-2xl overflow-hidden shadow-2xl"
+                style={{ 
+                  transform: "translateZ(-30px) translateX(20px) translateY(-10px) rotateZ(4deg)",
+                  boxShadow: "0 25px 50px -12px rgba(0,0,0,0.5)"
+                }}
+              >
+                <img 
+                  src="/src/assets/wedding-carousel-3.jpg" 
+                  alt="Wedding celebration" 
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-900/40 to-transparent" />
+              </div>
+
+              {/* Front Image */}
+              <div 
+                className="absolute inset-0 rounded-2xl overflow-hidden shadow-2xl border-2 border-white/20"
+                style={{ 
+                  transform: "translateZ(0px)",
+                  boxShadow: "0 35px 60px -15px rgba(0,0,0,0.6), 0 0 40px rgba(6,182,212,0.2)"
+                }}
+              >
+                <img 
+                  src="/src/assets/wedding-carousel-1.jpg" 
+                  alt="Happy couple" 
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-900/70 via-transparent to-transparent" />
+                
+                {/* Floating Hearts Animation */}
+                <div className="absolute top-4 right-4 text-2xl animate-float">💍</div>
+                <div className="absolute bottom-20 left-4 text-xl animate-float" style={{ animationDelay: "1s" }}>❤️</div>
+              </div>
+            </div>
+
+            {/* 3D Welcome Text */}
+            <div 
+              className="absolute -bottom-16 left-1/2 transform -translate-x-1/2 text-center"
+              style={{ 
+                transformStyle: "preserve-3d",
+                transform: "translateX(-50%) rotateX(-10deg)"
+              }}
+            >
+              <h2 
+                className="text-5xl font-display font-bold text-white leading-tight"
+                style={{ 
+                  textShadow: "0 4px 8px rgba(0,0,0,0.5), 0 8px 16px rgba(0,0,0,0.3)",
+                  transform: "translateZ(20px)"
+                }}
+              >
+                WELCOME
+              </h2>
+              <h2 
+                className="text-5xl font-display font-bold bg-gradient-to-r from-cyan-400 to-teal-300 bg-clip-text text-transparent leading-tight"
+                style={{ 
+                  filter: "drop-shadow(0 4px 8px rgba(6,182,212,0.4))",
+                  transform: "translateZ(30px)"
+                }}
+              >
+                BACK!
+              </h2>
+              <p className="mt-4 text-slate-400 text-lg">
+                Find your perfect match with<br />
+                <span className="text-secondary font-semibold">Vikshana Matrimony</span>
+              </p>
+            </div>
+
+            {/* Decorative 3D Ring */}
+            <div 
+              className="absolute -top-8 -right-8 w-16 h-16 border-4 border-cyan-400/40 rounded-full animate-spin"
+              style={{ 
+                animationDuration: "8s",
+                transform: "rotateX(60deg) translateZ(40px)",
+                boxShadow: "0 0 20px rgba(6,182,212,0.3)"
+              }}
+            />
           </div>
         </div>
       </div>
