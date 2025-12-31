@@ -5,8 +5,21 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "@/hooks/use-toast";
-import { User, Lock, Mail, Phone, Eye, EyeOff } from "lucide-react";
+import { Lock, Mail, Phone, Eye, EyeOff } from "lucide-react";
 import { z } from "zod";
+
+// Import wedding images
+import weddingImg1 from "@/assets/wedding-carousel-1.jpg";
+import weddingImg2 from "@/assets/wedding-carousel-2.jpg";
+import weddingImg3 from "@/assets/wedding-carousel-3.jpg";
+import weddingImg4 from "@/assets/wedding-carousel-4.jpg";
+import weddingImg6 from "@/assets/wedding-carousel-6.jpg";
+import weddingHero1 from "@/assets/wedding-hero-1.jpg";
+import weddingHero2 from "@/assets/wedding-hero-2.jpg";
+
+const weddingImages = [
+  weddingImg1, weddingImg2, weddingImg3, weddingImg4, weddingImg6, weddingHero1, weddingHero2
+];
 
 const loginSchema = z.object({
   identifier: z.string().min(1, "Phone or Email is required"),
@@ -199,112 +212,109 @@ const Login = () => {
           </div>
         </div>
 
-        {/* Welcome Back Section - Desktop Only with 3D Design */}
-        <div className="hidden lg:flex flex-1 items-center justify-center pl-12">
-          <div className="relative" style={{ perspective: "1000px" }}>
-            {/* 3D Image Stack */}
-            <div 
-              className="relative w-80 h-96"
+        {/* Welcome Back Section - Desktop Only with Auto-Scrolling Images */}
+        <div className="hidden lg:flex flex-1 flex-col items-center justify-center pl-8 overflow-hidden">
+          {/* 3D Welcome Text */}
+          <div 
+            className="text-center mb-8 relative z-10"
+            style={{ perspective: "1000px" }}
+          >
+            <h2 
+              className="text-6xl font-display font-bold text-white leading-tight"
               style={{ 
-                transformStyle: "preserve-3d",
-                transform: "rotateY(-15deg) rotateX(5deg)"
+                textShadow: "0 4px 12px rgba(0,0,0,0.5), 0 8px 24px rgba(0,0,0,0.3)",
+                transform: "rotateX(-5deg) translateZ(20px)"
               }}
             >
-              {/* Back Image */}
-              <div 
-                className="absolute inset-0 rounded-2xl overflow-hidden shadow-2xl"
-                style={{ 
-                  transform: "translateZ(-60px) translateX(40px) translateY(-20px) rotateZ(8deg)",
-                  boxShadow: "0 25px 50px -12px rgba(0,0,0,0.5)"
-                }}
-              >
-                <img 
-                  src="/src/assets/wedding-carousel-2.jpg" 
-                  alt="Wedding couple" 
-                  className="w-full h-full object-cover"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent" />
-              </div>
-
-              {/* Middle Image */}
-              <div 
-                className="absolute inset-0 rounded-2xl overflow-hidden shadow-2xl"
-                style={{ 
-                  transform: "translateZ(-30px) translateX(20px) translateY(-10px) rotateZ(4deg)",
-                  boxShadow: "0 25px 50px -12px rgba(0,0,0,0.5)"
-                }}
-              >
-                <img 
-                  src="/src/assets/wedding-carousel-3.jpg" 
-                  alt="Wedding celebration" 
-                  className="w-full h-full object-cover"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-900/40 to-transparent" />
-              </div>
-
-              {/* Front Image */}
-              <div 
-                className="absolute inset-0 rounded-2xl overflow-hidden shadow-2xl border-2 border-white/20"
-                style={{ 
-                  transform: "translateZ(0px)",
-                  boxShadow: "0 35px 60px -15px rgba(0,0,0,0.6), 0 0 40px rgba(6,182,212,0.2)"
-                }}
-              >
-                <img 
-                  src="/src/assets/wedding-carousel-1.jpg" 
-                  alt="Happy couple" 
-                  className="w-full h-full object-cover"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-900/70 via-transparent to-transparent" />
-                
-                {/* Floating Hearts Animation */}
-                <div className="absolute top-4 right-4 text-2xl animate-float">💍</div>
-                <div className="absolute bottom-20 left-4 text-xl animate-float" style={{ animationDelay: "1s" }}>❤️</div>
-              </div>
-            </div>
-
-            {/* 3D Welcome Text */}
-            <div 
-              className="absolute -bottom-16 left-1/2 transform -translate-x-1/2 text-center"
+              WELCOME
+            </h2>
+            <h2 
+              className="text-6xl font-display font-bold bg-gradient-to-r from-cyan-400 via-teal-300 to-cyan-400 bg-clip-text text-transparent leading-tight"
               style={{ 
-                transformStyle: "preserve-3d",
-                transform: "translateX(-50%) rotateX(-10deg)"
+                filter: "drop-shadow(0 4px 12px rgba(6,182,212,0.5))",
+                transform: "rotateX(-5deg) translateZ(30px)"
               }}
             >
-              <h2 
-                className="text-5xl font-display font-bold text-white leading-tight"
-                style={{ 
-                  textShadow: "0 4px 8px rgba(0,0,0,0.5), 0 8px 16px rgba(0,0,0,0.3)",
-                  transform: "translateZ(20px)"
-                }}
-              >
-                WELCOME
-              </h2>
-              <h2 
-                className="text-5xl font-display font-bold bg-gradient-to-r from-cyan-400 to-teal-300 bg-clip-text text-transparent leading-tight"
-                style={{ 
-                  filter: "drop-shadow(0 4px 8px rgba(6,182,212,0.4))",
-                  transform: "translateZ(30px)"
-                }}
-              >
-                BACK!
-              </h2>
-              <p className="mt-4 text-slate-400 text-lg">
-                Find your perfect match with<br />
-                <span className="text-secondary font-semibold">Vikshana Matrimony</span>
-              </p>
-            </div>
-
-            {/* Decorative 3D Ring */}
-            <div 
-              className="absolute -top-8 -right-8 w-16 h-16 border-4 border-cyan-400/40 rounded-full animate-spin"
-              style={{ 
-                animationDuration: "8s",
-                transform: "rotateX(60deg) translateZ(40px)",
-                boxShadow: "0 0 20px rgba(6,182,212,0.3)"
-              }}
-            />
+              BACK!
+            </h2>
+            <p className="mt-3 text-slate-400 text-lg">
+              Find your perfect match with{" "}
+              <span className="text-secondary font-semibold">Vikshana Matrimony</span>
+            </p>
           </div>
+
+          {/* Auto-Scrolling Image Gallery */}
+          <div 
+            className="relative w-full overflow-hidden rounded-2xl"
+            style={{ 
+              perspective: "1200px",
+              height: "320px"
+            }}
+          >
+            {/* Gradient overlays for smooth edges */}
+            <div className="absolute left-0 top-0 bottom-0 w-20 bg-gradient-to-r from-slate-900 to-transparent z-10" />
+            <div className="absolute right-0 top-0 bottom-0 w-20 bg-gradient-to-l from-slate-900 to-transparent z-10" />
+            
+            {/* Scrolling container */}
+            <div 
+              className="flex gap-4 animate-scroll-left"
+              style={{
+                width: "fit-content",
+                animation: "scroll-left 25s linear infinite"
+              }}
+            >
+              {/* First set of images */}
+              {weddingImages.map((img, index) => (
+                <div
+                  key={`first-${index}`}
+                  className="flex-shrink-0 w-64 h-80 rounded-xl overflow-hidden shadow-2xl border-2 border-white/10 transform transition-transform duration-500 hover:scale-105 hover:z-20"
+                  style={{
+                    boxShadow: "0 25px 50px -12px rgba(0,0,0,0.6), 0 0 30px rgba(6,182,212,0.15)"
+                  }}
+                >
+                  <img 
+                    src={img} 
+                    alt={`Hindu wedding ${index + 1}`}
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-transparent to-transparent" />
+                </div>
+              ))}
+              {/* Duplicate set for seamless loop */}
+              {weddingImages.map((img, index) => (
+                <div
+                  key={`second-${index}`}
+                  className="flex-shrink-0 w-64 h-80 rounded-xl overflow-hidden shadow-2xl border-2 border-white/10 transform transition-transform duration-500 hover:scale-105 hover:z-20"
+                  style={{
+                    boxShadow: "0 25px 50px -12px rgba(0,0,0,0.6), 0 0 30px rgba(6,182,212,0.15)"
+                  }}
+                >
+                  <img 
+                    src={img} 
+                    alt={`Hindu wedding ${index + 1}`}
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-transparent to-transparent" />
+                </div>
+              ))}
+            </div>
+
+            {/* Floating decorative elements */}
+            <div className="absolute top-4 right-24 text-3xl animate-float z-20">💍</div>
+            <div className="absolute bottom-8 left-24 text-2xl animate-float z-20" style={{ animationDelay: "1.5s" }}>❤️</div>
+          </div>
+
+          {/* CSS for scroll animation */}
+          <style>{`
+            @keyframes scroll-left {
+              0% {
+                transform: translateX(0);
+              }
+              100% {
+                transform: translateX(-50%);
+              }
+            }
+          `}</style>
         </div>
       </div>
     </div>
