@@ -5,27 +5,30 @@ import { Textarea } from "@/components/ui/textarea";
 import { MapPin, Phone, Mail, Clock, Facebook, Instagram, MessageCircle } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
-
 const ContactSection = () => {
-  const { toast } = useToast();
+  const {
+    toast
+  } = useToast();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     phone: "",
-    message: "",
+    message: ""
   });
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     toast({
       title: "Message Sent!",
-      description: "Thank you for reaching out. We'll get back to you soon.",
+      description: "Thank you for reaching out. We'll get back to you soon."
     });
-    setFormData({ name: "", email: "", phone: "", message: "" });
+    setFormData({
+      name: "",
+      email: "",
+      phone: "",
+      message: ""
+    });
   };
-
-  return (
-    <section id="contact" className="py-16 bg-background">
+  return <section id="contact" className="py-16 bg-background">
       <div className="container">
         {/* Section Header */}
         <div className="max-w-2xl mx-auto text-center mb-12">
@@ -50,52 +53,34 @@ const ContactSection = () => {
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-1.5">
                 <Label htmlFor="contact-name" className="text-sm">Full Name</Label>
-                <Input
-                  id="contact-name"
-                  type="text"
-                  placeholder="Enter your name"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  required
-                  className="h-10"
-                />
+                <Input id="contact-name" type="text" placeholder="Enter your name" value={formData.name} onChange={e => setFormData({
+                ...formData,
+                name: e.target.value
+              })} required className="h-10" />
               </div>
 
               <div className="space-y-1.5">
                 <Label htmlFor="contact-email" className="text-sm">Email Address</Label>
-                <Input
-                  id="contact-email"
-                  type="email"
-                  placeholder="Enter your email"
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  required
-                  className="h-10"
-                />
+                <Input id="contact-email" type="email" placeholder="Enter your email" value={formData.email} onChange={e => setFormData({
+                ...formData,
+                email: e.target.value
+              })} required className="h-10" />
               </div>
 
               <div className="space-y-1.5">
                 <Label htmlFor="contact-phone" className="text-sm">Phone Number</Label>
-                <Input
-                  id="contact-phone"
-                  type="tel"
-                  placeholder="+91 98765 43210"
-                  value={formData.phone}
-                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                  className="h-10"
-                />
+                <Input id="contact-phone" type="tel" placeholder="+91 98765 43210" value={formData.phone} onChange={e => setFormData({
+                ...formData,
+                phone: e.target.value
+              })} className="h-10" />
               </div>
 
               <div className="space-y-1.5">
                 <Label htmlFor="contact-message" className="text-sm">Your Message</Label>
-                <Textarea
-                  id="contact-message"
-                  placeholder="How can we help you?"
-                  value={formData.message}
-                  onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                  required
-                  className="min-h-[100px] resize-none"
-                />
+                <Textarea id="contact-message" placeholder="How can we help you?" value={formData.message} onChange={e => setFormData({
+                ...formData,
+                message: e.target.value
+              })} required className="min-h-[100px] resize-none" />
               </div>
 
               <Button type="submit" variant="primary" className="w-full">
@@ -120,8 +105,8 @@ const ContactSection = () => {
                   <div>
                     <h4 className="font-semibold text-foreground text-sm mb-0.5">Address</h4>
                     <p className="text-muted-foreground text-xs">
-                      123 Marriage Lane, T. Nagar<br />
-                      Chennai, Tamil Nadu 600017<br />
+                      ​20-1-244, Korlagunta junction, Tirupati Bypass road     <br />
+                      Tirupati, Andhrapradesh -     <br />
                       India
                     </p>
                   </div>
@@ -177,22 +162,13 @@ const ContactSection = () => {
                 Follow us on social media for updates, success stories, and more.
               </p>
               <div className="flex gap-3">
-                <a 
-                  href="#" 
-                  className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary hover:bg-primary hover:text-primary-foreground transition-colors"
-                >
+                <a href="#" className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary hover:bg-primary hover:text-primary-foreground transition-colors">
                   <Facebook size={18} />
                 </a>
-                <a 
-                  href="#" 
-                  className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary hover:bg-primary hover:text-primary-foreground transition-colors"
-                >
+                <a href="#" className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary hover:bg-primary hover:text-primary-foreground transition-colors">
                   <Instagram size={18} />
                 </a>
-                <a 
-                  href="#" 
-                  className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary hover:bg-primary hover:text-primary-foreground transition-colors"
-                >
+                <a href="#" className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary hover:bg-primary hover:text-primary-foreground transition-colors">
                   <MessageCircle size={18} />
                 </a>
               </div>
@@ -200,8 +176,6 @@ const ContactSection = () => {
           </div>
         </div>
       </div>
-    </section>
-  );
+    </section>;
 };
-
 export default ContactSection;
