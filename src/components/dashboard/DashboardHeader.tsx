@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -25,6 +26,8 @@ import {
   Menu,
   X,
 } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from '@/hooks/use-toast';
 
 interface DashboardHeaderProps {
   profile: {
@@ -45,6 +48,15 @@ interface DashboardHeaderProps {
   onMatchesClick?: () => void;
 }
 
+interface SearchResult {
+  id: string;
+  name: string;
+  profile_id: string | null;
+  photo_url: string | null;
+  city: string | null;
+  state: string | null;
+}
+
 const DashboardHeader = ({ 
   profile, 
   notificationCount = 0, 
@@ -60,13 +72,18 @@ const DashboardHeader = ({
   onMatchesClick,
 }: DashboardHeaderProps) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const navigate = useNavigate();
 
   const navItems = [
     { icon: Home, label: 'Home', action: onHomeClick },
     { icon: Heart, label: 'Interests', action: onInterestsClick },
     { icon: Gem, label: 'Matches', action: onMatchesClick },
     { icon: MessageCircle, label: 'Messages', action: onMessagesClick },
-    { icon: Search, label: 'Search', action: onSearchClick },
+    { icon: Search, label: 'Search', action: () => setIsSearchOpen(!isSearchOpen) },
   ];
 
   const getInitials = (name: string) => {
@@ -76,6 +93,57 @@ const DashboardHeader = ({
       .join('')
       .toUpperCase()
       .slice(0, 2);
+  };
+
+  const handleSearch = async () => {
+    if (!searchQuery.trim()) {
+      toast({
+        title: "Enter a name",
+        description: "Please enter a name to search for profiles.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsSearching(true);
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('id, name, profile_id, photo_url, city, state')
+        .ilike('name', `%${searchQuery.trim()}%`)
+        .limit(10);
+
+      if (error) throw error;
+
+      setSearchResults(data || []);
+      
+      if (!data || data.length === 0) {
+        toast({
+          title: "No profiles found",
+          description: `No profiles found matching "${searchQuery}"`,
+        });
+      }
+    } catch (error: any) {
+      toast({
+        title: "Search failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
+  };
+
+  const closeSearch = () => {
+    setIsSearchOpen(false);
+    setSearchQuery('');
+    setSearchResults([]);
   };
 
   return (
@@ -100,7 +168,7 @@ const DashboardHeader = ({
             {navItems.map((item) => (
               <Button 
                 key={item.label} 
-                variant="ghost" 
+                variant={item.label === 'Search' && isSearchOpen ? 'default' : 'ghost'}
                 size="sm" 
                 className="gap-2"
                 onClick={item.action}
@@ -182,6 +250,71 @@ const DashboardHeader = ({
           </div>
         </div>
 
+        {/* Search Bar */}
+        {isSearchOpen && (
+          <div className="py-3 border-t border-border animate-in slide-in-from-top-2 duration-200">
+            <div className="flex gap-2 max-w-2xl mx-auto">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  type="text"
+                  placeholder="Search profiles by name..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  className="pl-10"
+                  autoFocus
+                />
+              </div>
+              <Button onClick={handleSearch} disabled={isSearching}>
+                {isSearching ? 'Searching...' : 'Search'}
+              </Button>
+              <Button variant="ghost" size="icon" onClick={closeSearch}>
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+
+            {/* Search Results */}
+            {searchResults.length > 0 && (
+              <div className="mt-3 max-w-2xl mx-auto bg-card border border-border rounded-lg overflow-hidden">
+                <div className="p-2 bg-muted/50 border-b border-border">
+                  <p className="text-sm text-muted-foreground">{searchResults.length} profile(s) found</p>
+                </div>
+                <div className="max-h-64 overflow-y-auto">
+                  {searchResults.map((result) => (
+                    <div
+                      key={result.id}
+                      className="flex items-center gap-3 p-3 hover:bg-muted/50 cursor-pointer transition-colors border-b border-border last:border-b-0"
+                      onClick={() => {
+                        // You can navigate to profile view here
+                        toast({
+                          title: "Profile Selected",
+                          description: `Viewing ${result.name}'s profile`,
+                        });
+                        closeSearch();
+                      }}
+                    >
+                      <Avatar className="h-10 w-10">
+                        <AvatarImage src={result.photo_url || undefined} alt={result.name} />
+                        <AvatarFallback className="bg-primary/10 text-primary text-sm">
+                          {getInitials(result.name)}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium text-sm truncate">{result.name}</p>
+                        <p className="text-xs text-muted-foreground truncate">
+                          {result.profile_id} {result.city && result.state && `• ${result.city}, ${result.state}`}
+                        </p>
+                      </div>
+                      <Button variant="outline" size="sm">View</Button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Mobile Navigation */}
         {isMobileMenuOpen && (
           <nav className="lg:hidden py-4 border-t border-border">
@@ -193,7 +326,9 @@ const DashboardHeader = ({
                   className="w-full justify-start gap-2"
                   onClick={() => {
                     item.action?.();
-                    setIsMobileMenuOpen(false);
+                    if (item.label !== 'Search') {
+                      setIsMobileMenuOpen(false);
+                    }
                   }}
                 >
                   <item.icon className="h-4 w-4" />
