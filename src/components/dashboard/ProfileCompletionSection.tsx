@@ -230,10 +230,9 @@ const ProfileCompletionSection = ({ profile, onProfileUpdate }: ProfileCompletio
     <div className="container mx-auto px-4 py-3">
       <Card className="shadow-card">
         <CardHeader className="py-3 px-4">
-          <div className="flex items-center justify-between">
-            <CardTitle className="font-display text-base">Complete Your Profile</CardTitle>
-            <span className="text-lg font-bold text-primary">{completionPercentage}%</span>
-          </div>
+          <CardTitle className="font-display text-base flex items-center gap-2">
+            Complete Your Profile <span className="text-lg font-bold text-primary">{completionPercentage}%</span>
+          </CardTitle>
           <Progress value={completionPercentage} className="h-2 mt-1.5" />
         </CardHeader>
         <CardContent className="py-3 px-4">
