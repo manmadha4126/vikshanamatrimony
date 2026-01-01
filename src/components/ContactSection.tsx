@@ -131,9 +131,8 @@ const ContactSection = () => {
                   </div>
                   <div>
                     <h4 className="font-semibold text-foreground text-sm mb-0.5">Email</h4>
-                    <p className="text-muted-foreground text-xs">
-                      info@lakshmimatrimony.com<br />
-                      support@lakshmimatrimony.com
+                    <p className="text-muted-foreground text-xs">info@vikshanamatrimony.com<br />
+                      ​
                     </p>
                   </div>
                 </div>
