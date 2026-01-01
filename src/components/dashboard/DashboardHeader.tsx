@@ -28,6 +28,7 @@ import {
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
+import ProfileViewModal from './ProfileViewModal';
 
 interface DashboardHeaderProps {
   profile: {
@@ -76,6 +77,8 @@ const DashboardHeader = ({
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [isSearching, setIsSearching] = useState(false);
+  const [selectedProfileId, setSelectedProfileId] = useState<string | null>(null);
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const navigate = useNavigate();
 
   const navItems = [
@@ -286,11 +289,8 @@ const DashboardHeader = ({
                       key={result.id}
                       className="flex items-center gap-3 p-3 hover:bg-muted/50 cursor-pointer transition-colors border-b border-border last:border-b-0"
                       onClick={() => {
-                        // You can navigate to profile view here
-                        toast({
-                          title: "Profile Selected",
-                          description: `Viewing ${result.name}'s profile`,
-                        });
+                        setSelectedProfileId(result.id);
+                        setIsProfileModalOpen(true);
                         closeSearch();
                       }}
                     >
@@ -339,6 +339,16 @@ const DashboardHeader = ({
           </nav>
         )}
       </div>
+
+      {/* Profile View Modal */}
+      <ProfileViewModal
+        profileId={selectedProfileId}
+        isOpen={isProfileModalOpen}
+        onClose={() => {
+          setIsProfileModalOpen(false);
+          setSelectedProfileId(null);
+        }}
+      />
     </header>
   );
 };
