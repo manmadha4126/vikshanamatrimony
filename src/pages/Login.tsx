@@ -100,9 +100,9 @@ const Login = () => {
       <div className="absolute top-20 left-20 w-32 h-32 bg-primary/10 rounded-full blur-3xl animate-float" />
       <div className="absolute bottom-20 right-20 w-48 h-48 bg-cyan-500/10 rounded-full blur-3xl animate-float" style={{ animationDelay: "2s" }} />
 
-      <div className="relative z-10 flex w-full max-w-5xl mx-4">
+      <div className="relative z-10 flex flex-col lg:flex-row w-full max-w-5xl mx-4 items-end lg:items-center gap-8">
         {/* Login Form Card */}
-        <div className="flex-1 max-w-md mx-auto lg:mx-0">
+        <div className="flex-1 max-w-md mx-auto lg:mx-0 mb-8 lg:mb-0">
           <div 
             className="backdrop-blur-xl bg-slate-900/60 border border-slate-700/50 rounded-2xl p-8 shadow-2xl"
             style={{ 
