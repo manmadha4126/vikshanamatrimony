@@ -21,12 +21,16 @@ import {
   Sparkles,
   X,
   Loader2,
+  Lock,
+  Crown,
+  FileText,
 } from 'lucide-react';
 
 interface ProfileViewModalProps {
   profileId: string | null;
   isOpen: boolean;
   onClose: () => void;
+  currentUserIsPrime?: boolean;
 }
 
 interface FullProfile {
@@ -59,9 +63,11 @@ interface FullProfile {
   about_me: string | null;
   hobbies: string[] | null;
   is_prime: boolean | null;
+  phone: string | null;
+  horoscope_url: string | null;
 }
 
-const ProfileViewModal = ({ profileId, isOpen, onClose }: ProfileViewModalProps) => {
+const ProfileViewModal = ({ profileId, isOpen, onClose, currentUserIsPrime = false }: ProfileViewModalProps) => {
   const [profile, setProfile] = useState<FullProfile | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -304,6 +310,48 @@ const ProfileViewModal = ({ profileId, isOpen, onClose }: ProfileViewModalProps)
                 Shortlist
               </Button>
             </div>
+
+            {/* Phone Number Section */}
+            <div className="px-6 mt-4">
+              <div className="p-3 bg-muted/50 rounded-lg flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Phone className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-sm font-medium">Phone Number</span>
+                </div>
+                {currentUserIsPrime ? (
+                  <span className="text-sm font-semibold">{profile.phone || 'Not available'}</span>
+                ) : (
+                  <Button size="sm" variant="outline" className="text-xs">
+                    <Crown className="h-3 w-3 mr-1 text-amber-500" />
+                    Upgrade to Prime
+                  </Button>
+                )}
+              </div>
+            </div>
+
+            {/* Horoscope Section */}
+            {profile.horoscope_url && (
+              <div className="px-6 mt-2">
+                <div className="p-3 bg-primary/5 rounded-lg flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <FileText className="h-4 w-4 text-primary" />
+                    <span className="text-sm font-medium">Horoscope Available</span>
+                  </div>
+                  {currentUserIsPrime ? (
+                    <Button size="sm" variant="outline" className="text-xs" asChild>
+                      <a href={profile.horoscope_url} target="_blank" rel="noopener noreferrer">
+                        View Horoscope
+                      </a>
+                    </Button>
+                  ) : (
+                    <Button size="sm" variant="outline" className="text-xs">
+                      <Lock className="h-3 w-3 mr-1" />
+                      Upgrade to View
+                    </Button>
+                  )}
+                </div>
+              </div>
+            )}
 
             {/* Profile Details */}
             <ScrollArea className="h-[400px] px-6 py-4">

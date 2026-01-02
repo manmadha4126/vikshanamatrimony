@@ -49,13 +49,85 @@ const ProfileCompletionSection = ({ profile, onProfileUpdate }: ProfileCompletio
   const [isUploading, setIsUploading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
+  const [verificationRequested, setVerificationRequested] = useState(false);
+  const [checkingVerification, setCheckingVerification] = useState(false);
+
   const completionPercentage = profile.profile_completion_percentage || 0;
 
-  const handleVerifyPhone = () => {
-    toast({
-      title: "Verification Call Initiated",
-      description: `Our team will call you on ${profile.phone} shortly.`,
-    });
+  // Check if verification request exists
+  const checkVerificationStatus = async () => {
+    setCheckingVerification(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data } = await supabase
+        .from('verification_requests')
+        .select('status')
+        .eq('profile_id', profile.id)
+        .eq('status', 'pending')
+        .maybeSingle();
+
+      setVerificationRequested(!!data);
+    } catch (error) {
+      console.error('Error checking verification:', error);
+    } finally {
+      setCheckingVerification(false);
+    }
+  };
+
+  // Check on mount
+  useState(() => {
+    checkVerificationStatus();
+  });
+
+  const handleVerifyPhone = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
+      // Create verification request in backend
+      const { error } = await supabase
+        .from('verification_requests')
+        .insert({
+          profile_id: profile.id,
+          user_id: user.id,
+          status: 'pending',
+        });
+
+      if (error) {
+        if (error.code === '23505') {
+          toast({
+            title: "Request Already Submitted",
+            description: "Your verification request is already pending.",
+          });
+        } else {
+          throw error;
+        }
+      } else {
+        // Create notification for the user
+        await supabase
+          .from('notifications')
+          .insert({
+            user_id: user.id,
+            type: 'verification',
+            title: 'Verification Request Submitted',
+            message: `Your profile verification request has been submitted. Our team will call you on ${profile.phone} shortly.`,
+          });
+
+        toast({
+          title: "Verification Request Submitted",
+          description: `Our team will call you on ${profile.phone} shortly.`,
+        });
+        setVerificationRequested(true);
+      }
+    } catch (error: any) {
+      toast({
+        title: "Request Failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
     setIsVerifyOpen(false);
   };
 

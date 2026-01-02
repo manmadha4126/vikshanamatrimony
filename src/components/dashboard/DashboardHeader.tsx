@@ -35,6 +35,7 @@ interface DashboardHeaderProps {
     name: string;
     photo_url: string | null;
     profile_id: string | null;
+    is_prime?: boolean;
   } | null;
   notificationCount?: number;
   onSignOut: () => void;
@@ -348,6 +349,7 @@ const DashboardHeader = ({
           setIsProfileModalOpen(false);
           setSelectedProfileId(null);
         }}
+        currentUserIsPrime={profile?.is_prime || false}
       />
     </header>
   );
