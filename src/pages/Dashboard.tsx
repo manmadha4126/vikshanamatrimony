@@ -243,7 +243,7 @@ const Dashboard = () => {
   return (
     <div className="min-h-screen bg-background">
       <DashboardHeader
-        profile={profile}
+        profile={profile ? { ...profile, is_prime: profile.is_prime || false } : null}
         notificationCount={0}
         onSignOut={handleSignOut}
         onSearchClick={() => handleViewChange('search')}
@@ -308,6 +308,8 @@ const Dashboard = () => {
                 <DailyRecommendations
                   userGender={profile.gender}
                   userId={user.id}
+                  userAge={profile.date_of_birth ? Math.floor((new Date().getTime() - new Date(profile.date_of_birth).getTime()) / (365.25 * 24 * 60 * 60 * 1000)) : undefined}
+                  userReligion={profile.religion || undefined}
                 />
 
                 <MatchesPreview

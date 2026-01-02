@@ -45,6 +45,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { EditProfileDialog } from "@/components/staff/EditProfileDialog";
+import VerificationCenter from "@/components/staff/VerificationCenter";
 
 interface Profile {
   id: string;
@@ -98,7 +99,7 @@ const StaffDashboard = () => {
   const [totalCount, setTotalCount] = useState(0);
   const [statusCounts, setStatusCounts] = useState({ all: 0, verified: 0, pending: 0, rejected: 0 });
   const [selectedProfile, setSelectedProfile] = useState<Profile | null>(null);
-  const [activeSection, setActiveSection] = useState<"profiles" | "add">("profiles");
+  const [activeSection, setActiveSection] = useState<"profiles" | "add" | "verification">("profiles");
   const [deleteProfile, setDeleteProfile] = useState<Profile | null>(null);
   const [deleting, setDeleting] = useState(false);
   const [verificationFilter, setVerificationFilter] = useState<VerificationFilter>("all");
@@ -484,7 +485,7 @@ const StaffDashboard = () => {
         </div>
 
         {/* Action Boxes */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <Card 
             className={`cursor-pointer transition-all hover:shadow-lg ${activeSection === "profiles" ? "ring-2 ring-primary border-primary" : "border-gold/20"}`}
             onClick={() => setActiveSection("profiles")}
@@ -502,6 +503,26 @@ const StaffDashboard = () => {
             </CardHeader>
             <CardContent>
               <p className="text-3xl font-bold text-foreground">{totalRegistrations} Profiles</p>
+            </CardContent>
+          </Card>
+
+          <Card 
+            className={`cursor-pointer transition-all hover:shadow-lg ${activeSection === "verification" ? "ring-2 ring-primary border-primary" : "border-gold/20"}`}
+            onClick={() => setActiveSection("verification")}
+          >
+            <CardHeader className="pb-3">
+              <div className="flex items-center gap-4">
+                <div className="p-3 bg-yellow-100 rounded-lg">
+                  <CheckCircle className="w-8 h-8 text-yellow-600" />
+                </div>
+                <div>
+                  <CardTitle className="text-xl text-maroon">Verification Center</CardTitle>
+                  <CardDescription>Review and verify user profiles</CardDescription>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <p className="text-3xl font-bold text-foreground">{pendingVerification} Pending</p>
             </CardContent>
           </Card>
 
@@ -535,6 +556,11 @@ const StaffDashboard = () => {
             </CardContent>
           </Card>
         </div>
+
+        {/* Verification Center Section */}
+        {activeSection === "verification" && (
+          <VerificationCenter />
+        )}
 
         {/* Profiles Table - Only show when activeSection is "profiles" */}
         {activeSection === "profiles" && (
