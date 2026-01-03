@@ -244,6 +244,106 @@ export type Database = {
           },
         ]
       }
+      prime_call_logs: {
+        Row: {
+          call_status: string
+          call_type: string
+          created_at: string
+          id: string
+          phone_number: string
+          profile_id: string | null
+          selected_package: string | null
+          user_id: string
+          user_name: string
+        }
+        Insert: {
+          call_status?: string
+          call_type: string
+          created_at?: string
+          id?: string
+          phone_number: string
+          profile_id?: string | null
+          selected_package?: string | null
+          user_id: string
+          user_name: string
+        }
+        Update: {
+          call_status?: string
+          call_type?: string
+          created_at?: string
+          id?: string
+          phone_number?: string
+          profile_id?: string | null
+          selected_package?: string | null
+          user_id?: string
+          user_name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prime_call_logs_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      prime_subscriptions: {
+        Row: {
+          amount: number
+          created_at: string
+          expires_at: string | null
+          id: string
+          plan_category: string
+          plan_name: string
+          plan_type: string
+          profile_id: string | null
+          started_at: string | null
+          status: string
+          updated_at: string
+          user_id: string
+          validity_months: number | null
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          plan_category: string
+          plan_name: string
+          plan_type: string
+          profile_id?: string | null
+          started_at?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+          validity_months?: number | null
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          plan_category?: string
+          plan_name?: string
+          plan_type?: string
+          profile_id?: string | null
+          started_at?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+          validity_months?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prime_subscriptions_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profile_photos: {
         Row: {
           created_at: string
