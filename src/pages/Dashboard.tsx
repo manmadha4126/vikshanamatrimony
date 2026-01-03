@@ -39,6 +39,12 @@ import {
 
 type DashboardView = 'home' | 'preferences' | 'search' | 'edit-profile' | 'view-profile' | 'interests' | 'messages' | 'notifications' | 'matches' | 'who-viewed-me';
 
+interface MessageRecipient {
+  recipientUserId: string;
+  recipientProfileId: string;
+  recipientName: string;
+}
+
 interface SearchFilters {
   age_from: number;
   age_to: number;
@@ -85,6 +91,7 @@ const Dashboard = () => {
   const [matchedProfiles, setMatchedProfiles] = useState<MatchedProfile[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
+  const [messageRecipient, setMessageRecipient] = useState<MessageRecipient | null>(null);
 
   useEffect(() => {
     if (!loading && !isAuthenticated) {
@@ -203,7 +210,15 @@ const Dashboard = () => {
   };
 
   const handleViewChange = (view: DashboardView) => {
+    if (view !== 'messages') {
+      setMessageRecipient(null);
+    }
     setActiveView(view);
+  };
+
+  const handleMessageClick = (recipientUserId: string, recipientProfileId: string, recipientName: string) => {
+    setMessageRecipient({ recipientUserId, recipientProfileId, recipientName });
+    setActiveView('messages');
   };
 
   if (loading) {
@@ -421,6 +436,7 @@ const Dashboard = () => {
               <InterestsSection
                 userId={user.id}
                 profileId={profile.id}
+                onMessageClick={handleMessageClick}
               />
             )}
 
@@ -428,6 +444,7 @@ const Dashboard = () => {
               <MessagesSection
                 userId={user.id}
                 profileId={profile.id}
+                initialRecipient={messageRecipient || undefined}
               />
             )}
 

@@ -5,6 +5,9 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { toast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import {
@@ -12,10 +15,10 @@ import {
   Heart,
   GraduationCap,
   MapPin,
-  Check,
   Save,
   Loader2,
   Info,
+  ChevronDown,
 } from 'lucide-react';
 import {
   heightOptions,
@@ -89,6 +92,82 @@ const EMPLOYED_IN_OPTIONS = ['Government / PSU', 'Private', 'Business', 'Defence
 interface PartnerPreferencesSectionProps {
   userId: string;
 }
+
+// Multi-select dropdown component
+const MultiSelectDropdown = ({
+  label,
+  options,
+  selectedValues,
+  onToggle,
+  placeholder = "Select options"
+}: {
+  label: string;
+  options: string[];
+  selectedValues: string[];
+  onToggle: (value: string) => void;
+  placeholder?: string;
+}) => {
+  const [open, setOpen] = useState(false);
+  
+  const displayText = selectedValues.length === 0 
+    ? placeholder 
+    : selectedValues.length === 1 
+      ? selectedValues[0] 
+      : `${selectedValues.length} selected`;
+
+  return (
+    <div>
+      <Label className="text-xs">{label}</Label>
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>
+          <Button
+            variant="outline"
+            role="combobox"
+            aria-expanded={open}
+            className="w-full justify-between h-9 mt-1 font-normal"
+          >
+            <span className="truncate">{displayText}</span>
+            <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-full min-w-[200px] p-0" align="start">
+          <ScrollArea className="h-[200px]">
+            <div className="p-2 space-y-1">
+              {options.map((option) => (
+                <div
+                  key={option}
+                  className="flex items-center space-x-2 p-2 hover:bg-muted rounded cursor-pointer"
+                  onClick={() => onToggle(option)}
+                >
+                  <Checkbox
+                    id={option}
+                    checked={selectedValues.includes(option)}
+                    onCheckedChange={() => onToggle(option)}
+                  />
+                  <label
+                    htmlFor={option}
+                    className="text-sm font-medium leading-none cursor-pointer flex-1"
+                  >
+                    {option}
+                  </label>
+                </div>
+              ))}
+            </div>
+          </ScrollArea>
+        </PopoverContent>
+      </Popover>
+      {selectedValues.length > 0 && (
+        <div className="flex flex-wrap gap-1 mt-2">
+          {selectedValues.map((value) => (
+            <Badge key={value} variant="secondary" className="text-xs">
+              {value}
+            </Badge>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
 
 const PartnerPreferencesSection = ({ userId }: PartnerPreferencesSectionProps) => {
   const [formData, setFormData] = useState<PartnerPreferences>(defaultPreferences);
@@ -324,39 +403,21 @@ const PartnerPreferencesSection = ({ userId }: PartnerPreferencesSectionProps) =
               </div>
             </div>
 
-            <div>
-              <Label className="text-xs">Marital Status (Select multiple)</Label>
-              <div className="flex flex-wrap gap-2 mt-2">
-                {maritalStatusOptions.map((status) => (
-                  <Badge
-                    key={status}
-                    variant={formData.marital_status.includes(status) ? 'default' : 'outline'}
-                    className="cursor-pointer"
-                    onClick={() => toggleArrayItem('marital_status', status)}
-                  >
-                    {status}
-                    {formData.marital_status.includes(status) && <Check className="h-3 w-3 ml-1" />}
-                  </Badge>
-                ))}
-              </div>
-            </div>
+            <MultiSelectDropdown
+              label="Marital Status"
+              options={maritalStatusOptions}
+              selectedValues={formData.marital_status}
+              onToggle={(v) => toggleArrayItem('marital_status', v)}
+              placeholder="Select marital status"
+            />
 
-            <div>
-              <Label className="text-xs">Mother Tongue (Select multiple)</Label>
-              <div className="flex flex-wrap gap-2 mt-2">
-                {motherTongueOptions.map((lang) => (
-                  <Badge
-                    key={lang}
-                    variant={formData.mother_tongue.includes(lang) ? 'default' : 'outline'}
-                    className="cursor-pointer"
-                    onClick={() => toggleArrayItem('mother_tongue', lang)}
-                  >
-                    {lang}
-                    {formData.mother_tongue.includes(lang) && <Check className="h-3 w-3 ml-1" />}
-                  </Badge>
-                ))}
-              </div>
-            </div>
+            <MultiSelectDropdown
+              label="Mother Tongue"
+              options={motherTongueOptions}
+              selectedValues={formData.mother_tongue}
+              onToggle={(v) => toggleArrayItem('mother_tongue', v)}
+              placeholder="Select mother tongue"
+            />
 
             <div>
               <Label className="text-xs">Physical Status</Label>
@@ -373,22 +434,13 @@ const PartnerPreferencesSection = ({ userId }: PartnerPreferencesSectionProps) =
               </Select>
             </div>
 
-            <div>
-              <Label className="text-xs">Eating Habits (Select multiple)</Label>
-              <div className="flex flex-wrap gap-2 mt-2">
-                {EATING_HABITS.map((habit) => (
-                  <Badge
-                    key={habit}
-                    variant={formData.eating_habits.includes(habit) ? 'default' : 'outline'}
-                    className="cursor-pointer"
-                    onClick={() => toggleArrayItem('eating_habits', habit)}
-                  >
-                    {habit}
-                    {formData.eating_habits.includes(habit) && <Check className="h-3 w-3 ml-1" />}
-                  </Badge>
-                ))}
-              </div>
-            </div>
+            <MultiSelectDropdown
+              label="Eating Habits"
+              options={EATING_HABITS}
+              selectedValues={formData.eating_habits}
+              onToggle={(v) => toggleArrayItem('eating_habits', v)}
+              placeholder="Select eating habits"
+            />
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
@@ -434,40 +486,22 @@ const PartnerPreferencesSection = ({ userId }: PartnerPreferencesSectionProps) =
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div>
-              <Label className="text-xs">Religion (Select multiple)</Label>
-              <div className="flex flex-wrap gap-2 mt-2">
-                {religionOptions.map((religion) => (
-                  <Badge
-                    key={religion}
-                    variant={formData.religion.includes(religion) ? 'default' : 'outline'}
-                    className="cursor-pointer"
-                    onClick={() => toggleArrayItem('religion', religion)}
-                  >
-                    {religion}
-                    {formData.religion.includes(religion) && <Check className="h-3 w-3 ml-1" />}
-                  </Badge>
-                ))}
-              </div>
-            </div>
+            <MultiSelectDropdown
+              label="Religion"
+              options={religionOptions}
+              selectedValues={formData.religion}
+              onToggle={(v) => toggleArrayItem('religion', v)}
+              placeholder="Select religion"
+            />
 
             {availableCastes.length > 0 && (
-              <div>
-                <Label className="text-xs">Caste (Select multiple)</Label>
-                <div className="flex flex-wrap gap-2 mt-2 max-h-40 overflow-y-auto">
-                  {availableCastes.map((caste) => (
-                    <Badge
-                      key={caste}
-                      variant={formData.caste.includes(caste) ? 'default' : 'outline'}
-                      className="cursor-pointer"
-                      onClick={() => toggleArrayItem('caste', caste)}
-                    >
-                      {caste}
-                      {formData.caste.includes(caste) && <Check className="h-3 w-3 ml-1" />}
-                    </Badge>
-                  ))}
-                </div>
-              </div>
+              <MultiSelectDropdown
+                label="Caste"
+                options={availableCastes}
+                selectedValues={formData.caste}
+                onToggle={(v) => toggleArrayItem('caste', v)}
+                placeholder="Select caste"
+              />
             )}
 
             <div>
@@ -486,22 +520,13 @@ const PartnerPreferencesSection = ({ userId }: PartnerPreferencesSectionProps) =
               </Select>
             </div>
 
-            <div>
-              <Label className="text-xs">Star / Nakshatra (Select multiple)</Label>
-              <div className="flex flex-wrap gap-2 mt-2 max-h-40 overflow-y-auto">
-                {starOptions.map((star) => (
-                  <Badge
-                    key={star}
-                    variant={formData.star.includes(star) ? 'default' : 'outline'}
-                    className="cursor-pointer"
-                    onClick={() => toggleArrayItem('star', star)}
-                  >
-                    {star}
-                    {formData.star.includes(star) && <Check className="h-3 w-3 ml-1" />}
-                  </Badge>
-                ))}
-              </div>
-            </div>
+            <MultiSelectDropdown
+              label="Star / Nakshatra"
+              options={starOptions}
+              selectedValues={formData.star}
+              onToggle={(v) => toggleArrayItem('star', v)}
+              placeholder="Select star"
+            />
           </CardContent>
         </Card>
       )}
@@ -516,22 +541,13 @@ const PartnerPreferencesSection = ({ userId }: PartnerPreferencesSectionProps) =
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div>
-              <Label className="text-xs">Education (Select multiple)</Label>
-              <div className="flex flex-wrap gap-2 mt-2 max-h-40 overflow-y-auto">
-                {educationOptions.map((edu) => (
-                  <Badge
-                    key={edu}
-                    variant={formData.education.includes(edu) ? 'default' : 'outline'}
-                    className="cursor-pointer"
-                    onClick={() => toggleArrayItem('education', edu)}
-                  >
-                    {edu}
-                    {formData.education.includes(edu) && <Check className="h-3 w-3 ml-1" />}
-                  </Badge>
-                ))}
-              </div>
-            </div>
+            <MultiSelectDropdown
+              label="Education"
+              options={educationOptions}
+              selectedValues={formData.education}
+              onToggle={(v) => toggleArrayItem('education', v)}
+              placeholder="Select education"
+            />
 
             <div>
               <Label className="text-xs">Employed In</Label>
@@ -577,39 +593,21 @@ const PartnerPreferencesSection = ({ userId }: PartnerPreferencesSectionProps) =
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div>
-              <Label className="text-xs">Country (Select multiple)</Label>
-              <div className="flex flex-wrap gap-2 mt-2">
-                {COUNTRIES.map((country) => (
-                  <Badge
-                    key={country}
-                    variant={formData.country.includes(country) ? 'default' : 'outline'}
-                    className="cursor-pointer"
-                    onClick={() => toggleArrayItem('country', country)}
-                  >
-                    {country}
-                    {formData.country.includes(country) && <Check className="h-3 w-3 ml-1" />}
-                  </Badge>
-                ))}
-              </div>
-            </div>
+            <MultiSelectDropdown
+              label="Country"
+              options={COUNTRIES}
+              selectedValues={formData.country}
+              onToggle={(v) => toggleArrayItem('country', v)}
+              placeholder="Select country"
+            />
 
-            <div>
-              <Label className="text-xs">Residing State (Select multiple)</Label>
-              <div className="flex flex-wrap gap-2 mt-2 max-h-40 overflow-y-auto">
-                {stateOptions.map((state) => (
-                  <Badge
-                    key={state}
-                    variant={formData.residing_state.includes(state) ? 'default' : 'outline'}
-                    className="cursor-pointer"
-                    onClick={() => toggleArrayItem('residing_state', state)}
-                  >
-                    {state}
-                    {formData.residing_state.includes(state) && <Check className="h-3 w-3 ml-1" />}
-                  </Badge>
-                ))}
-              </div>
-            </div>
+            <MultiSelectDropdown
+              label="Residing State"
+              options={stateOptions}
+              selectedValues={formData.residing_state}
+              onToggle={(v) => toggleArrayItem('residing_state', v)}
+              placeholder="Select state"
+            />
           </CardContent>
         </Card>
       )}
