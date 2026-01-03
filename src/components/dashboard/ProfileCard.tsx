@@ -103,7 +103,7 @@ const ProfileCard = ({
   const currentPhoto = allPhotos[currentPhotoIndex] || profile.photo_url;
 
   return (
-    <Card className="overflow-hidden hover:shadow-lg transition-shadow group">
+    <Card className="overflow-hidden hover:shadow-xl hover:shadow-primary/10 transition-all duration-300 group cursor-pointer hover:-translate-y-1">
       <div className="relative">
         {/* Profile Image */}
         <div className="aspect-square bg-muted relative overflow-hidden">
@@ -111,7 +111,7 @@ const ProfileCard = ({
             <img
               src={currentPhoto}
               alt={profile.name}
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 ease-out"
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/10 to-secondary/10">
