@@ -221,63 +221,66 @@ const PrimeSubscriptionModal = ({ isOpen, onClose, userId, profileId, userName }
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto p-4 sm:p-6">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2 text-2xl">
-            <Crown className="h-7 w-7 text-amber-500" />
+          <DialogTitle className="flex items-center gap-2 text-lg sm:text-2xl">
+            <Crown className="h-5 w-5 sm:h-7 sm:w-7 text-amber-500" />
             Prime Membership Plans
           </DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-8 py-4">
+        <div className="space-y-6 sm:space-y-8 py-2 sm:py-4">
           {/* Support Matrimony Section */}
           <div>
-            <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-              <Heart className="h-5 w-5 text-primary" />
+            <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 flex items-center gap-2">
+              <Heart className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
               Support Matrimony
             </h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
               {supportPlans.map((plan) => (
                 <Card 
                   key={plan.id} 
-                  className={`p-5 relative overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1 ${
+                  className={`p-3 sm:p-5 relative overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1 ${
                     selectedPlan === plan.id ? 'ring-2 ring-primary' : ''
                   }`}
                 >
                   <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${getCategoryColor(plan.category)}`} />
                   
-                  <div className="space-y-4">
+                  <div className="space-y-3 sm:space-y-4">
                     <div>
-                      <p className="text-sm text-muted-foreground">{plan.duration}</p>
-                      <p className="text-2xl font-bold text-primary">{formatPrice(plan.price)}</p>
+                      <p className="text-xs sm:text-sm text-muted-foreground">{plan.duration}</p>
+                      <p className="text-xl sm:text-2xl font-bold text-primary">{formatPrice(plan.price)}</p>
                     </div>
 
-                    <ul className="space-y-2">
-                      {plan.benefits.map((benefit, idx) => (
-                        <li key={idx} className="flex items-start gap-2 text-sm">
-                          <Check className="h-4 w-4 text-primary mt-0.5 shrink-0" />
-                          <span>{benefit}</span>
+                    <ul className="space-y-1.5 sm:space-y-2">
+                      {plan.benefits.slice(0, 3).map((benefit, idx) => (
+                        <li key={idx} className="flex items-start gap-1.5 sm:gap-2 text-xs sm:text-sm">
+                          <Check className="h-3 w-3 sm:h-4 sm:w-4 text-primary mt-0.5 shrink-0" />
+                          <span className="line-clamp-2">{benefit}</span>
                         </li>
                       ))}
+                      {plan.benefits.length > 3 && (
+                        <li className="text-xs text-muted-foreground ml-5">+{plan.benefits.length - 3} more</li>
+                      )}
                     </ul>
 
-                    <div className="flex gap-2 pt-2">
+                    <div className="flex gap-1.5 sm:gap-2 pt-2">
                       <Button 
                         size="sm" 
-                        className="flex-1 gap-1"
+                        className="flex-1 gap-1 h-8 sm:h-9 text-xs sm:text-sm"
                         onClick={() => handleCallToSubscribe(plan)}
                         disabled={isLogging}
                       >
-                        <Phone className="h-4 w-4" />
+                        <Phone className="h-3 w-3 sm:h-4 sm:w-4" />
                         Call
                       </Button>
                       <Button 
                         size="sm" 
                         variant="outline" 
-                        className="flex-1 gap-1"
+                        className="flex-1 gap-1 h-8 sm:h-9 text-xs sm:text-sm"
                         onClick={handleWhatsApp}
                       >
-                        <MessageCircle className="h-4 w-4" />
+                        <MessageCircle className="h-3 w-3 sm:h-4 sm:w-4" />
                         Chat
                       </Button>
                     </div>
@@ -289,56 +292,59 @@ const PrimeSubscriptionModal = ({ isOpen, onClose, userId, profileId, userName }
 
           {/* Affluent Matrimony Section */}
           <div>
-            <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-              <Star className="h-5 w-5 text-purple-500" />
+            <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 flex items-center gap-2 flex-wrap">
+              <Star className="h-4 w-4 sm:h-5 sm:w-5 text-purple-500" />
               Affluent Matrimony
-              <Badge className="bg-purple-500 text-white">Premium</Badge>
+              <Badge className="bg-purple-500 text-white text-xs">Premium</Badge>
             </h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
               {affluentPlans.map((plan) => (
                 <Card 
                   key={plan.id} 
-                  className={`p-5 relative overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1 border-purple-200 ${
+                  className={`p-3 sm:p-5 relative overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1 border-purple-200 ${
                     selectedPlan === plan.id ? 'ring-2 ring-purple-500' : ''
                   }`}
                 >
                   <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${getCategoryColor(plan.category)}`} />
                   
-                  <div className="space-y-4">
+                  <div className="space-y-3 sm:space-y-4">
                     <div>
-                      <p className="text-sm text-muted-foreground">{plan.duration}</p>
-                      <p className="text-2xl font-bold text-purple-600">{formatPrice(plan.price)}</p>
+                      <p className="text-xs sm:text-sm text-muted-foreground">{plan.duration}</p>
+                      <p className="text-xl sm:text-2xl font-bold text-purple-600">{formatPrice(plan.price)}</p>
                       {plan.validity && (
-                        <p className="text-xs text-muted-foreground">Validity: {plan.validity}</p>
+                        <p className="text-[10px] sm:text-xs text-muted-foreground">Validity: {plan.validity}</p>
                       )}
                     </div>
 
-                    <ul className="space-y-2">
-                      {plan.benefits.map((benefit, idx) => (
-                        <li key={idx} className="flex items-start gap-2 text-sm">
-                          <Check className="h-4 w-4 text-purple-500 mt-0.5 shrink-0" />
-                          <span>{benefit}</span>
+                    <ul className="space-y-1.5 sm:space-y-2">
+                      {plan.benefits.slice(0, 3).map((benefit, idx) => (
+                        <li key={idx} className="flex items-start gap-1.5 sm:gap-2 text-xs sm:text-sm">
+                          <Check className="h-3 w-3 sm:h-4 sm:w-4 text-purple-500 mt-0.5 shrink-0" />
+                          <span className="line-clamp-2">{benefit}</span>
                         </li>
                       ))}
+                      {plan.benefits.length > 3 && (
+                        <li className="text-xs text-muted-foreground ml-5">+{plan.benefits.length - 3} more</li>
+                      )}
                     </ul>
 
-                    <div className="flex gap-2 pt-2">
+                    <div className="flex gap-1.5 sm:gap-2 pt-2">
                       <Button 
                         size="sm" 
-                        className="flex-1 gap-1 bg-purple-500 hover:bg-purple-600"
+                        className="flex-1 gap-1 bg-purple-500 hover:bg-purple-600 h-8 sm:h-9 text-xs sm:text-sm"
                         onClick={() => handleCallToSubscribe(plan)}
                         disabled={isLogging}
                       >
-                        <Phone className="h-4 w-4" />
+                        <Phone className="h-3 w-3 sm:h-4 sm:w-4" />
                         Call
                       </Button>
                       <Button 
                         size="sm" 
                         variant="outline" 
-                        className="flex-1 gap-1 border-purple-300 text-purple-600 hover:bg-purple-50"
+                        className="flex-1 gap-1 border-purple-300 text-purple-600 hover:bg-purple-50 h-8 sm:h-9 text-xs sm:text-sm"
                         onClick={handleWhatsApp}
                       >
-                        <MessageCircle className="h-4 w-4" />
+                        <MessageCircle className="h-3 w-3 sm:h-4 sm:w-4" />
                         Chat
                       </Button>
                     </div>
@@ -351,39 +357,39 @@ const PrimeSubscriptionModal = ({ isOpen, onClose, userId, profileId, userName }
           {/* Till You Marry Section */}
           {tillMarryPlan && (
             <div>
-              <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                <Award className="h-5 w-5 text-amber-500" />
+              <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 flex items-center gap-2 flex-wrap">
+                <Award className="h-4 w-4 sm:h-5 sm:w-5 text-amber-500" />
                 Till You Marry
-                <Badge className="bg-gradient-to-r from-amber-500 to-yellow-500 text-white">Best Seller</Badge>
+                <Badge className="bg-gradient-to-r from-amber-500 to-yellow-500 text-white text-xs">Best Seller</Badge>
               </h3>
               <Card 
-                className={`p-6 relative overflow-hidden transition-all duration-300 hover:shadow-xl border-amber-200 bg-gradient-to-br from-amber-50 to-yellow-50 ${
+                className={`p-4 sm:p-6 relative overflow-hidden transition-all duration-300 hover:shadow-xl border-amber-200 bg-gradient-to-br from-amber-50 to-yellow-50 ${
                   selectedPlan === tillMarryPlan.id ? 'ring-2 ring-amber-500' : ''
                 }`}
               >
-                <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-amber-500 to-yellow-500" />
-                <div className="absolute top-4 right-4">
-                  <Badge className="bg-gradient-to-r from-amber-500 to-yellow-500 text-white text-sm px-3 py-1">
+                <div className="absolute top-0 left-0 right-0 h-1.5 sm:h-2 bg-gradient-to-r from-amber-500 to-yellow-500" />
+                <div className="absolute top-2 right-2 sm:top-4 sm:right-4">
+                  <Badge className="bg-gradient-to-r from-amber-500 to-yellow-500 text-white text-[10px] sm:text-sm px-2 sm:px-3 py-0.5 sm:py-1">
                     Best Seller
                   </Badge>
                 </div>
                 
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div className="space-y-4">
+                <div className="grid sm:grid-cols-2 gap-4 sm:gap-6 pt-6 sm:pt-0">
+                  <div className="space-y-2 sm:space-y-4">
                     <div>
-                      <p className="text-sm text-muted-foreground">{tillMarryPlan.validity}</p>
-                      <p className="text-4xl font-bold bg-gradient-to-r from-amber-600 to-yellow-600 bg-clip-text text-transparent">
+                      <p className="text-xs sm:text-sm text-muted-foreground">{tillMarryPlan.validity}</p>
+                      <p className="text-2xl sm:text-4xl font-bold bg-gradient-to-r from-amber-600 to-yellow-600 bg-clip-text text-transparent">
                         {formatPrice(tillMarryPlan.price)}
                       </p>
-                      <p className="text-sm text-amber-700 font-medium mt-1">One-time payment • Lifetime benefits</p>
+                      <p className="text-xs sm:text-sm text-amber-700 font-medium mt-1">One-time payment • Lifetime benefits</p>
                     </div>
                   </div>
 
                   <div>
-                    <ul className="space-y-3">
+                    <ul className="space-y-2 sm:space-y-3">
                       {tillMarryPlan.benefits.map((benefit, idx) => (
-                        <li key={idx} className="flex items-start gap-2 text-sm">
-                          <Check className="h-5 w-5 text-amber-500 mt-0.5 shrink-0" />
+                        <li key={idx} className="flex items-start gap-1.5 sm:gap-2 text-xs sm:text-sm">
+                          <Check className="h-4 w-4 sm:h-5 sm:w-5 text-amber-500 mt-0.5 shrink-0" />
                           <span className="font-medium">{benefit}</span>
                         </li>
                       ))}
@@ -391,21 +397,21 @@ const PrimeSubscriptionModal = ({ isOpen, onClose, userId, profileId, userName }
                   </div>
                 </div>
 
-                <div className="flex gap-3 mt-6">
+                <div className="flex flex-col xs:flex-row gap-2 sm:gap-3 mt-4 sm:mt-6">
                   <Button 
-                    className="flex-1 gap-2 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-foreground h-12"
+                    className="flex-1 gap-2 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-foreground h-10 sm:h-12 text-sm sm:text-base"
                     onClick={() => handleCallToSubscribe(tillMarryPlan)}
                     disabled={isLogging}
                   >
-                    <Phone className="h-5 w-5" />
+                    <Phone className="h-4 w-4 sm:h-5 sm:w-5" />
                     Call to Subscribe
                   </Button>
                   <Button 
                     variant="outline" 
-                    className="flex-1 gap-2 border-amber-400 text-amber-700 hover:bg-amber-100 h-12"
+                    className="flex-1 gap-2 border-amber-400 text-amber-700 hover:bg-amber-100 h-10 sm:h-12 text-sm sm:text-base"
                     onClick={handleWhatsApp}
                   >
-                    <MessageCircle className="h-5 w-5" />
+                    <MessageCircle className="h-4 w-4 sm:h-5 sm:w-5" />
                     Chat with us
                   </Button>
                 </div>
@@ -414,28 +420,28 @@ const PrimeSubscriptionModal = ({ isOpen, onClose, userId, profileId, userName }
           )}
 
           {/* Need Assistance Section */}
-          <Card className="p-6 bg-muted/50 border-dashed">
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-              <div className="text-center sm:text-left">
-                <h4 className="font-semibold text-lg">Need assistance to take Prime Membership?</h4>
-                <p className="text-sm text-muted-foreground">Our team is here to help you choose the right plan</p>
+          <Card className="p-4 sm:p-6 bg-muted/50 border-dashed">
+            <div className="flex flex-col items-center gap-3 sm:gap-4 text-center sm:text-left sm:flex-row sm:justify-between">
+              <div>
+                <h4 className="font-semibold text-sm sm:text-lg">Need assistance to take Prime Membership?</h4>
+                <p className="text-xs sm:text-sm text-muted-foreground">Our team is here to help you choose the right plan</p>
               </div>
-              <div className="flex gap-3">
+              <div className="flex flex-col xs:flex-row gap-2 sm:gap-3 w-full sm:w-auto">
                 <Button 
                   variant="outline" 
-                  className="gap-2"
+                  className="gap-2 text-xs sm:text-sm h-9 sm:h-10"
                   onClick={handleAssistanceCall}
                   disabled={isLogging}
                 >
-                  <Phone className="h-4 w-4" />
+                  <Phone className="h-3 w-3 sm:h-4 sm:w-4" />
                   Call: {SUPPORT_PHONE}
                 </Button>
                 <Button 
                   variant="outline" 
-                  className="gap-2"
+                  className="gap-2 text-xs sm:text-sm h-9 sm:h-10"
                   onClick={handleWhatsApp}
                 >
-                  <MessageCircle className="h-4 w-4" />
+                  <MessageCircle className="h-3 w-3 sm:h-4 sm:w-4" />
                   Chat with us
                 </Button>
               </div>
