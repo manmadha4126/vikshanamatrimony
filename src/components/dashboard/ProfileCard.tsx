@@ -1,8 +1,10 @@
+import { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Heart, Bookmark, Eye, MapPin, Briefcase, GraduationCap, Shield } from 'lucide-react';
+import { Heart, Bookmark, Eye, MapPin, Briefcase, GraduationCap, Shield, ChevronLeft, ChevronRight } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 
 interface ProfileCardProps {
   profile: {
@@ -31,6 +33,39 @@ const ProfileCard = ({
   onShortlist,
   isShortlisted = false,
 }: ProfileCardProps) => {
+  const [allPhotos, setAllPhotos] = useState<string[]>([]);
+  const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
+
+  useEffect(() => {
+    const fetchAdditionalPhotos = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('profile_photos')
+          .select('photo_url')
+          .eq('profile_id', profile.id)
+          .order('display_order', { ascending: true });
+
+        if (error) throw error;
+
+        const photos: string[] = [];
+        if (profile.photo_url) {
+          photos.push(profile.photo_url);
+        }
+        if (data) {
+          photos.push(...data.map(p => p.photo_url));
+        }
+        setAllPhotos(photos);
+      } catch (error) {
+        // Fallback to main photo only
+        if (profile.photo_url) {
+          setAllPhotos([profile.photo_url]);
+        }
+      }
+    };
+
+    fetchAdditionalPhotos();
+  }, [profile.id, profile.photo_url]);
+
   const calculateAge = (dob: string | null) => {
     if (!dob) return null;
     const today = new Date();
@@ -52,17 +87,29 @@ const ProfileCard = ({
       .slice(0, 2);
   };
 
+  const handlePrevPhoto = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setCurrentPhotoIndex((prev) => (prev === 0 ? allPhotos.length - 1 : prev - 1));
+  };
+
+  const handleNextPhoto = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setCurrentPhotoIndex((prev) => (prev === allPhotos.length - 1 ? 0 : prev + 1));
+  };
+
   const age = calculateAge(profile.date_of_birth);
   const location = [profile.city, profile.state].filter(Boolean).join(', ');
+  const hasMultiplePhotos = allPhotos.length > 1;
+  const currentPhoto = allPhotos[currentPhotoIndex] || profile.photo_url;
 
   return (
     <Card className="overflow-hidden hover:shadow-lg transition-shadow group">
       <div className="relative">
         {/* Profile Image */}
         <div className="aspect-square bg-muted relative overflow-hidden">
-          {profile.photo_url ? (
+          {currentPhoto ? (
             <img
-              src={profile.photo_url}
+              src={currentPhoto}
               alt={profile.name}
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
             />
@@ -74,6 +121,39 @@ const ProfileCard = ({
                 </AvatarFallback>
               </Avatar>
             </div>
+          )}
+
+          {/* Photo Navigation Arrows */}
+          {hasMultiplePhotos && (
+            <>
+              <button
+                onClick={handlePrevPhoto}
+                className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full p-1.5 opacity-0 group-hover:opacity-100 transition-opacity z-10"
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </button>
+              <button
+                onClick={handleNextPhoto}
+                className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full p-1.5 opacity-0 group-hover:opacity-100 transition-opacity z-10"
+              >
+                <ChevronRight className="h-4 w-4" />
+              </button>
+              {/* Photo Indicators */}
+              <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1 z-10">
+                {allPhotos.map((_, index) => (
+                  <button
+                    key={index}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setCurrentPhotoIndex(index);
+                    }}
+                    className={`w-1.5 h-1.5 rounded-full transition-colors ${
+                      index === currentPhotoIndex ? 'bg-white' : 'bg-white/50'
+                    }`}
+                  />
+                ))}
+              </div>
+            </>
           )}
 
           {/* Verification Badge */}
