@@ -313,7 +313,10 @@ const Dashboard = () => {
               <>
                 <AccountTypeSection
                   isPrime={profile.is_prime || false}
-                  primeExpiresAt={null}
+                  primeExpiresAt={profile.prime_expires_at}
+                  userId={user.id}
+                  profileId={profile.id}
+                  userName={profile.name}
                 />
 
                 <ProfileCompletionSection

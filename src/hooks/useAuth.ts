@@ -13,6 +13,7 @@ interface Profile {
   photo_url: string | null;
   profile_completion_percentage: number | null;
   is_prime: boolean | null;
+  prime_expires_at: string | null;
   is_complete: boolean | null;
   about_me: string | null;
   hobbies: string[] | null;
