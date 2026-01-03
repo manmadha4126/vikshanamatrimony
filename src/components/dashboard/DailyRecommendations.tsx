@@ -28,11 +28,12 @@ interface DailyRecommendationsProps {
   userId: string;
   userAge?: number;
   userReligion?: string;
+  onViewProfile?: (profileId: string) => void;
 }
 
 const MAX_DAILY_RECOMMENDATIONS = 10;
 
-const DailyRecommendations = ({ userGender, userId, userAge, userReligion }: DailyRecommendationsProps) => {
+const DailyRecommendations = ({ userGender, userId, userAge, userReligion, onViewProfile }: DailyRecommendationsProps) => {
   const navigate = useNavigate();
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [loading, setLoading] = useState(true);
@@ -283,7 +284,7 @@ const DailyRecommendations = ({ userGender, userId, userAge, userReligion }: Dai
                   key={profile.id}
                   profile={profile}
                   isShortlisted={shortlistedIds.includes(profile.id)}
-                  onViewProfile={() => navigate(`/dashboard/profile/${profile.profile_id}`)}
+                  onViewProfile={() => onViewProfile?.(profile.id)}
                   onSendInterest={() => handleSendInterest(profile.id)}
                   onShortlist={() => handleShortlist(profile.id)}
                 />

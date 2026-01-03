@@ -48,9 +48,10 @@ interface PartnerPreferences {
 interface MatchesSectionProps {
   userId: string;
   userGender: string;
+  onViewProfile?: (profileId: string) => void;
 }
 
-const MatchesSection = ({ userId, userGender }: MatchesSectionProps) => {
+const MatchesSection = ({ userId, userGender, onViewProfile }: MatchesSectionProps) => {
   const [matches, setMatches] = useState<MatchedProfile[]>([]);
   const [loading, setLoading] = useState(true);
   const [sendingInterest, setSendingInterest] = useState<string | null>(null);
@@ -318,7 +319,7 @@ const MatchesSection = ({ userId, userGender }: MatchesSectionProps) => {
               const hasSentInterest = sentInterests.includes(match.id);
               
               return (
-                <Card key={match.id} className="overflow-hidden hover:shadow-lg transition-shadow">
+                <Card key={match.id} className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer" onClick={() => onViewProfile?.(match.id)}>
                   {/* Square Profile Image */}
                   <div className="relative">
                     <AspectRatio ratio={1}>
@@ -408,7 +409,10 @@ const MatchesSection = ({ userId, userGender }: MatchesSectionProps) => {
                         size="sm"
                         className="w-full"
                         disabled={hasSentInterest || sendingInterest === match.id}
-                        onClick={() => sendInterest(match.id)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          sendInterest(match.id);
+                        }}
                       >
                         {sendingInterest === match.id ? (
                           <Loader2 className="h-4 w-4 animate-spin mr-1" />

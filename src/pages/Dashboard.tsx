@@ -19,6 +19,7 @@ import InterestsSection from '@/components/dashboard/InterestsSection';
 import MessagesSection from '@/components/dashboard/MessagesSection';
 import NotificationsSection from '@/components/dashboard/NotificationsSection';
 import MatchesSection from '@/components/dashboard/MatchesSection';
+import ProfileViewModal from '@/components/dashboard/ProfileViewModal';
 import Footer from '@/components/Footer';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -92,6 +93,7 @@ const Dashboard = () => {
   const [isSearching, setIsSearching] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
   const [messageRecipient, setMessageRecipient] = useState<MessageRecipient | null>(null);
+  const [viewingProfileId, setViewingProfileId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!loading && !isAuthenticated) {
@@ -221,6 +223,10 @@ const Dashboard = () => {
     setActiveView('messages');
   };
 
+  const handleViewProfile = (profileId: string) => {
+    setViewingProfileId(profileId);
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
@@ -328,6 +334,7 @@ const Dashboard = () => {
                   userId={user.id}
                   userAge={profile.date_of_birth ? Math.floor((new Date().getTime() - new Date(profile.date_of_birth).getTime()) / (365.25 * 24 * 60 * 60 * 1000)) : undefined}
                   userReligion={profile.religion || undefined}
+                  onViewProfile={handleViewProfile}
                 />
 
                 <MatchesPreview
@@ -338,10 +345,10 @@ const Dashboard = () => {
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                   <div className="lg:col-span-2">
-                    <ShortlistedProfilesSection userId={user.id} />
+                    <ShortlistedProfilesSection userId={user.id} onViewProfile={handleViewProfile} />
                   </div>
                   <div>
-                    <ProfileViewsSection profileId={profile.id} />
+                    <ProfileViewsSection profileId={profile.id} onViewProfile={handleViewProfile} />
                   </div>
                 </div>
 
@@ -456,6 +463,7 @@ const Dashboard = () => {
               <MatchesSection
                 userId={user.id}
                 userGender={profile.gender}
+                onViewProfile={handleViewProfile}
               />
             )}
 
@@ -677,6 +685,14 @@ const Dashboard = () => {
           </main>
         </div>
       </div>
+
+      {/* Profile View Modal */}
+      <ProfileViewModal
+        profileId={viewingProfileId}
+        isOpen={!!viewingProfileId}
+        onClose={() => setViewingProfileId(null)}
+        currentUserIsPrime={profile?.is_prime || false}
+      />
 
       <Footer />
     </div>

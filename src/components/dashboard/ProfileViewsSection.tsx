@@ -17,9 +17,10 @@ interface ProfileView {
 
 interface ProfileViewsSectionProps {
   profileId: string;
+  onViewProfile?: (profileId: string) => void;
 }
 
-const ProfileViewsSection = ({ profileId }: ProfileViewsSectionProps) => {
+const ProfileViewsSection = ({ profileId, onViewProfile }: ProfileViewsSectionProps) => {
   const [viewCount, setViewCount] = useState(0);
   const [recentViewers, setRecentViewers] = useState<ProfileView[]>([]);
   const [loading, setLoading] = useState(true);
@@ -148,7 +149,23 @@ const ProfileViewsSection = ({ profileId }: ProfileViewsSectionProps) => {
             <h4 className="text-sm font-medium text-muted-foreground mb-3">Recent Viewers</h4>
             <div className="space-y-3">
               {recentViewers.map((view) => (
-                <div key={view.id} className="flex items-center gap-3">
+                <div 
+                  key={view.id} 
+                  className="flex items-center gap-3 cursor-pointer hover:bg-muted/50 p-2 rounded-lg transition-colors"
+                  onClick={() => {
+                    // Get the viewer's profile ID from their user_id
+                    supabase
+                      .from('profiles')
+                      .select('id')
+                      .eq('user_id', view.viewer_id)
+                      .single()
+                      .then(({ data }) => {
+                        if (data?.id) {
+                          onViewProfile?.(data.id);
+                        }
+                      });
+                  }}
+                >
                   <Avatar className="h-10 w-10">
                     <AvatarImage src={view.viewer?.photo_url || undefined} />
                     <AvatarFallback className="text-xs">

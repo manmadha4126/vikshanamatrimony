@@ -19,6 +19,8 @@ import {
   Loader2,
   Info,
   ChevronDown,
+  ChevronRight,
+  Check,
 } from 'lucide-react';
 import {
   heightOptions,
@@ -93,7 +95,44 @@ interface PartnerPreferencesSectionProps {
   userId: string;
 }
 
-// Multi-select dropdown component
+// Styled Select Dropdown component
+const StyledSelect = ({
+  label,
+  value,
+  onValueChange,
+  options,
+  placeholder = "Select option"
+}: {
+  label: string;
+  value: string;
+  onValueChange: (value: string) => void;
+  options: string[];
+  placeholder?: string;
+}) => {
+  return (
+    <div>
+      <Label className="text-xs font-medium text-foreground">{label}</Label>
+      <Select value={value} onValueChange={onValueChange}>
+        <SelectTrigger className="h-10 mt-1 bg-primary/5 border-primary/20 hover:bg-primary/10 focus:ring-primary/30">
+          <SelectValue placeholder={placeholder} />
+        </SelectTrigger>
+        <SelectContent className="max-h-[300px]">
+          {options.map((option) => (
+            <SelectItem 
+              key={option} 
+              value={option}
+              className="cursor-pointer hover:bg-primary/10"
+            >
+              {option}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
+  );
+};
+
+// Multi-select dropdown component with improved styling
 const MultiSelectDropdown = ({
   label,
   options,
@@ -108,6 +147,7 @@ const MultiSelectDropdown = ({
   placeholder?: string;
 }) => {
   const [open, setOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
   
   const displayText = selectedValues.length === 0 
     ? placeholder 
@@ -115,34 +155,52 @@ const MultiSelectDropdown = ({
       ? selectedValues[0] 
       : `${selectedValues.length} selected`;
 
+  const filteredOptions = options.filter(option => 
+    option.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
     <div>
-      <Label className="text-xs">{label}</Label>
+      <Label className="text-xs font-medium text-foreground">{label}</Label>
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <Button
             variant="outline"
             role="combobox"
             aria-expanded={open}
-            className="w-full justify-between h-9 mt-1 font-normal"
+            className="w-full justify-between h-10 mt-1 font-normal bg-primary/5 border-primary/20 hover:bg-primary/10"
           >
             <span className="truncate">{displayText}</span>
             <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-full min-w-[200px] p-0" align="start">
+        <PopoverContent className="w-full min-w-[250px] p-0" align="start">
+          <div className="p-2 border-b">
+            <input
+              type="text"
+              placeholder="Type to search..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full px-2 py-1.5 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/30"
+            />
+          </div>
           <ScrollArea className="h-[200px]">
             <div className="p-2 space-y-1">
-              {options.map((option) => (
+              {filteredOptions.map((option) => (
                 <div
                   key={option}
-                  className="flex items-center space-x-2 p-2 hover:bg-muted rounded cursor-pointer"
+                  className={`flex items-center space-x-2 p-2 rounded cursor-pointer transition-colors ${
+                    selectedValues.includes(option) 
+                      ? 'bg-primary/20 text-primary-foreground' 
+                      : 'hover:bg-muted'
+                  }`}
                   onClick={() => onToggle(option)}
                 >
                   <Checkbox
                     id={option}
                     checked={selectedValues.includes(option)}
                     onCheckedChange={() => onToggle(option)}
+                    className="border-primary data-[state=checked]:bg-primary"
                   />
                   <label
                     htmlFor={option}
@@ -150,6 +208,9 @@ const MultiSelectDropdown = ({
                   >
                     {option}
                   </label>
+                  {selectedValues.includes(option) && (
+                    <Check className="h-4 w-4 text-primary" />
+                  )}
                 </div>
               ))}
             </div>
@@ -159,8 +220,13 @@ const MultiSelectDropdown = ({
       {selectedValues.length > 0 && (
         <div className="flex flex-wrap gap-1 mt-2">
           {selectedValues.map((value) => (
-            <Badge key={value} variant="secondary" className="text-xs">
-              {value}
+            <Badge 
+              key={value} 
+              variant="secondary" 
+              className="text-xs bg-primary/10 text-primary cursor-pointer hover:bg-primary/20"
+              onClick={() => onToggle(value)}
+            >
+              {value} ×
             </Badge>
           ))}
         </div>
@@ -169,11 +235,21 @@ const MultiSelectDropdown = ({
   );
 };
 
+type PreferenceStep = 'basic' | 'religious' | 'professional' | 'location';
+
 const PartnerPreferencesSection = ({ userId }: PartnerPreferencesSectionProps) => {
   const [formData, setFormData] = useState<PartnerPreferences>(defaultPreferences);
   const [isSaving, setIsSaving] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [activeSection, setActiveSection] = useState<'basic' | 'religious' | 'professional' | 'location'>('basic');
+  const [activeStep, setActiveStep] = useState<PreferenceStep>('basic');
+  const [completedSteps, setCompletedSteps] = useState<PreferenceStep[]>([]);
+
+  const steps: { id: PreferenceStep; label: string; icon: typeof User }[] = [
+    { id: 'basic', label: 'Basic Details', icon: User },
+    { id: 'religious', label: 'Religious', icon: Heart },
+    { id: 'professional', label: 'Professional', icon: GraduationCap },
+    { id: 'location', label: 'Location', icon: MapPin },
+  ];
 
   useEffect(() => {
     fetchPreferences();
@@ -206,6 +282,8 @@ const PartnerPreferencesSection = ({ userId }: PartnerPreferencesSectionProps) =
           country: data.country || [],
           residing_state: data.residing_state || [],
         });
+        // Mark all steps as completed if data exists
+        setCompletedSteps(['basic', 'religious', 'professional', 'location']);
       }
     } catch (error: any) {
       console.error('Error fetching preferences:', error);
@@ -214,7 +292,7 @@ const PartnerPreferencesSection = ({ userId }: PartnerPreferencesSectionProps) =
     }
   };
 
-  const handleSave = async () => {
+  const saveCurrentStep = async () => {
     setIsSaving(true);
     try {
       const { error } = await supabase
@@ -246,10 +324,25 @@ const PartnerPreferencesSection = ({ userId }: PartnerPreferencesSectionProps) =
 
       if (error) throw error;
 
-      toast({
-        title: "Preferences Saved",
-        description: "Your partner preferences have been updated successfully.",
-      });
+      // Mark current step as completed
+      if (!completedSteps.includes(activeStep)) {
+        setCompletedSteps(prev => [...prev, activeStep]);
+      }
+
+      // Move to next step
+      const currentIndex = steps.findIndex(s => s.id === activeStep);
+      if (currentIndex < steps.length - 1) {
+        setActiveStep(steps[currentIndex + 1].id);
+        toast({
+          title: "Saved!",
+          description: `${steps[currentIndex].label} saved. Moving to ${steps[currentIndex + 1].label}...`,
+        });
+      } else {
+        toast({
+          title: "All Preferences Saved!",
+          description: "Your partner preferences have been saved successfully. Matching profiles will now appear based on your preferences.",
+        });
+      }
     } catch (error: any) {
       toast({
         title: "Failed to Save",
@@ -277,13 +370,6 @@ const PartnerPreferencesSection = ({ userId }: PartnerPreferencesSectionProps) =
   const availableCastes = formData.religion.length > 0
     ? [...new Set(formData.religion.flatMap(r => castesByReligion[r] || []))]
     : [];
-
-  const sections = [
-    { id: 'basic', label: 'Basic', icon: User },
-    { id: 'religious', label: 'Religious', icon: Heart },
-    { id: 'professional', label: 'Professional', icon: GraduationCap },
-    { id: 'location', label: 'Location', icon: MapPin },
-  ] as const;
 
   if (loading) {
     return (
@@ -318,89 +404,72 @@ const PartnerPreferencesSection = ({ userId }: PartnerPreferencesSectionProps) =
         </CardContent>
       </Card>
 
-      {/* Section Tabs */}
+      {/* Step Indicator */}
       <div className="flex gap-2 overflow-x-auto pb-2">
-        {sections.map((section) => (
-          <Button
-            key={section.id}
-            variant={activeSection === section.id ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => setActiveSection(section.id)}
-            className="flex-shrink-0 gap-2"
-          >
-            <section.icon className="h-4 w-4" />
-            {section.label}
-          </Button>
-        ))}
+        {steps.map((step, index) => {
+          const isCompleted = completedSteps.includes(step.id);
+          const isActive = activeStep === step.id;
+          const Icon = step.icon;
+          
+          return (
+            <Button
+              key={step.id}
+              variant={isActive ? 'default' : isCompleted ? 'secondary' : 'outline'}
+              size="sm"
+              onClick={() => setActiveStep(step.id)}
+              className={`flex-shrink-0 gap-2 ${isCompleted && !isActive ? 'bg-green-100 text-green-700 hover:bg-green-200' : ''}`}
+            >
+              {isCompleted && !isActive ? (
+                <Check className="h-4 w-4" />
+              ) : (
+                <Icon className="h-4 w-4" />
+              )}
+              {step.label}
+              {index < steps.length - 1 && <ChevronRight className="h-3 w-3 ml-1 opacity-50" />}
+            </Button>
+          );
+        })}
       </div>
 
-      {/* Basic Preferences Section */}
-      {activeSection === 'basic' && (
+      {/* Basic Details Section */}
+      {activeStep === 'basic' && (
         <Card className="shadow-card">
           <CardHeader className="pb-3">
             <CardTitle className="font-display text-lg flex items-center gap-2">
               <User className="h-5 w-5 text-primary" />
-              Basic Preferences
+              Basic Details
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <Label className="text-xs">Age From</Label>
-                <Select
-                  value={formData.age_from.toString()}
-                  onValueChange={(v) => handleInputChange('age_from', parseInt(v))}
-                >
-                  <SelectTrigger className="h-9"><SelectValue placeholder="Select age" /></SelectTrigger>
-                  <SelectContent>
-                    {Array.from({ length: 43 }, (_, i) => 18 + i).map((age) => (
-                      <SelectItem key={age} value={age.toString()}>{age} years</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label className="text-xs">Age To</Label>
-                <Select
-                  value={formData.age_to.toString()}
-                  onValueChange={(v) => handleInputChange('age_to', parseInt(v))}
-                >
-                  <SelectTrigger className="h-9"><SelectValue placeholder="Select age" /></SelectTrigger>
-                  <SelectContent>
-                    {Array.from({ length: 43 }, (_, i) => 18 + i).map((age) => (
-                      <SelectItem key={age} value={age.toString()}>{age} years</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label className="text-xs">Height From</Label>
-                <Select
-                  value={formData.height_from}
-                  onValueChange={(v) => handleInputChange('height_from', v)}
-                >
-                  <SelectTrigger className="h-9"><SelectValue placeholder="Select height" /></SelectTrigger>
-                  <SelectContent>
-                    {heightOptions.map((h) => (
-                      <SelectItem key={h} value={h}>{h}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label className="text-xs">Height To</Label>
-                <Select
-                  value={formData.height_to}
-                  onValueChange={(v) => handleInputChange('height_to', v)}
-                >
-                  <SelectTrigger className="h-9"><SelectValue placeholder="Select height" /></SelectTrigger>
-                  <SelectContent>
-                    {heightOptions.map((h) => (
-                      <SelectItem key={h} value={h}>{h}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+              <StyledSelect
+                label="Age From"
+                value={formData.age_from.toString()}
+                onValueChange={(v) => handleInputChange('age_from', parseInt(v))}
+                options={Array.from({ length: 43 }, (_, i) => `${18 + i}`)}
+                placeholder="Select age"
+              />
+              <StyledSelect
+                label="Age To"
+                value={formData.age_to.toString()}
+                onValueChange={(v) => handleInputChange('age_to', parseInt(v))}
+                options={Array.from({ length: 43 }, (_, i) => `${18 + i}`)}
+                placeholder="Select age"
+              />
+              <StyledSelect
+                label="Height From"
+                value={formData.height_from}
+                onValueChange={(v) => handleInputChange('height_from', v)}
+                options={heightOptions}
+                placeholder="Select height"
+              />
+              <StyledSelect
+                label="Height To"
+                value={formData.height_to}
+                onValueChange={(v) => handleInputChange('height_to', v)}
+                options={heightOptions}
+                placeholder="Select height"
+              />
             </div>
 
             <MultiSelectDropdown
@@ -419,20 +488,13 @@ const PartnerPreferencesSection = ({ userId }: PartnerPreferencesSectionProps) =
               placeholder="Select mother tongue"
             />
 
-            <div>
-              <Label className="text-xs">Physical Status</Label>
-              <Select
-                value={formData.physical_status}
-                onValueChange={(v) => handleInputChange('physical_status', v)}
-              >
-                <SelectTrigger className="h-9"><SelectValue placeholder="Select status" /></SelectTrigger>
-                <SelectContent>
-                  {PHYSICAL_STATUS_OPTIONS.map((s) => (
-                    <SelectItem key={s} value={s}>{s}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+            <StyledSelect
+              label="Physical Status"
+              value={formData.physical_status}
+              onValueChange={(v) => handleInputChange('physical_status', v)}
+              options={PHYSICAL_STATUS_OPTIONS}
+              placeholder="Select status"
+            />
 
             <MultiSelectDropdown
               label="Eating Habits"
@@ -443,41 +505,38 @@ const PartnerPreferencesSection = ({ userId }: PartnerPreferencesSectionProps) =
             />
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <Label className="text-xs">Drinking Habits</Label>
-                <Select
-                  value={formData.drinking_habits}
-                  onValueChange={(v) => handleInputChange('drinking_habits', v)}
-                >
-                  <SelectTrigger className="h-9"><SelectValue placeholder="Select" /></SelectTrigger>
-                  <SelectContent>
-                    {DRINKING_OPTIONS.map((o) => (
-                      <SelectItem key={o} value={o}>{o}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label className="text-xs">Smoking Habits</Label>
-                <Select
-                  value={formData.smoking_habits}
-                  onValueChange={(v) => handleInputChange('smoking_habits', v)}
-                >
-                  <SelectTrigger className="h-9"><SelectValue placeholder="Select" /></SelectTrigger>
-                  <SelectContent>
-                    {SMOKING_OPTIONS.map((o) => (
-                      <SelectItem key={o} value={o}>{o}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+              <StyledSelect
+                label="Drinking Habits"
+                value={formData.drinking_habits}
+                onValueChange={(v) => handleInputChange('drinking_habits', v)}
+                options={DRINKING_OPTIONS}
+                placeholder="Select"
+              />
+              <StyledSelect
+                label="Smoking Habits"
+                value={formData.smoking_habits}
+                onValueChange={(v) => handleInputChange('smoking_habits', v)}
+                options={SMOKING_OPTIONS}
+                placeholder="Select"
+              />
+            </div>
+
+            <div className="flex justify-end pt-4">
+              <Button onClick={saveCurrentStep} disabled={isSaving} className="gap-2">
+                {isSaving ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Save className="h-4 w-4" />
+                )}
+                Save & Continue
+              </Button>
             </div>
           </CardContent>
         </Card>
       )}
 
       {/* Religious Preferences Section */}
-      {activeSection === 'religious' && (
+      {activeStep === 'religious' && (
         <Card className="shadow-card">
           <CardHeader className="pb-3">
             <CardTitle className="font-display text-lg flex items-center gap-2">
@@ -504,21 +563,13 @@ const PartnerPreferencesSection = ({ userId }: PartnerPreferencesSectionProps) =
               />
             )}
 
-            <div>
-              <Label className="text-xs">Dosham</Label>
-              <Select
-                value={formData.dosham}
-                onValueChange={(v) => handleInputChange('dosham', v)}
-              >
-                <SelectTrigger className="h-9"><SelectValue placeholder="Select dosham" /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Doesn't matter">Doesn't matter</SelectItem>
-                  {doshamOptions.map((d) => (
-                    <SelectItem key={d} value={d}>{d}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+            <StyledSelect
+              label="Dosham"
+              value={formData.dosham}
+              onValueChange={(v) => handleInputChange('dosham', v)}
+              options={["Doesn't matter", ...doshamOptions]}
+              placeholder="Select dosham"
+            />
 
             <MultiSelectDropdown
               label="Star / Nakshatra"
@@ -527,12 +578,23 @@ const PartnerPreferencesSection = ({ userId }: PartnerPreferencesSectionProps) =
               onToggle={(v) => toggleArrayItem('star', v)}
               placeholder="Select star"
             />
+
+            <div className="flex justify-end pt-4">
+              <Button onClick={saveCurrentStep} disabled={isSaving} className="gap-2">
+                {isSaving ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Save className="h-4 w-4" />
+                )}
+                Save & Continue
+              </Button>
+            </div>
           </CardContent>
         </Card>
       )}
 
       {/* Professional Preferences Section */}
-      {activeSection === 'professional' && (
+      {activeStep === 'professional' && (
         <Card className="shadow-card">
           <CardHeader className="pb-3">
             <CardTitle className="font-display text-lg flex items-center gap-2">
@@ -549,42 +611,38 @@ const PartnerPreferencesSection = ({ userId }: PartnerPreferencesSectionProps) =
               placeholder="Select education"
             />
 
-            <div>
-              <Label className="text-xs">Employed In</Label>
-              <Select
-                value={formData.employed_in}
-                onValueChange={(v) => handleInputChange('employed_in', v)}
-              >
-                <SelectTrigger className="h-9"><SelectValue placeholder="Select employment type" /></SelectTrigger>
-                <SelectContent>
-                  {EMPLOYED_IN_OPTIONS.map((e) => (
-                    <SelectItem key={e} value={e}>{e}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+            <StyledSelect
+              label="Employed In"
+              value={formData.employed_in}
+              onValueChange={(v) => handleInputChange('employed_in', v)}
+              options={EMPLOYED_IN_OPTIONS}
+              placeholder="Select employment type"
+            />
 
-            <div>
-              <Label className="text-xs">Annual Income</Label>
-              <Select
-                value={formData.annual_income}
-                onValueChange={(v) => handleInputChange('annual_income', v)}
-              >
-                <SelectTrigger className="h-9"><SelectValue placeholder="Select income range" /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Any">Any</SelectItem>
-                  {incomeOptions.map((i) => (
-                    <SelectItem key={i} value={i}>{i}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+            <StyledSelect
+              label="Annual Income"
+              value={formData.annual_income}
+              onValueChange={(v) => handleInputChange('annual_income', v)}
+              options={['Any', ...incomeOptions]}
+              placeholder="Select income range"
+            />
+
+            <div className="flex justify-end pt-4">
+              <Button onClick={saveCurrentStep} disabled={isSaving} className="gap-2">
+                {isSaving ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Save className="h-4 w-4" />
+                )}
+                Save & Continue
+              </Button>
             </div>
           </CardContent>
         </Card>
       )}
 
       {/* Location Preferences Section */}
-      {activeSection === 'location' && (
+      {activeStep === 'location' && (
         <Card className="shadow-card">
           <CardHeader className="pb-3">
             <CardTitle className="font-display text-lg flex items-center gap-2">
@@ -608,21 +666,20 @@ const PartnerPreferencesSection = ({ userId }: PartnerPreferencesSectionProps) =
               onToggle={(v) => toggleArrayItem('residing_state', v)}
               placeholder="Select state"
             />
+
+            <div className="flex justify-end pt-4">
+              <Button onClick={saveCurrentStep} disabled={isSaving} className="gap-2">
+                {isSaving ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Save className="h-4 w-4" />
+                )}
+                Save Preferences
+              </Button>
+            </div>
           </CardContent>
         </Card>
       )}
-
-      {/* Save Button */}
-      <div className="flex justify-end pt-2">
-        <Button onClick={handleSave} disabled={isSaving} className="gap-2">
-          {isSaving ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
-          ) : (
-            <Save className="h-4 w-4" />
-          )}
-          Save Preferences
-        </Button>
-      </div>
     </div>
   );
 };
