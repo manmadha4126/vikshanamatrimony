@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { Heart, HeartOff, Check, X, Loader2, User, Clock, CheckCircle, XCircle } from 'lucide-react';
+import { Heart, HeartOff, Check, X, Loader2, Clock, CheckCircle, XCircle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
@@ -18,6 +18,7 @@ interface Profile {
   education: string | null;
   occupation: string | null;
   profile_id: string | null;
+  user_id?: string | null;
 }
 
 interface Interest {
@@ -35,32 +36,47 @@ interface InterestsSectionProps {
   profileId: string;
 }
 
+type StatusFilter = 'all' | 'pending' | 'accepted' | 'rejected';
+
 const InterestsSection = ({ userId, profileId }: InterestsSectionProps) => {
   const [receivedInterests, setReceivedInterests] = useState<Interest[]>([]);
   const [sentInterests, setSentInterests] = useState<Interest[]>([]);
   const [loading, setLoading] = useState(true);
   const [processingId, setProcessingId] = useState<string | null>(null);
+  const [receivedFilter, setReceivedFilter] = useState<StatusFilter>('all');
+  const [sentFilter, setSentFilter] = useState<StatusFilter>('all');
   const { toast } = useToast();
 
   const fetchInterests = async () => {
     setLoading(true);
     try {
-      // Fetch received interests (where to_profile_id = current user's profile id)
+      // Fetch received interests - get all interests where to_profile_id matches our profile
       const { data: received, error: receivedError } = await supabase
         .from('interests')
         .select('*')
         .eq('to_profile_id', profileId)
         .order('created_at', { ascending: false });
 
-      if (receivedError) throw receivedError;
+      if (receivedError) {
+        console.error('Error fetching received interests:', receivedError);
+        throw receivedError;
+      }
+
+      console.log('Received interests for profile', profileId, ':', received);
 
       // Get profile details for received interests
       if (received && received.length > 0) {
         const fromUserIds = received.map(i => i.from_user_id);
-        const { data: profiles } = await supabase
+        const { data: profiles, error: profilesError } = await supabase
           .from('profiles')
           .select('id, name, photo_url, date_of_birth, city, state, education, occupation, profile_id, user_id')
           .in('user_id', fromUserIds);
+
+        if (profilesError) {
+          console.error('Error fetching profiles for received interests:', profilesError);
+        }
+
+        console.log('Profiles for received interests:', profiles);
 
         const receivedWithProfiles = received.map(interest => ({
           ...interest,
@@ -78,15 +94,24 @@ const InterestsSection = ({ userId, profileId }: InterestsSectionProps) => {
         .eq('from_user_id', userId)
         .order('created_at', { ascending: false });
 
-      if (sentError) throw sentError;
+      if (sentError) {
+        console.error('Error fetching sent interests:', sentError);
+        throw sentError;
+      }
+
+      console.log('Sent interests:', sent);
 
       // Get profile details for sent interests
       if (sent && sent.length > 0) {
         const toProfileIds = sent.map(i => i.to_profile_id);
-        const { data: profiles } = await supabase
+        const { data: profiles, error: profilesError } = await supabase
           .from('profiles')
           .select('id, name, photo_url, date_of_birth, city, state, education, occupation, profile_id')
           .in('id', toProfileIds);
+
+        if (profilesError) {
+          console.error('Error fetching profiles for sent interests:', profilesError);
+        }
 
         const sentWithProfiles = sent.map(interest => ({
           ...interest,
@@ -97,6 +122,7 @@ const InterestsSection = ({ userId, profileId }: InterestsSectionProps) => {
         setSentInterests([]);
       }
     } catch (error: any) {
+      console.error('Failed to fetch interests:', error);
       toast({
         title: "Error",
         description: "Failed to fetch interests",
@@ -109,6 +135,7 @@ const InterestsSection = ({ userId, profileId }: InterestsSectionProps) => {
 
   useEffect(() => {
     if (userId && profileId) {
+      console.log('Fetching interests for userId:', userId, 'profileId:', profileId);
       fetchInterests();
     }
   }, [userId, profileId]);
@@ -200,6 +227,16 @@ const InterestsSection = ({ userId, profileId }: InterestsSectionProps) => {
     });
   };
 
+  const filterInterests = (interests: Interest[], filter: StatusFilter) => {
+    if (filter === 'all') return interests;
+    return interests.filter(i => i.status === filter);
+  };
+
+  const getFilterCount = (interests: Interest[], filter: StatusFilter) => {
+    if (filter === 'all') return interests.length;
+    return interests.filter(i => i.status === filter).length;
+  };
+
   const InterestCard = ({ interest, type }: { interest: Interest; type: 'received' | 'sent' }) => {
     const profile = interest.profile;
     if (!profile) return null;
@@ -280,7 +317,7 @@ const InterestsSection = ({ userId, profileId }: InterestsSectionProps) => {
     );
   };
 
-  const EmptyState = ({ type }: { type: 'received' | 'sent' }) => (
+  const EmptyState = ({ type, filter }: { type: 'received' | 'sent'; filter: StatusFilter }) => (
     <div className="text-center py-12">
       <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mx-auto mb-4">
         {type === 'received' ? (
@@ -290,13 +327,74 @@ const InterestsSection = ({ userId, profileId }: InterestsSectionProps) => {
         )}
       </div>
       <h3 className="text-lg font-medium text-foreground mb-1">
-        {type === 'received' ? 'No interests received yet' : 'No interests sent yet'}
+        {filter === 'all' 
+          ? (type === 'received' ? 'No interests received yet' : 'No interests sent yet')
+          : `No ${filter} interests`}
       </h3>
       <p className="text-muted-foreground text-sm">
-        {type === 'received' 
-          ? 'When someone shows interest in your profile, it will appear here.'
-          : 'When you send interest to profiles, they will appear here.'}
+        {filter === 'all' 
+          ? (type === 'received' 
+              ? 'When someone shows interest in your profile, it will appear here.'
+              : 'When you send interest to profiles, they will appear here.')
+          : `You don't have any ${filter} interests yet.`}
       </p>
+    </div>
+  );
+
+  const StatusFilterTabs = ({ 
+    filter, 
+    setFilter, 
+    interests 
+  }: { 
+    filter: StatusFilter; 
+    setFilter: (f: StatusFilter) => void; 
+    interests: Interest[] 
+  }) => (
+    <div className="flex flex-wrap gap-2 mb-4">
+      <Button
+        size="sm"
+        variant={filter === 'all' ? 'default' : 'outline'}
+        onClick={() => setFilter('all')}
+        className="gap-1"
+      >
+        All
+        <Badge variant="secondary" className="ml-1 h-5 px-1.5 text-xs">
+          {getFilterCount(interests, 'all')}
+        </Badge>
+      </Button>
+      <Button
+        size="sm"
+        variant={filter === 'pending' ? 'default' : 'outline'}
+        onClick={() => setFilter('pending')}
+        className="gap-1"
+      >
+        Pending
+        <Badge variant="secondary" className="ml-1 h-5 px-1.5 text-xs">
+          {getFilterCount(interests, 'pending')}
+        </Badge>
+      </Button>
+      <Button
+        size="sm"
+        variant={filter === 'accepted' ? 'default' : 'outline'}
+        onClick={() => setFilter('accepted')}
+        className="gap-1"
+      >
+        Accepted
+        <Badge variant="secondary" className="ml-1 h-5 px-1.5 text-xs">
+          {getFilterCount(interests, 'accepted')}
+        </Badge>
+      </Button>
+      <Button
+        size="sm"
+        variant={filter === 'rejected' ? 'default' : 'outline'}
+        onClick={() => setFilter('rejected')}
+        className="gap-1"
+      >
+        Declined
+        <Badge variant="secondary" className="ml-1 h-5 px-1.5 text-xs">
+          {getFilterCount(interests, 'rejected')}
+        </Badge>
+      </Button>
     </div>
   );
 
@@ -309,6 +407,8 @@ const InterestsSection = ({ userId, profileId }: InterestsSectionProps) => {
   }
 
   const pendingReceived = receivedInterests.filter(i => i.status === 'pending').length;
+  const filteredReceivedInterests = filterInterests(receivedInterests, receivedFilter);
+  const filteredSentInterests = filterInterests(sentInterests, sentFilter);
 
   return (
     <div className="space-y-4">
@@ -334,22 +434,32 @@ const InterestsSection = ({ userId, profileId }: InterestsSectionProps) => {
             </TabsList>
 
             <TabsContent value="received" className="space-y-3">
-              {receivedInterests.length > 0 ? (
-                receivedInterests.map(interest => (
+              <StatusFilterTabs 
+                filter={receivedFilter} 
+                setFilter={setReceivedFilter} 
+                interests={receivedInterests} 
+              />
+              {filteredReceivedInterests.length > 0 ? (
+                filteredReceivedInterests.map(interest => (
                   <InterestCard key={interest.id} interest={interest} type="received" />
                 ))
               ) : (
-                <EmptyState type="received" />
+                <EmptyState type="received" filter={receivedFilter} />
               )}
             </TabsContent>
 
             <TabsContent value="sent" className="space-y-3">
-              {sentInterests.length > 0 ? (
-                sentInterests.map(interest => (
+              <StatusFilterTabs 
+                filter={sentFilter} 
+                setFilter={setSentFilter} 
+                interests={sentInterests} 
+              />
+              {filteredSentInterests.length > 0 ? (
+                filteredSentInterests.map(interest => (
                   <InterestCard key={interest.id} interest={interest} type="sent" />
                 ))
               ) : (
-                <EmptyState type="sent" />
+                <EmptyState type="sent" filter={sentFilter} />
               )}
             </TabsContent>
           </Tabs>
