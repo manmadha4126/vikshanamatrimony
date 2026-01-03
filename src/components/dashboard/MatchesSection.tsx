@@ -8,7 +8,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Slider } from '@/components/ui/slider';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Label } from '@/components/ui/label';
-import { Gem, Heart, Loader2, MapPin, GraduationCap, Briefcase, Star, User, Filter, SlidersHorizontal, X } from 'lucide-react';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Gem, Heart, Loader2, MapPin, GraduationCap, Briefcase, Star, User, Filter, SlidersHorizontal, X, ZoomIn } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
@@ -71,6 +72,7 @@ const MatchesSection = ({ userId, userGender, onViewProfile }: MatchesSectionPro
   const [filterReligion, setFilterReligion] = useState<string>('');
   const [filterEducation, setFilterEducation] = useState<string>('');
   const [showFilters, setShowFilters] = useState(false);
+  const [zoomedPhoto, setZoomedPhoto] = useState<{ url: string; name: string } | null>(null);
 
   const calculateAge = (dob: string | null) => {
     if (!dob) return null;
@@ -475,7 +477,7 @@ const MatchesSection = ({ userId, userGender, onViewProfile }: MatchesSectionPro
               return (
                 <Card key={match.id} className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer" onClick={() => onViewProfile?.(match.id)}>
                   {/* Square Profile Image */}
-                  <div className="relative">
+                  <div className="relative group/photo">
                     <AspectRatio ratio={1}>
                       {match.photo_url ? (
                         <img
@@ -489,6 +491,20 @@ const MatchesSection = ({ userId, userGender, onViewProfile }: MatchesSectionPro
                         </div>
                       )}
                     </AspectRatio>
+                    
+                    {/* Photo Zoom Button */}
+                    {match.photo_url && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setZoomedPhoto({ url: match.photo_url!, name: match.name });
+                        }}
+                        className="absolute bottom-2 left-2 p-2 rounded-full bg-black/50 text-white opacity-0 group-hover/photo:opacity-100 transition-opacity hover:bg-black/70"
+                        aria-label="Zoom photo"
+                      >
+                        <ZoomIn className="h-4 w-4" />
+                      </button>
+                    )}
                     
                     {/* Compatibility Badge */}
                     <div className="absolute top-2 right-2">
@@ -583,6 +599,26 @@ const MatchesSection = ({ userId, userGender, onViewProfile }: MatchesSectionPro
           </div>
         )}
       </CardContent>
+
+      {/* Photo Zoom Dialog */}
+      <Dialog open={!!zoomedPhoto} onOpenChange={() => setZoomedPhoto(null)}>
+        <DialogContent className="max-w-3xl p-0 overflow-hidden bg-black/95 border-none">
+          <div className="relative">
+            {zoomedPhoto && (
+              <>
+                <img
+                  src={zoomedPhoto.url}
+                  alt={zoomedPhoto.name}
+                  className="w-full h-auto max-h-[80vh] object-contain"
+                />
+                <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent">
+                  <p className="text-white font-medium text-lg">{zoomedPhoto.name}</p>
+                </div>
+              </>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 };
