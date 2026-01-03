@@ -4,7 +4,11 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { AspectRatio } from '@/components/ui/aspect-ratio';
-import { Gem, Heart, Loader2, MapPin, GraduationCap, Briefcase, Star, User } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Slider } from '@/components/ui/slider';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Label } from '@/components/ui/label';
+import { Gem, Heart, Loader2, MapPin, GraduationCap, Briefcase, Star, User, Filter, SlidersHorizontal, X } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
@@ -51,12 +55,22 @@ interface MatchesSectionProps {
   onViewProfile?: (profileId: string) => void;
 }
 
+type SortOption = 'score' | 'age' | 'recent';
+
 const MatchesSection = ({ userId, userGender, onViewProfile }: MatchesSectionProps) => {
   const [matches, setMatches] = useState<MatchedProfile[]>([]);
+  const [filteredMatches, setFilteredMatches] = useState<MatchedProfile[]>([]);
   const [loading, setLoading] = useState(true);
   const [sendingInterest, setSendingInterest] = useState<string | null>(null);
   const [sentInterests, setSentInterests] = useState<string[]>([]);
   const { toast } = useToast();
+
+  // Filter states
+  const [minScore, setMinScore] = useState<number>(0);
+  const [sortBy, setSortBy] = useState<SortOption>('score');
+  const [filterReligion, setFilterReligion] = useState<string>('');
+  const [filterEducation, setFilterEducation] = useState<string>('');
+  const [showFilters, setShowFilters] = useState(false);
 
   const calculateAge = (dob: string | null) => {
     if (!dob) return null;
@@ -204,6 +218,7 @@ const MatchesSection = ({ userId, userGender, onViewProfile }: MatchesSectionPro
 
       if (!prefs || !profiles) {
         setMatches([]);
+        setFilteredMatches([]);
         return;
       }
 
@@ -221,9 +236,10 @@ const MatchesSection = ({ userId, userGender, onViewProfile }: MatchesSectionPro
       matchedProfiles.sort((a, b) => b.compatibilityScore - a.compatibilityScore);
 
       // Filter out profiles with 0% match
-      const filteredMatches = matchedProfiles.filter(m => m.compatibilityScore > 0);
+      const filteredResults = matchedProfiles.filter(m => m.compatibilityScore > 0);
 
-      setMatches(filteredMatches);
+      setMatches(filteredResults);
+      setFilteredMatches(filteredResults);
     } catch (error) {
       console.error('Error fetching matches:', error);
       toast({
@@ -235,6 +251,39 @@ const MatchesSection = ({ userId, userGender, onViewProfile }: MatchesSectionPro
       setLoading(false);
     }
   };
+
+  // Apply filters when filter state changes
+  useEffect(() => {
+    let result = [...matches];
+
+    // Filter by minimum score
+    if (minScore > 0) {
+      result = result.filter(m => m.compatibilityScore >= minScore);
+    }
+
+    // Filter by religion
+    if (filterReligion) {
+      result = result.filter(m => m.religion === filterReligion);
+    }
+
+    // Filter by education
+    if (filterEducation) {
+      result = result.filter(m => m.education === filterEducation);
+    }
+
+    // Sort
+    if (sortBy === 'score') {
+      result.sort((a, b) => b.compatibilityScore - a.compatibilityScore);
+    } else if (sortBy === 'age') {
+      result.sort((a, b) => {
+        const ageA = calculateAge(a.date_of_birth) || 0;
+        const ageB = calculateAge(b.date_of_birth) || 0;
+        return ageA - ageB;
+      });
+    }
+
+    setFilteredMatches(result);
+  }, [matches, minScore, sortBy, filterReligion, filterEducation]);
 
   const sendInterest = async (profileId: string) => {
     setSendingInterest(profileId);
@@ -273,12 +322,18 @@ const MatchesSection = ({ userId, userGender, onViewProfile }: MatchesSectionPro
     return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
   };
 
-  const getScoreColor = (score: number) => {
-    if (score >= 80) return 'text-green-600';
-    if (score >= 60) return 'text-blue-600';
-    if (score >= 40) return 'text-yellow-600';
-    return 'text-orange-600';
+  const clearFilters = () => {
+    setMinScore(0);
+    setSortBy('score');
+    setFilterReligion('');
+    setFilterEducation('');
   };
+
+  const hasActiveFilters = minScore > 0 || filterReligion || filterEducation;
+
+  // Get unique values for filters
+  const uniqueReligions = [...new Set(matches.map(m => m.religion).filter(Boolean))] as string[];
+  const uniqueEducations = [...new Set(matches.map(m => m.education).filter(Boolean))] as string[];
 
   if (loading) {
     return (
@@ -291,30 +346,129 @@ const MatchesSection = ({ userId, userGender, onViewProfile }: MatchesSectionPro
   return (
     <Card>
       <CardHeader className="pb-3">
-        <CardTitle className="flex items-center gap-2">
-          <Gem className="h-5 w-5 text-primary" />
-          Your Matches
-          {matches.length > 0 && (
-            <Badge variant="secondary" className="ml-2">
-              {matches.length} profiles
-            </Badge>
-          )}
-        </CardTitle>
+        <div className="flex items-center justify-between flex-wrap gap-3">
+          <CardTitle className="flex items-center gap-2">
+            <Gem className="h-5 w-5 text-primary" />
+            Your Matches
+            {matches.length > 0 && (
+              <Badge variant="secondary" className="ml-2">
+                {filteredMatches.length} of {matches.length} profiles
+              </Badge>
+            )}
+          </CardTitle>
+          
+          <div className="flex items-center gap-2">
+            <Select value={sortBy} onValueChange={(v: SortOption) => setSortBy(v)}>
+              <SelectTrigger className="w-[140px] h-9">
+                <SelectValue placeholder="Sort by" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="score">Best Match</SelectItem>
+                <SelectItem value="age">Age</SelectItem>
+                <SelectItem value="recent">Recent</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <Popover open={showFilters} onOpenChange={setShowFilters}>
+              <PopoverTrigger asChild>
+                <Button 
+                  variant={hasActiveFilters ? "default" : "outline"} 
+                  size="sm" 
+                  className="gap-2"
+                >
+                  <SlidersHorizontal className="h-4 w-4" />
+                  Filters
+                  {hasActiveFilters && (
+                    <Badge variant="secondary" className="ml-1 h-5 w-5 p-0 text-xs">
+                      !
+                    </Badge>
+                  )}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-80" align="end">
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h4 className="font-medium">Filter Matches</h4>
+                    {hasActiveFilters && (
+                      <Button variant="ghost" size="sm" onClick={clearFilters}>
+                        <X className="h-3 w-3 mr-1" />
+                        Clear
+                      </Button>
+                    )}
+                  </div>
+
+                  {/* Minimum Score Filter */}
+                  <div className="space-y-2">
+                    <Label className="text-sm">Minimum Match Score: {minScore}%</Label>
+                    <Slider
+                      value={[minScore]}
+                      onValueChange={(v) => setMinScore(v[0])}
+                      max={100}
+                      step={10}
+                      className="py-2"
+                    />
+                  </div>
+
+                  {/* Religion Filter */}
+                  <div className="space-y-2">
+                    <Label className="text-sm">Religion</Label>
+                    <Select value={filterReligion} onValueChange={setFilterReligion}>
+                      <SelectTrigger className="h-9">
+                        <SelectValue placeholder="All religions" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="">All religions</SelectItem>
+                        {uniqueReligions.map(r => (
+                          <SelectItem key={r} value={r}>{r}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* Education Filter */}
+                  <div className="space-y-2">
+                    <Label className="text-sm">Education</Label>
+                    <Select value={filterEducation} onValueChange={setFilterEducation}>
+                      <SelectTrigger className="h-9">
+                        <SelectValue placeholder="All education" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="">All education</SelectItem>
+                        {uniqueEducations.map(e => (
+                          <SelectItem key={e} value={e}>{e}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              </PopoverContent>
+            </Popover>
+          </div>
+        </div>
       </CardHeader>
       <CardContent>
-        {matches.length === 0 ? (
+        {filteredMatches.length === 0 ? (
           <div className="text-center py-12">
             <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mx-auto mb-4">
               <Gem className="h-8 w-8 text-muted-foreground" />
             </div>
-            <h3 className="text-lg font-medium text-foreground mb-1">No matches found</h3>
+            <h3 className="text-lg font-medium text-foreground mb-1">
+              {matches.length === 0 ? 'No matches found' : 'No matches with current filters'}
+            </h3>
             <p className="text-muted-foreground text-sm">
-              Update your partner preferences to find compatible matches.
+              {matches.length === 0 
+                ? 'Update your partner preferences to find compatible matches.'
+                : 'Try adjusting your filters to see more profiles.'}
             </p>
+            {hasActiveFilters && (
+              <Button variant="outline" size="sm" className="mt-4" onClick={clearFilters}>
+                Clear Filters
+              </Button>
+            )}
           </div>
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {matches.map((match) => {
+            {filteredMatches.map((match) => {
               const age = calculateAge(match.date_of_birth);
               const hasSentInterest = sentInterests.includes(match.id);
               
