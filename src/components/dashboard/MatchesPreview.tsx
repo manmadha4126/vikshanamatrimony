@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { AspectRatio } from '@/components/ui/aspect-ratio';
 import { Progress } from '@/components/ui/progress';
-import { Users, ArrowRight, MapPin, GraduationCap } from 'lucide-react';
+import { Users, ArrowRight, MapPin, GraduationCap, User } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 
 interface Profile {
@@ -125,44 +125,47 @@ const MatchesPreview = ({ userId, userGender, onViewAllClick }: MatchesPreviewPr
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {matches.map((match) => (
-              <div 
+              <Card 
                 key={match.id} 
-                className="bg-muted/30 rounded-lg p-4 hover:bg-muted/50 transition-colors cursor-pointer"
+                className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
                 onClick={onViewAllClick}
               >
-                <div className="flex flex-col items-center text-center space-y-3">
-                  <Avatar className="h-16 w-16 border-2 border-primary/20">
-                    <AvatarImage src={match.photo_url || ''} alt={match.name} />
-                    <AvatarFallback className="bg-primary/10 text-primary font-semibold">
-                      {getInitials(match.name)}
-                    </AvatarFallback>
-                  </Avatar>
-                  
-                  <div className="space-y-1">
-                    <h4 className="font-semibold text-foreground truncate max-w-full">
-                      {match.name}
-                    </h4>
-                    {match.date_of_birth && (
-                      <p className="text-sm text-muted-foreground">
-                        {calculateAge(match.date_of_birth)} yrs
-                      </p>
+                {/* Square Profile Image */}
+                <div className="relative">
+                  <AspectRatio ratio={1}>
+                    {match.photo_url ? (
+                      <img
+                        src={match.photo_url}
+                        alt={match.name}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-muted flex items-center justify-center">
+                        <User className="h-12 w-12 text-muted-foreground" />
+                      </div>
                     )}
+                  </AspectRatio>
+                  
+                  {/* Compatibility Badge */}
+                  <div className="absolute top-2 right-2">
+                    <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold bg-background/90 ${getScoreColor(match.compatibilityScore)}`}>
+                      {match.compatibilityScore}% Match
+                    </span>
+                  </div>
+                </div>
+
+                {/* Profile Info */}
+                <div className="p-3 space-y-2">
+                  <div>
+                    <h4 className="font-semibold text-foreground truncate">
+                      {match.name}
+                      {match.date_of_birth && (
+                        <span className="text-muted-foreground font-normal">, {calculateAge(match.date_of_birth)}</span>
+                      )}
+                    </h4>
                   </div>
 
-                  <div className="w-full space-y-1">
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="text-muted-foreground">Match</span>
-                      <span className={`font-semibold ${getScoreColor(match.compatibilityScore)}`}>
-                        {match.compatibilityScore}%
-                      </span>
-                    </div>
-                    <Progress 
-                      value={match.compatibilityScore} 
-                      className="h-1.5" 
-                    />
-                  </div>
-
-                  <div className="flex flex-wrap gap-1 justify-center">
+                  <div className="flex flex-wrap gap-1">
                     {match.city && (
                       <span className="inline-flex items-center gap-1 text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
                         <MapPin className="h-3 w-3" />
@@ -177,7 +180,7 @@ const MatchesPreview = ({ userId, userGender, onViewAllClick }: MatchesPreviewPr
                     )}
                   </div>
                 </div>
-              </div>
+              </Card>
             ))}
           </div>
         )}
