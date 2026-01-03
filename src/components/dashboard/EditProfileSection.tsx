@@ -7,7 +7,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { User, Briefcase, MapPin, Heart, GraduationCap, Save, Loader2 } from 'lucide-react';
+import { User, Briefcase, MapPin, Heart, GraduationCap, Save, Loader2, Camera } from 'lucide-react';
+import { ProfilePhotosManager } from './ProfilePhotosManager';
 import {
   motherTongueOptions,
   heightOptions,
@@ -108,7 +109,7 @@ const EditProfileSection = ({ userId, profile, onProfileUpdate }: EditProfileSec
     about_me: profile.about_me || '',
   });
   const [isSaving, setIsSaving] = useState(false);
-  const [activeSection, setActiveSection] = useState<'basic' | 'religious' | 'professional' | 'family' | 'about'>('basic');
+  const [activeSection, setActiveSection] = useState<'basic' | 'religious' | 'professional' | 'family' | 'about' | 'photos'>('basic');
 
   const availableCastes = formData.religion ? castesByReligion[formData.religion] || [] : [];
 
@@ -127,6 +128,7 @@ const EditProfileSection = ({ userId, profile, onProfileUpdate }: EditProfileSec
     { id: 'professional', label: 'Professional', icon: Briefcase },
     { id: 'family', label: 'Family', icon: MapPin },
     { id: 'about', label: 'About Me', icon: GraduationCap },
+    { id: 'photos', label: 'Photos', icon: Camera },
   ] as const;
 
   const getNextSection = () => {
@@ -137,7 +139,7 @@ const EditProfileSection = ({ userId, profile, onProfileUpdate }: EditProfileSec
     return null; // Already on last section
   };
 
-  const isLastSection = activeSection === 'about';
+  const isLastSection = activeSection === 'photos';
 
   const handleSave = async () => {
     setIsSaving(true);
@@ -528,6 +530,11 @@ const EditProfileSection = ({ userId, profile, onProfileUpdate }: EditProfileSec
             </div>
           </CardContent>
         </Card>
+      )}
+
+      {/* Photos Section */}
+      {activeSection === 'photos' && (
+        <ProfilePhotosManager profileId={profile.id} onPhotosChange={onProfileUpdate} />
       )}
 
       {/* Save Button */}
