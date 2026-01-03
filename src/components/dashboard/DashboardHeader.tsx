@@ -87,7 +87,7 @@ const DashboardHeader = ({
     { icon: Heart, label: 'Interests', action: onInterestsClick },
     { icon: Gem, label: 'Matches', action: onMatchesClick },
     { icon: MessageCircle, label: 'Messages', action: onMessagesClick },
-    { icon: Search, label: 'Search', action: () => setIsSearchOpen(!isSearchOpen) },
+    { icon: Search, label: 'Search', action: onPreferencesClick },
   ];
 
   const getInitials = (name: string) => {
