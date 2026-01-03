@@ -59,7 +59,7 @@ const ProfileCard = ({
     <Card className="overflow-hidden hover:shadow-lg transition-shadow group">
       <div className="relative">
         {/* Profile Image */}
-        <div className="aspect-[4/5] bg-muted relative overflow-hidden">
+        <div className="aspect-square bg-muted relative overflow-hidden">
           {profile.photo_url ? (
             <img
               src={profile.photo_url}
