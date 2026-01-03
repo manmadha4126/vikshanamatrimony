@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { Heart, HeartOff, Check, X, Loader2, Clock, CheckCircle, XCircle } from 'lucide-react';
+import { Heart, HeartOff, Check, X, Loader2, Clock, CheckCircle, XCircle, MessageCircle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
@@ -34,11 +34,12 @@ interface Interest {
 interface InterestsSectionProps {
   userId: string;
   profileId: string;
+  onMessageClick?: (userId: string, profileId: string, name: string) => void;
 }
 
 type StatusFilter = 'all' | 'pending' | 'accepted' | 'rejected';
 
-const InterestsSection = ({ userId, profileId }: InterestsSectionProps) => {
+const InterestsSection = ({ userId, profileId, onMessageClick }: InterestsSectionProps) => {
   const [receivedInterests, setReceivedInterests] = useState<Interest[]>([]);
   const [sentInterests, setSentInterests] = useState<Interest[]>([]);
   const [loading, setLoading] = useState(true);
@@ -253,6 +254,12 @@ const InterestsSection = ({ userId, profileId }: InterestsSectionProps) => {
     const displayName = profile?.name || 'Unknown User';
     const displayAge = profile?.date_of_birth ? calculateAge(profile.date_of_birth) : null;
 
+    const handleMessageClick = () => {
+      if (profile && interest.from_user_id && onMessageClick) {
+        onMessageClick(interest.from_user_id, profile.id, displayName);
+      }
+    };
+
     return (
       <Card className="hover:shadow-md transition-shadow">
         <CardContent className="p-4">
@@ -289,37 +296,52 @@ const InterestsSection = ({ userId, profileId }: InterestsSectionProps) => {
               </div>
             </div>
 
-            {type === 'received' && interest.status === 'pending' && (
-              <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-2">
+              {type === 'received' && interest.status === 'pending' && (
+                <>
+                  <Button
+                    size="sm"
+                    onClick={() => handleAccept(interest.id)}
+                    disabled={isProcessing}
+                    className="gap-1"
+                  >
+                    {isProcessing ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Check className="h-4 w-4" />
+                    )}
+                    Accept
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => handleReject(interest.id)}
+                    disabled={isProcessing}
+                    className="gap-1"
+                  >
+                    {isProcessing ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <X className="h-4 w-4" />
+                    )}
+                    Decline
+                  </Button>
+                </>
+              )}
+              
+              {/* Show message button only for accepted interests */}
+              {interest.status === 'accepted' && profile && (
                 <Button
                   size="sm"
-                  onClick={() => handleAccept(interest.id)}
-                  disabled={isProcessing}
-                  className="gap-1"
+                  variant="default"
+                  onClick={handleMessageClick}
+                  className="gap-1 bg-green-600 hover:bg-green-700"
                 >
-                  {isProcessing ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <Check className="h-4 w-4" />
-                  )}
-                  Accept
+                  <MessageCircle className="h-4 w-4" />
+                  Message
                 </Button>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => handleReject(interest.id)}
-                  disabled={isProcessing}
-                  className="gap-1"
-                >
-                  {isProcessing ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <X className="h-4 w-4" />
-                  )}
-                  Decline
-                </Button>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         </CardContent>
       </Card>

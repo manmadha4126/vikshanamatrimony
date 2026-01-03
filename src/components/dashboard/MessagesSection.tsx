@@ -37,9 +37,14 @@ interface Message {
 interface MessagesSectionProps {
   userId: string;
   profileId: string;
+  initialRecipient?: {
+    recipientUserId: string;
+    recipientProfileId: string;
+    recipientName: string;
+  };
 }
 
-const MessagesSection = ({ userId, profileId }: MessagesSectionProps) => {
+const MessagesSection = ({ userId, profileId, initialRecipient }: MessagesSectionProps) => {
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -205,6 +210,32 @@ const MessagesSection = ({ userId, profileId }: MessagesSectionProps) => {
   useEffect(() => {
     fetchConversations();
   }, [userId, profileId]);
+
+  // Handle initial recipient from interest section
+  useEffect(() => {
+    if (initialRecipient && conversations.length > 0) {
+      const existingConv = conversations.find(c => c.userId === initialRecipient.recipientUserId);
+      if (existingConv) {
+        setSelectedConversation(existingConv);
+      } else {
+        // Create a temporary conversation entry for new chats
+        const tempConversation: Conversation = {
+          userId: initialRecipient.recipientUserId,
+          profile: {
+            id: initialRecipient.recipientProfileId,
+            name: initialRecipient.recipientName,
+            photo_url: null,
+            profile_id: null,
+            user_id: initialRecipient.recipientUserId,
+          },
+          lastMessage: 'Start a conversation',
+          lastMessageTime: '',
+          unreadCount: 0,
+        };
+        setSelectedConversation(tempConversation);
+      }
+    }
+  }, [initialRecipient, conversations]);
 
   useEffect(() => {
     if (selectedConversation) {
