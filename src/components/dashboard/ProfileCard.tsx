@@ -103,7 +103,7 @@ const ProfileCard = ({
   const currentPhoto = allPhotos[currentPhotoIndex] || profile.photo_url;
 
   return (
-    <Card className="overflow-hidden hover:shadow-xl hover:shadow-primary/10 transition-all duration-300 group cursor-pointer hover:-translate-y-1">
+    <Card className="overflow-hidden hover:shadow-xl hover:shadow-primary/10 transition-all duration-300 group cursor-pointer hover:-translate-y-1 active:scale-[0.98]">
       <div className="relative">
         {/* Profile Image */}
         <div className="aspect-square bg-muted relative overflow-hidden">
@@ -115,31 +115,31 @@ const ProfileCard = ({
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/10 to-secondary/10">
-              <Avatar className="h-24 w-24">
-                <AvatarFallback className="text-3xl bg-primary text-primary-foreground">
+              <Avatar className="h-16 w-16 sm:h-24 sm:w-24">
+                <AvatarFallback className="text-xl sm:text-3xl bg-primary text-primary-foreground">
                   {getInitials(profile.name)}
                 </AvatarFallback>
               </Avatar>
             </div>
           )}
 
-          {/* Photo Navigation Arrows */}
+          {/* Photo Navigation Arrows - Always visible on mobile */}
           {hasMultiplePhotos && (
             <>
               <button
                 onClick={handlePrevPhoto}
-                className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full p-1.5 opacity-0 group-hover:opacity-100 transition-opacity z-10"
+                className="absolute left-1 sm:left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full p-1 sm:p-1.5 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity z-10"
               >
-                <ChevronLeft className="h-4 w-4" />
+                <ChevronLeft className="h-3 w-3 sm:h-4 sm:w-4" />
               </button>
               <button
                 onClick={handleNextPhoto}
-                className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full p-1.5 opacity-0 group-hover:opacity-100 transition-opacity z-10"
+                className="absolute right-1 sm:right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full p-1 sm:p-1.5 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity z-10"
               >
-                <ChevronRight className="h-4 w-4" />
+                <ChevronRight className="h-3 w-3 sm:h-4 sm:w-4" />
               </button>
               {/* Photo Indicators */}
-              <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1 z-10">
+              <div className="absolute bottom-1 sm:bottom-2 left-1/2 -translate-x-1/2 flex gap-0.5 sm:gap-1 z-10">
                 {allPhotos.map((_, index) => (
                   <button
                     key={index}
@@ -147,7 +147,7 @@ const ProfileCard = ({
                       e.stopPropagation();
                       setCurrentPhotoIndex(index);
                     }}
-                    className={`w-1.5 h-1.5 rounded-full transition-colors ${
+                    className={`w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full transition-colors ${
                       index === currentPhotoIndex ? 'bg-white' : 'bg-white/50'
                     }`}
                   />
@@ -158,57 +158,57 @@ const ProfileCard = ({
 
           {/* Verification Badge */}
           {profile.verification_status === 'verified' && (
-            <Badge className="absolute top-2 left-2 bg-green-500/90 text-white">
-              <Shield className="h-3 w-3 mr-1" />
-              Verified
+            <Badge className="absolute top-1 sm:top-2 left-1 sm:left-2 bg-green-500/90 text-white text-[10px] sm:text-xs px-1 sm:px-2 py-0.5">
+              <Shield className="h-2.5 w-2.5 sm:h-3 sm:w-3 mr-0.5 sm:mr-1" />
+              <span className="hidden xs:inline">Verified</span>
             </Badge>
           )}
 
           {/* Profile ID */}
-          <Badge variant="secondary" className="absolute top-2 right-2 text-xs">
+          <Badge variant="secondary" className="absolute top-1 sm:top-2 right-1 sm:right-2 text-[10px] sm:text-xs px-1 sm:px-2">
             {profile.profile_id}
           </Badge>
 
           {/* Quick Actions Overlay */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
-            <div className="absolute bottom-4 left-4 right-4 flex gap-2">
+            <div className="absolute bottom-2 sm:bottom-4 left-2 sm:left-4 right-2 sm:right-4 flex gap-1 sm:gap-2">
               <Button
                 size="sm"
                 variant="secondary"
-                className="flex-1"
+                className="flex-1 h-7 sm:h-9 text-xs sm:text-sm px-1 sm:px-3"
                 onClick={onViewProfile}
               >
-                <Eye className="h-4 w-4 mr-1" />
-                View
+                <Eye className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" />
+                <span className="hidden xs:inline">View</span>
               </Button>
               <Button
                 size="sm"
                 variant="default"
-                className="flex-1"
+                className="flex-1 h-7 sm:h-9 text-xs sm:text-sm px-1 sm:px-3"
                 onClick={onSendInterest}
               >
-                <Heart className="h-4 w-4 mr-1" />
-                Interest
+                <Heart className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" />
+                <span className="hidden xs:inline">Interest</span>
               </Button>
               <Button
                 size="icon"
                 variant={isShortlisted ? 'default' : 'outline'}
                 onClick={onShortlist}
-                className="shrink-0"
+                className="shrink-0 h-7 w-7 sm:h-9 sm:w-9"
               >
-                <Bookmark className={`h-4 w-4 ${isShortlisted ? 'fill-current' : ''}`} />
+                <Bookmark className={`h-3 w-3 sm:h-4 sm:w-4 ${isShortlisted ? 'fill-current' : ''}`} />
               </Button>
             </div>
           </div>
         </div>
       </div>
 
-      <CardContent className="p-4">
-        <h3 className="font-semibold text-lg truncate">{profile.name}</h3>
+      <CardContent className="p-2 sm:p-4">
+        <h3 className="font-semibold text-sm sm:text-lg truncate">{profile.name}</h3>
         
-        <div className="mt-2 space-y-1 text-sm text-muted-foreground">
+        <div className="mt-1 sm:mt-2 space-y-0.5 sm:space-y-1 text-xs sm:text-sm text-muted-foreground">
           {(age || profile.height) && (
-            <p className="flex items-center gap-2">
+            <p className="flex items-center gap-1 sm:gap-2">
               {age && <span>{age} yrs</span>}
               {age && profile.height && <span>•</span>}
               {profile.height && <span>{profile.height.split(' ')[0]}</span>}
@@ -217,21 +217,21 @@ const ProfileCard = ({
           
           {location && (
             <p className="flex items-center gap-1">
-              <MapPin className="h-3 w-3" />
+              <MapPin className="h-2.5 w-2.5 sm:h-3 sm:w-3 shrink-0" />
               <span className="truncate">{location}</span>
             </p>
           )}
           
           {profile.education && (
-            <p className="flex items-center gap-1">
-              <GraduationCap className="h-3 w-3" />
+            <p className="flex items-center gap-1 hidden sm:flex">
+              <GraduationCap className="h-3 w-3 shrink-0" />
               <span className="truncate">{profile.education}</span>
             </p>
           )}
           
           {profile.occupation && (
-            <p className="flex items-center gap-1">
-              <Briefcase className="h-3 w-3" />
+            <p className="flex items-center gap-1 hidden sm:flex">
+              <Briefcase className="h-3 w-3 shrink-0" />
               <span className="truncate">{profile.occupation}</span>
             </p>
           )}

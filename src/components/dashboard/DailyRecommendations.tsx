@@ -239,46 +239,49 @@ const DailyRecommendations = ({ userGender, userId, userAge, userReligion, onVie
   };
 
   return (
-    <div className="container mx-auto px-4 py-6">
-      <Card className="shadow-card">
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle className="font-display text-xl">Daily Recommendations</CardTitle>
-            <div className="flex gap-2">
-              <Button variant="outline" size="sm" onClick={fetchRecommendations}>
-                <RefreshCw className="h-4 w-4 mr-1" />
-                Refresh
+    <div className="container mx-auto px-0 sm:px-4 py-3 sm:py-6">
+      <Card className="shadow-card border-0 sm:border">
+        <CardHeader className="px-3 sm:px-6 py-3 sm:py-4">
+          <div className="flex items-center justify-between gap-2">
+            <CardTitle className="font-display text-base sm:text-xl flex items-center gap-2">
+              <Sparkles className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
+              <span className="hidden xs:inline">Daily </span>Recommendations
+            </CardTitle>
+            <div className="flex gap-1 sm:gap-2">
+              <Button variant="outline" size="sm" onClick={fetchRecommendations} className="h-8 px-2 sm:px-3">
+                <RefreshCw className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" />
+                <span className="hidden sm:inline">Refresh</span>
               </Button>
-              <Button variant="ghost" size="sm" onClick={() => navigate('/dashboard/matches')}>
-                View All
-                <ChevronRight className="h-4 w-4 ml-1" />
+              <Button variant="ghost" size="sm" onClick={() => navigate('/dashboard/matches')} className="h-8 px-2 sm:px-3">
+                <span className="hidden sm:inline">View All</span>
+                <ChevronRight className="h-3 w-3 sm:h-4 sm:w-4" />
               </Button>
             </div>
           </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="px-2 sm:px-6 pb-3 sm:pb-6">
           {loading ? (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-4">
               {[...Array(4)].map((_, i) => (
                 <Card key={i} className="animate-pulse">
                   <div className="aspect-square bg-muted" />
-                  <CardContent className="p-4 space-y-2">
-                    <div className="h-5 bg-muted rounded" />
-                    <div className="h-4 bg-muted rounded w-2/3" />
+                  <CardContent className="p-2 sm:p-4 space-y-2">
+                    <div className="h-4 sm:h-5 bg-muted rounded" />
+                    <div className="h-3 sm:h-4 bg-muted rounded w-2/3" />
                   </CardContent>
                 </Card>
               ))}
             </div>
           ) : profiles.length === 0 ? (
-            <div className="text-center py-12">
-              <p className="text-muted-foreground">No recommendations available at the moment.</p>
+            <div className="text-center py-8 sm:py-12">
+              <p className="text-muted-foreground text-sm sm:text-base">No recommendations available at the moment.</p>
               <Button variant="outline" className="mt-4" onClick={fetchRecommendations}>
                 <RefreshCw className="h-4 w-4 mr-2" />
                 Try Again
               </Button>
             </div>
           ) : (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-4">
               {profiles.map((profile) => (
                 <ProfileCard
                   key={profile.id}

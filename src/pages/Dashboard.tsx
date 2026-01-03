@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import DashboardHeader from '@/components/dashboard/DashboardHeader';
 import ProfileSidebar from '@/components/dashboard/ProfileSidebar';
+import MobileBottomNav from '@/components/dashboard/MobileBottomNav';
 import AccountTypeSection from '@/components/dashboard/AccountTypeSection';
 import ProfileCompletionSection from '@/components/dashboard/ProfileCompletionSection';
 import DailyRecommendations from '@/components/dashboard/DailyRecommendations';
@@ -278,8 +279,8 @@ const Dashboard = () => {
         onMatchesClick={() => handleViewChange('matches')}
       />
 
-      <div className="container mx-auto px-4 py-6">
-        <div className="flex gap-6">
+      <div className="container mx-auto px-2 sm:px-4 py-3 sm:py-6 pb-20 lg:pb-6">
+        <div className="flex gap-4 lg:gap-6">
           {/* Left Sidebar - Profile */}
           <div className="hidden lg:block flex-shrink-0">
             <ProfileSidebar
@@ -308,7 +309,7 @@ const Dashboard = () => {
           </div>
 
           {/* Main Content */}
-          <main className="flex-1 min-w-0 pb-12 space-y-6">
+          <main className="flex-1 min-w-0 pb-4 lg:pb-12 space-y-4 sm:space-y-6">
             {activeView === 'home' && (
               <>
                 <AccountTypeSection
@@ -697,7 +698,15 @@ const Dashboard = () => {
         currentUserIsPrime={profile?.is_prime || false}
       />
 
-      <Footer />
+      {/* Mobile Bottom Navigation */}
+      <MobileBottomNav 
+        activeView={activeView} 
+        onNavigate={handleViewChange} 
+      />
+
+      <div className="hidden lg:block">
+        <Footer />
+      </div>
     </div>
   );
 };
