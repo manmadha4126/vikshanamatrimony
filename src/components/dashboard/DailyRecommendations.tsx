@@ -261,7 +261,7 @@ const DailyRecommendations = ({ userGender, userId, userAge, userReligion, onVie
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
               {[...Array(4)].map((_, i) => (
                 <Card key={i} className="animate-pulse">
-                  <div className="aspect-[4/5] bg-muted" />
+                  <div className="aspect-square bg-muted" />
                   <CardContent className="p-4 space-y-2">
                     <div className="h-5 bg-muted rounded" />
                     <div className="h-4 bg-muted rounded w-2/3" />
