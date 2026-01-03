@@ -2,9 +2,9 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Progress } from '@/components/ui/progress';
-import { Gem, Heart, Loader2, MapPin, GraduationCap, Briefcase, Star } from 'lucide-react';
+import { AspectRatio } from '@/components/ui/aspect-ratio';
+import { Gem, Heart, Loader2, MapPin, GraduationCap, Briefcase, Star, User } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
@@ -312,87 +312,111 @@ const MatchesSection = ({ userId, userGender }: MatchesSectionProps) => {
             </p>
           </div>
         ) : (
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {matches.map((match) => {
               const age = calculateAge(match.date_of_birth);
               const hasSentInterest = sentInterests.includes(match.id);
               
               return (
-                <Card key={match.id} className="overflow-hidden hover:shadow-md transition-shadow">
+                <Card key={match.id} className="overflow-hidden hover:shadow-lg transition-shadow">
+                  {/* Square Profile Image */}
+                  <div className="relative">
+                    <AspectRatio ratio={1}>
+                      {match.photo_url ? (
+                        <img
+                          src={match.photo_url}
+                          alt={match.name}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center">
+                          <User className="h-16 w-16 text-primary/40" />
+                        </div>
+                      )}
+                    </AspectRatio>
+                    
+                    {/* Compatibility Badge */}
+                    <div className="absolute top-2 right-2">
+                      <Badge 
+                        className={`${
+                          match.compatibilityScore >= 80 ? 'bg-green-500' :
+                          match.compatibilityScore >= 60 ? 'bg-blue-500' :
+                          match.compatibilityScore >= 40 ? 'bg-yellow-500' :
+                          'bg-orange-500'
+                        } text-white font-bold`}
+                      >
+                        {match.compatibilityScore}% Match
+                      </Badge>
+                    </div>
+                  </div>
+
                   <CardContent className="p-4">
-                    <div className="flex gap-4">
-                      <Avatar className="h-20 w-20 border-2 border-primary/20">
-                        <AvatarImage src={match.photo_url || ''} />
-                        <AvatarFallback className="bg-primary/10 text-primary text-lg">
-                          {getInitials(match.name)}
-                        </AvatarFallback>
-                      </Avatar>
-                      
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-start justify-between">
-                          <div>
-                            <h3 className="font-semibold text-foreground truncate">{match.name}</h3>
-                            {match.profile_id && (
-                              <p className="text-xs text-muted-foreground">{match.profile_id}</p>
-                            )}
-                          </div>
-                          <div className="text-right">
-                            <div className={`text-lg font-bold ${getScoreColor(match.compatibilityScore)}`}>
-                              {match.compatibilityScore}%
-                            </div>
-                            <p className="text-xs text-muted-foreground">Match</p>
-                          </div>
-                        </div>
-
-                        <Progress value={match.compatibilityScore} className="h-1.5 mt-2" />
-
-                        <div className="mt-2 space-y-1 text-sm text-muted-foreground">
-                          {age && <p>{age} years{match.height ? `, ${match.height}` : ''}</p>}
-                          {(match.city || match.state) && (
-                            <p className="flex items-center gap-1">
-                              <MapPin className="h-3 w-3" />
-                              {[match.city, match.state].filter(Boolean).join(', ')}
-                            </p>
-                          )}
-                          {match.education && (
-                            <p className="flex items-center gap-1">
-                              <GraduationCap className="h-3 w-3" />
-                              {match.education}
-                            </p>
-                          )}
-                          {match.occupation && (
-                            <p className="flex items-center gap-1">
-                              <Briefcase className="h-3 w-3" />
-                              {match.occupation}
-                            </p>
-                          )}
-                        </div>
-
-                        {match.matchedCriteria.length > 0 && (
-                          <div className="flex flex-wrap gap-1 mt-2">
-                            {match.matchedCriteria.map((criteria) => (
-                              <Badge key={criteria} variant="secondary" className="text-xs px-1.5 py-0">
-                                <Star className="h-2.5 w-2.5 mr-0.5" />
-                                {criteria}
-                              </Badge>
-                            ))}
-                          </div>
+                    <div className="space-y-3">
+                      {/* Name and Profile ID */}
+                      <div>
+                        <h3 className="font-semibold text-lg text-foreground truncate">{match.name}</h3>
+                        {match.profile_id && (
+                          <p className="text-xs text-muted-foreground">{match.profile_id}</p>
                         )}
-
-                        <Button
-                          size="sm"
-                          className="w-full mt-3"
-                          disabled={hasSentInterest || sendingInterest === match.id}
-                          onClick={() => sendInterest(match.id)}
-                        >
-                          {sendingInterest === match.id ? (
-                            <Loader2 className="h-4 w-4 animate-spin mr-1" />
-                          ) : (
-                            <Heart className={`h-4 w-4 mr-1 ${hasSentInterest ? 'fill-current' : ''}`} />
-                          )}
-                          {hasSentInterest ? 'Interest Sent' : 'Send Interest'}
-                        </Button>
                       </div>
+
+                      {/* Progress Bar */}
+                      <Progress value={match.compatibilityScore} className="h-1.5" />
+
+                      {/* Details */}
+                      <div className="space-y-1.5 text-sm text-muted-foreground">
+                        {age && <p>{age} years{match.height ? `, ${match.height}` : ''}</p>}
+                        {(match.city || match.state) && (
+                          <p className="flex items-center gap-1">
+                            <MapPin className="h-3 w-3 flex-shrink-0" />
+                            <span className="truncate">{[match.city, match.state].filter(Boolean).join(', ')}</span>
+                          </p>
+                        )}
+                        {match.education && (
+                          <p className="flex items-center gap-1">
+                            <GraduationCap className="h-3 w-3 flex-shrink-0" />
+                            <span className="truncate">{match.education}</span>
+                          </p>
+                        )}
+                        {match.occupation && (
+                          <p className="flex items-center gap-1">
+                            <Briefcase className="h-3 w-3 flex-shrink-0" />
+                            <span className="truncate">{match.occupation}</span>
+                          </p>
+                        )}
+                      </div>
+
+                      {/* Matched Criteria */}
+                      {match.matchedCriteria.length > 0 && (
+                        <div className="flex flex-wrap gap-1">
+                          {match.matchedCriteria.slice(0, 3).map((criteria) => (
+                            <Badge key={criteria} variant="secondary" className="text-xs px-1.5 py-0">
+                              <Star className="h-2.5 w-2.5 mr-0.5" />
+                              {criteria}
+                            </Badge>
+                          ))}
+                          {match.matchedCriteria.length > 3 && (
+                            <Badge variant="secondary" className="text-xs px-1.5 py-0">
+                              +{match.matchedCriteria.length - 3}
+                            </Badge>
+                          )}
+                        </div>
+                      )}
+
+                      {/* Send Interest Button */}
+                      <Button
+                        size="sm"
+                        className="w-full"
+                        disabled={hasSentInterest || sendingInterest === match.id}
+                        onClick={() => sendInterest(match.id)}
+                      >
+                        {sendingInterest === match.id ? (
+                          <Loader2 className="h-4 w-4 animate-spin mr-1" />
+                        ) : (
+                          <Heart className={`h-4 w-4 mr-1 ${hasSentInterest ? 'fill-current' : ''}`} />
+                        )}
+                        {hasSentInterest ? 'Interest Sent' : 'Send Interest'}
+                      </Button>
                     </div>
                   </CardContent>
                 </Card>

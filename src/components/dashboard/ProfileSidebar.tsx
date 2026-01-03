@@ -1,19 +1,24 @@
+import { useState, useRef } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Camera, Edit, Settings, Crown, User, LogOut, BadgeCheck, Home, Eye, Heart, MessageCircle, Bell, Gem, Users } from 'lucide-react';
+import { Camera, Edit, Settings, Crown, LogOut, BadgeCheck, Home, Eye, Heart, MessageCircle, Bell, Gem, Users, Loader2 } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 type DashboardView = 'home' | 'preferences' | 'search' | 'edit-profile' | 'view-profile' | 'interests' | 'messages' | 'notifications' | 'matches' | 'who-viewed-me';
 
 interface ProfileSidebarProps {
   profile: {
+    id?: string;
     name: string;
     photo_url: string | null;
     profile_id: string | null;
     is_prime?: boolean;
     verification_status?: string | null;
   };
+  userId?: string;
   onSignOut: () => void;
   onPreferencesClick?: () => void;
   onEditProfileClick?: () => void;
@@ -24,10 +29,30 @@ interface ProfileSidebarProps {
   onNotificationsClick?: () => void;
   onMatchesClick?: () => void;
   onWhoViewedMeClick?: () => void;
+  onProfilePhotoUpdated?: () => void;
   activeView?: DashboardView;
 }
 
-const ProfileSidebar = ({ profile, onSignOut, onPreferencesClick, onEditProfileClick, onViewProfileClick, onHomeClick, onInterestsClick, onMessagesClick, onNotificationsClick, onMatchesClick, onWhoViewedMeClick, activeView = 'home' }: ProfileSidebarProps) => {
+const ProfileSidebar = ({ 
+  profile, 
+  userId,
+  onSignOut, 
+  onPreferencesClick, 
+  onEditProfileClick, 
+  onViewProfileClick, 
+  onHomeClick, 
+  onInterestsClick, 
+  onMessagesClick, 
+  onNotificationsClick, 
+  onMatchesClick, 
+  onWhoViewedMeClick,
+  onProfilePhotoUpdated,
+  activeView = 'home' 
+}: ProfileSidebarProps) => {
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const { toast } = useToast();
+
   const getInitials = (name: string) => {
     return name
       .split(' ')
@@ -38,6 +63,87 @@ const ProfileSidebar = ({ profile, onSignOut, onPreferencesClick, onEditProfileC
   };
 
   const isVerified = profile.verification_status === 'verified';
+  const hasPhoto = !!profile.photo_url;
+
+  const handlePhotoClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file || !profile.id) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      toast({
+        title: "Invalid file type",
+        description: "Please select an image file.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast({
+        title: "File too large",
+        description: "Please select an image under 5MB.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setUploading(true);
+    try {
+      // Generate unique file name
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${profile.id}-${Date.now()}.${fileExt}`;
+      const filePath = `${fileName}`;
+
+      // Upload to Supabase storage
+      const { error: uploadError } = await supabase.storage
+        .from('profile-photos')
+        .upload(filePath, file, { upsert: true });
+
+      if (uploadError) throw uploadError;
+
+      // Get public URL
+      const { data: urlData } = supabase.storage
+        .from('profile-photos')
+        .getPublicUrl(filePath);
+
+      const photoUrl = urlData.publicUrl;
+
+      // Update profile with new photo URL
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ photo_url: photoUrl })
+        .eq('id', profile.id);
+
+      if (updateError) throw updateError;
+
+      toast({
+        title: "Photo uploaded",
+        description: "Your profile photo has been updated successfully.",
+      });
+
+      // Trigger profile refresh
+      onProfilePhotoUpdated?.();
+    } catch (error: any) {
+      console.error('Error uploading photo:', error);
+      toast({
+        title: "Upload failed",
+        description: error.message || "Failed to upload photo. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setUploading(false);
+      // Reset file input
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  };
 
   return (
     <aside className="w-72 bg-card rounded-2xl shadow-lg border border-border h-[calc(100vh-6rem)] sticky top-20 flex flex-col">
@@ -51,13 +157,32 @@ const ProfileSidebar = ({ profile, onSignOut, onPreferencesClick, onEditProfileC
                 {getInitials(profile.name)}
               </AvatarFallback>
             </Avatar>
-            <Button
-              size="icon"
-              variant="secondary"
-              className="absolute -bottom-1 -right-1 h-8 w-8 rounded-full shadow-md"
-            >
-              <Camera className="h-4 w-4" />
-            </Button>
+            
+            {/* Hidden file input */}
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handleFileChange}
+              className="hidden"
+            />
+            
+            {/* Show camera button only if no photo is set */}
+            {!hasPhoto && (
+              <Button
+                size="icon"
+                variant="secondary"
+                className="absolute -bottom-1 -right-1 h-8 w-8 rounded-full shadow-md"
+                onClick={handlePhotoClick}
+                disabled={uploading}
+              >
+                {uploading ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Camera className="h-4 w-4" />
+                )}
+              </Button>
+            )}
           </div>
 
           {/* User Name with Verification Badge */}
@@ -85,6 +210,24 @@ const ProfileSidebar = ({ profile, onSignOut, onPreferencesClick, onEditProfileC
           <Badge variant={profile.is_prime ? 'default' : 'secondary'} className="mt-1">
             {profile.is_prime ? 'Prime Member' : 'Free member'}
           </Badge>
+
+          {/* Add/Change Photo Button - only show if no photo */}
+          {!hasPhoto && (
+            <Button
+              variant="outline"
+              size="sm"
+              className="mt-3 gap-2"
+              onClick={handlePhotoClick}
+              disabled={uploading}
+            >
+              {uploading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Camera className="h-4 w-4" />
+              )}
+              Add Profile Photo
+            </Button>
+          )}
         </div>
 
         {/* Upgrade Section (for non-prime users) */}
