@@ -311,7 +311,7 @@ const StaffLogin = () => {
               <Button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground py-6 text-lg font-semibold"
+                className="w-full bg-black hover:bg-black/90 text-white py-6 text-lg font-semibold"
               >
                 {loading ? "Signing in..." : "Sign In"}
               </Button>
