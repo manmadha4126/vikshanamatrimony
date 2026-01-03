@@ -263,12 +263,14 @@ const Dashboard = () => {
           <div className="hidden lg:block flex-shrink-0">
             <ProfileSidebar
               profile={{
+                id: profile.id,
                 name: profile.name,
                 photo_url: profile.photo_url,
                 profile_id: profile.profile_id,
                 is_prime: profile.is_prime || false,
                 verification_status: profile.verification_status,
               }}
+              userId={user.id}
               onSignOut={handleSignOut}
               onPreferencesClick={() => handleViewChange('preferences')}
               onEditProfileClick={() => handleViewChange('edit-profile')}
@@ -279,6 +281,7 @@ const Dashboard = () => {
               onNotificationsClick={() => handleViewChange('notifications')}
               onMatchesClick={() => handleViewChange('matches')}
               onWhoViewedMeClick={() => handleViewChange('who-viewed-me')}
+              onProfilePhotoUpdated={refreshProfile}
               activeView={activeView}
             />
           </div>
