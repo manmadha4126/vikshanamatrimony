@@ -20,6 +20,10 @@
     --primary: 142 70% 35%;
     --primary-foreground: 0 0% 100%;
 
+    /* Dark Green */
+    --primary-dark: 142 80% 22%;
+    --primary-dark-foreground: 0 0% 100%;
+
     /* Orange - Secondary */
     --secondary: 25 95% 53%;
     --secondary-foreground: 0 0% 100%;
