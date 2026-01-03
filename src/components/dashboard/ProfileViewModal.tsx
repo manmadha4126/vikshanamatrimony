@@ -74,8 +74,30 @@ const ProfileViewModal = ({ profileId, isOpen, onClose, currentUserIsPrime = fal
   useEffect(() => {
     if (profileId && isOpen) {
       fetchProfile();
+      recordProfileView();
     }
   }, [profileId, isOpen]);
+
+  // Record profile view when opening a profile
+  const recordProfileView = async () => {
+    if (!profileId) return;
+    
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      // Insert profile view record
+      await supabase
+        .from('profile_views')
+        .insert({
+          viewer_id: user.id,
+          viewed_profile_id: profileId,
+        });
+    } catch (error) {
+      // Silently fail - don't interrupt user experience for tracking
+      console.log('Profile view tracking error:', error);
+    }
+  };
 
   const fetchProfile = async () => {
     if (!profileId) return;

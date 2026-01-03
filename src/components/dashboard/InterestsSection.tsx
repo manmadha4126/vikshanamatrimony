@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { Heart, HeartOff, Check, X, Loader2, Clock, CheckCircle, XCircle, MessageCircle } from 'lucide-react';
+import { Heart, HeartOff, Check, X, Loader2, Clock, CheckCircle, XCircle, MessageCircle, Phone, User } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
@@ -19,6 +19,9 @@ interface Profile {
   occupation: string | null;
   profile_id: string | null;
   user_id?: string | null;
+  height: string | null;
+  religion: string | null;
+  employment_type: string | null;
 }
 
 interface Interest {
@@ -51,76 +54,48 @@ const InterestsSection = ({ userId, profileId, onMessageClick }: InterestsSectio
   const fetchInterests = async () => {
     setLoading(true);
     try {
-      // Fetch received interests - get all interests where to_profile_id matches our profile
+      // Fetch received interests
       const { data: received, error: receivedError } = await supabase
         .from('interests')
         .select('*')
         .eq('to_profile_id', profileId)
         .order('created_at', { ascending: false });
 
-      if (receivedError) {
-        console.error('Error fetching received interests:', receivedError);
-        throw receivedError;
-      }
+      if (receivedError) throw receivedError;
 
-      console.log('Received interests for profile', profileId, ':', received);
-
-      // Get profile details for received interests
       if (received && received.length > 0) {
         const fromUserIds = received.map(i => i.from_user_id);
         
-        // First try to get profiles by user_id
-        const { data: profilesByUserId, error: profilesError } = await supabase
+        const { data: profilesByUserId } = await supabase
           .from('profiles')
-          .select('id, name, photo_url, date_of_birth, city, state, education, occupation, profile_id, user_id')
+          .select('id, name, photo_url, date_of_birth, city, state, education, occupation, profile_id, user_id, height, religion, employment_type')
           .in('user_id', fromUserIds);
 
-        if (profilesError) {
-          console.error('Error fetching profiles for received interests:', profilesError);
-        }
-
-        console.log('Profiles for received interests:', profilesByUserId);
-
-        // For any interests without matching profiles, the sender might have NULL user_id
-        // We need to fetch those profiles separately using a database query
-        const receivedWithProfiles = received.map(interest => {
-          const matchedProfile = profilesByUserId?.find(p => p.user_id === interest.from_user_id);
-          return {
-            ...interest,
-            profile: matchedProfile
-          };
-        });
+        const receivedWithProfiles = received.map(interest => ({
+          ...interest,
+          profile: profilesByUserId?.find(p => p.user_id === interest.from_user_id)
+        }));
         
         setReceivedInterests(receivedWithProfiles);
       } else {
         setReceivedInterests([]);
       }
 
-      // Fetch sent interests (where from_user_id = current user)
+      // Fetch sent interests
       const { data: sent, error: sentError } = await supabase
         .from('interests')
         .select('*')
         .eq('from_user_id', userId)
         .order('created_at', { ascending: false });
 
-      if (sentError) {
-        console.error('Error fetching sent interests:', sentError);
-        throw sentError;
-      }
+      if (sentError) throw sentError;
 
-      console.log('Sent interests:', sent);
-
-      // Get profile details for sent interests
       if (sent && sent.length > 0) {
         const toProfileIds = sent.map(i => i.to_profile_id);
-        const { data: profiles, error: profilesError } = await supabase
+        const { data: profiles } = await supabase
           .from('profiles')
-          .select('id, name, photo_url, date_of_birth, city, state, education, occupation, profile_id')
+          .select('id, name, photo_url, date_of_birth, city, state, education, occupation, profile_id, height, religion, employment_type')
           .in('id', toProfileIds);
-
-        if (profilesError) {
-          console.error('Error fetching profiles for sent interests:', profilesError);
-        }
 
         const sentWithProfiles = sent.map(interest => ({
           ...interest,
@@ -131,7 +106,6 @@ const InterestsSection = ({ userId, profileId, onMessageClick }: InterestsSectio
         setSentInterests([]);
       }
     } catch (error: any) {
-      console.error('Failed to fetch interests:', error);
       toast({
         title: "Error",
         description: "Failed to fetch interests",
@@ -144,7 +118,6 @@ const InterestsSection = ({ userId, profileId, onMessageClick }: InterestsSectio
 
   useEffect(() => {
     if (userId && profileId) {
-      console.log('Fetching interests for userId:', userId, 'profileId:', profileId);
       fetchInterests();
     }
   }, [userId, profileId]);
@@ -159,11 +132,15 @@ const InterestsSection = ({ userId, profileId, onMessageClick }: InterestsSectio
 
       if (error) throw error;
 
+      // Update local state immediately for better UX
+      setReceivedInterests(prev => 
+        prev.map(i => i.id === interestId ? { ...i, status: 'accepted' } : i)
+      );
+
       toast({
         title: "Interest Accepted",
-        description: "You have accepted the interest request.",
+        description: "You can now message this profile.",
       });
-      fetchInterests();
     } catch (error: any) {
       toast({
         title: "Error",
@@ -185,11 +162,14 @@ const InterestsSection = ({ userId, profileId, onMessageClick }: InterestsSectio
 
       if (error) throw error;
 
+      setReceivedInterests(prev => 
+        prev.map(i => i.id === interestId ? { ...i, status: 'rejected' } : i)
+      );
+
       toast({
         title: "Interest Declined",
         description: "You have declined the interest request.",
       });
-      fetchInterests();
     } catch (error: any) {
       toast({
         title: "Error",
@@ -217,17 +197,6 @@ const InterestsSection = ({ userId, profileId, onMessageClick }: InterestsSectio
     return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
   };
 
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case 'accepted':
-        return <Badge className="bg-green-500/20 text-green-600 border-green-500/30"><CheckCircle className="h-3 w-3 mr-1" /> Accepted</Badge>;
-      case 'rejected':
-        return <Badge className="bg-red-500/20 text-red-600 border-red-500/30"><XCircle className="h-3 w-3 mr-1" /> Declined</Badge>;
-      default:
-        return <Badge className="bg-yellow-500/20 text-yellow-600 border-yellow-500/30"><Clock className="h-3 w-3 mr-1" /> Pending</Badge>;
-    }
-  };
-
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-IN', {
       day: 'numeric',
@@ -246,13 +215,14 @@ const InterestsSection = ({ userId, profileId, onMessageClick }: InterestsSectio
     return interests.filter(i => i.status === filter).length;
   };
 
+  // New horizontal card design matching reference
   const InterestCard = ({ interest, type }: { interest: Interest; type: 'received' | 'sent' }) => {
     const profile = interest.profile;
     const isProcessing = processingId === interest.id;
     
-    // For received interests without a matching profile, show placeholder
     const displayName = profile?.name || 'Unknown User';
     const displayAge = profile?.date_of_birth ? calculateAge(profile.date_of_birth) : null;
+    const profileIdText = profile?.profile_id || 'N/A';
 
     const handleMessageClick = () => {
       if (profile && interest.from_user_id && onMessageClick) {
@@ -260,87 +230,152 @@ const InterestsSection = ({ userId, profileId, onMessageClick }: InterestsSectio
       }
     };
 
+    // Build profile details string
+    const detailParts = [
+      displayAge ? `${displayAge} yrs` : null,
+      profile?.height,
+      profile?.religion,
+      profile?.education,
+      profile?.employment_type || (profile?.occupation ? 'Working' : null),
+      [profile?.city, profile?.state].filter(Boolean).join(', ')
+    ].filter(Boolean);
+
+    const detailsString = detailParts.join(' • ');
+
+    // Status text
+    const statusText = type === 'sent' 
+      ? `You sent an interest – ${formatDate(interest.created_at)}`
+      : `Sent you an interest – ${formatDate(interest.created_at)}`;
+
     return (
-      <Card className="hover:shadow-md transition-shadow">
-        <CardContent className="p-4">
-          <div className="flex items-start gap-4">
-            <Avatar className="h-16 w-16 border-2 border-primary/20">
-              <AvatarImage src={profile?.photo_url || ''} alt={displayName} />
-              <AvatarFallback className="bg-primary/10 text-primary font-semibold">
-                {getInitials(displayName)}
-              </AvatarFallback>
-            </Avatar>
-            
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 flex-wrap">
-                <h3 className="font-semibold text-foreground truncate">{displayName}</h3>
-                {profile?.profile_id && (
-                  <span className="text-xs text-muted-foreground">({profile.profile_id})</span>
-                )}
-              </div>
-              
-              <div className="text-sm text-muted-foreground mt-1 space-y-0.5">
-                {displayAge && <p>{displayAge} years old</p>}
-                {profile && (profile.city || profile.state) && (
-                  <p>{[profile.city, profile.state].filter(Boolean).join(', ')}</p>
-                )}
-                {profile?.education && <p>{profile.education}</p>}
-                {profile?.occupation && <p>{profile.occupation}</p>}
-              </div>
-              
-              <div className="flex items-center gap-2 mt-2 flex-wrap">
-                {getStatusBadge(interest.status)}
-                <span className="text-xs text-muted-foreground">
-                  {formatDate(interest.created_at)}
-                </span>
-              </div>
+      <Card className="hover:shadow-lg transition-all duration-200 border border-border/50 rounded-xl overflow-hidden">
+        <CardContent className="p-0">
+          <div className="flex flex-col sm:flex-row">
+            {/* Left side - Profile Photo */}
+            <div className="sm:w-32 md:w-40 flex-shrink-0 bg-muted/30">
+              {profile?.photo_url ? (
+                <img
+                  src={profile.photo_url}
+                  alt={displayName}
+                  className="w-full h-32 sm:h-full object-cover"
+                />
+              ) : (
+                <div className="w-full h-32 sm:h-full min-h-[120px] flex items-center justify-center bg-gradient-to-br from-primary/10 to-primary/5">
+                  <User className="h-12 w-12 text-primary/30" />
+                </div>
+              )}
             </div>
 
-            <div className="flex flex-col gap-2">
-              {type === 'received' && interest.status === 'pending' && (
-                <>
-                  <Button
-                    size="sm"
-                    onClick={() => handleAccept(interest.id)}
-                    disabled={isProcessing}
-                    className="gap-1"
-                  >
-                    {isProcessing ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : (
-                      <Check className="h-4 w-4" />
-                    )}
-                    Accept
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => handleReject(interest.id)}
-                    disabled={isProcessing}
-                    className="gap-1"
-                  >
-                    {isProcessing ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : (
+            {/* Right side - Profile Details */}
+            <div className="flex-1 p-4 flex flex-col justify-between">
+              <div className="space-y-2">
+                {/* Name and Profile ID */}
+                <div>
+                  <h3 className="font-semibold text-lg text-foreground leading-tight">{displayName}</h3>
+                  <p className="text-xs text-muted-foreground">{profileIdText}</p>
+                </div>
+
+                {/* Single line profile details */}
+                <p className="text-sm text-muted-foreground line-clamp-2">
+                  {detailsString || 'Profile details not available'}
+                </p>
+
+                {/* Status text */}
+                <div className="flex items-center gap-2">
+                  {interest.status === 'pending' && (
+                    <Badge variant="outline" className="bg-yellow-500/10 text-yellow-600 border-yellow-500/30 text-xs">
+                      <Clock className="h-3 w-3 mr-1" />
+                      Pending
+                    </Badge>
+                  )}
+                  {interest.status === 'accepted' && (
+                    <Badge variant="outline" className="bg-green-500/10 text-green-600 border-green-500/30 text-xs">
+                      <CheckCircle className="h-3 w-3 mr-1" />
+                      Accepted
+                    </Badge>
+                  )}
+                  {interest.status === 'rejected' && (
+                    <Badge variant="outline" className="bg-red-500/10 text-red-600 border-red-500/30 text-xs">
+                      <XCircle className="h-3 w-3 mr-1" />
+                      Declined
+                    </Badge>
+                  )}
+                  <span className="text-xs text-muted-foreground">
+                    {statusText}
+                  </span>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex flex-wrap items-center gap-2 mt-3 pt-3 border-t border-border/50">
+                {/* For Received Interests - Pending */}
+                {type === 'received' && interest.status === 'pending' && (
+                  <>
+                    <Button
+                      size="sm"
+                      onClick={() => handleAccept(interest.id)}
+                      disabled={isProcessing}
+                      className="gap-1.5"
+                    >
+                      {isProcessing ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <Check className="h-4 w-4" />
+                      )}
+                      Accept
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => handleReject(interest.id)}
+                      disabled={isProcessing}
+                      className="gap-1.5"
+                    >
                       <X className="h-4 w-4" />
-                    )}
-                    Decline
-                  </Button>
-                </>
-              )}
-              
-              {/* Show message button only for accepted interests */}
-              {interest.status === 'accepted' && profile && (
-                <Button
-                  size="sm"
-                  variant="default"
-                  onClick={handleMessageClick}
-                  className="gap-1 bg-green-600 hover:bg-green-700"
-                >
-                  <MessageCircle className="h-4 w-4" />
-                  Message
-                </Button>
-              )}
+                      Decline
+                    </Button>
+                    <span className="text-xs text-muted-foreground ml-auto hidden sm:block">
+                      Interest Pending
+                    </span>
+                  </>
+                )}
+
+                {/* For Accepted Interests - Show Message Button */}
+                {interest.status === 'accepted' && profile && (
+                  <>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="gap-1.5"
+                    >
+                      <Phone className="h-4 w-4" />
+                      Call Now
+                    </Button>
+                    <Button
+                      size="sm"
+                      onClick={handleMessageClick}
+                      className="gap-1.5"
+                    >
+                      <MessageCircle className="h-4 w-4" />
+                      Send Message
+                    </Button>
+                  </>
+                )}
+
+                {/* For Sent Interests - Pending */}
+                {type === 'sent' && interest.status === 'pending' && (
+                  <span className="text-xs text-muted-foreground">
+                    Waiting for response...
+                  </span>
+                )}
+
+                {/* For Rejected Interests - No buttons */}
+                {interest.status === 'rejected' && (
+                  <span className="text-xs text-muted-foreground">
+                    This interest was declined
+                  </span>
+                )}
+              </div>
             </div>
           </div>
         </CardContent>
@@ -382,50 +417,20 @@ const InterestsSection = ({ userId, profileId, onMessageClick }: InterestsSectio
     interests: Interest[] 
   }) => (
     <div className="flex flex-wrap gap-2 mb-4">
-      <Button
-        size="sm"
-        variant={filter === 'all' ? 'default' : 'outline'}
-        onClick={() => setFilter('all')}
-        className="gap-1"
-      >
-        All
-        <Badge variant="secondary" className="ml-1 h-5 px-1.5 text-xs">
-          {getFilterCount(interests, 'all')}
-        </Badge>
-      </Button>
-      <Button
-        size="sm"
-        variant={filter === 'pending' ? 'default' : 'outline'}
-        onClick={() => setFilter('pending')}
-        className="gap-1"
-      >
-        Pending
-        <Badge variant="secondary" className="ml-1 h-5 px-1.5 text-xs">
-          {getFilterCount(interests, 'pending')}
-        </Badge>
-      </Button>
-      <Button
-        size="sm"
-        variant={filter === 'accepted' ? 'default' : 'outline'}
-        onClick={() => setFilter('accepted')}
-        className="gap-1"
-      >
-        Accepted
-        <Badge variant="secondary" className="ml-1 h-5 px-1.5 text-xs">
-          {getFilterCount(interests, 'accepted')}
-        </Badge>
-      </Button>
-      <Button
-        size="sm"
-        variant={filter === 'rejected' ? 'default' : 'outline'}
-        onClick={() => setFilter('rejected')}
-        className="gap-1"
-      >
-        Declined
-        <Badge variant="secondary" className="ml-1 h-5 px-1.5 text-xs">
-          {getFilterCount(interests, 'rejected')}
-        </Badge>
-      </Button>
+      {(['all', 'pending', 'accepted', 'rejected'] as StatusFilter[]).map((f) => (
+        <Button
+          key={f}
+          size="sm"
+          variant={filter === f ? 'default' : 'outline'}
+          onClick={() => setFilter(f)}
+          className="gap-1 capitalize"
+        >
+          {f === 'all' ? 'All' : f === 'accepted' ? 'Accepted' : f === 'rejected' ? 'Declined' : 'Pending'}
+          <Badge variant="secondary" className="ml-1 h-5 px-1.5 text-xs">
+            {getFilterCount(interests, f)}
+          </Badge>
+        </Button>
+      ))}
     </div>
   );
 
@@ -464,31 +469,35 @@ const InterestsSection = ({ userId, profileId, onMessageClick }: InterestsSectio
               <TabsTrigger value="sent">Sent</TabsTrigger>
             </TabsList>
 
-            <TabsContent value="received" className="space-y-3">
+            <TabsContent value="received" className="space-y-4">
               <StatusFilterTabs 
                 filter={receivedFilter} 
                 setFilter={setReceivedFilter} 
                 interests={receivedInterests} 
               />
               {filteredReceivedInterests.length > 0 ? (
-                filteredReceivedInterests.map(interest => (
-                  <InterestCard key={interest.id} interest={interest} type="received" />
-                ))
+                <div className="space-y-4">
+                  {filteredReceivedInterests.map(interest => (
+                    <InterestCard key={interest.id} interest={interest} type="received" />
+                  ))}
+                </div>
               ) : (
                 <EmptyState type="received" filter={receivedFilter} />
               )}
             </TabsContent>
 
-            <TabsContent value="sent" className="space-y-3">
+            <TabsContent value="sent" className="space-y-4">
               <StatusFilterTabs 
                 filter={sentFilter} 
                 setFilter={setSentFilter} 
                 interests={sentInterests} 
               />
               {filteredSentInterests.length > 0 ? (
-                filteredSentInterests.map(interest => (
-                  <InterestCard key={interest.id} interest={interest} type="sent" />
-                ))
+                <div className="space-y-4">
+                  {filteredSentInterests.map(interest => (
+                    <InterestCard key={interest.id} interest={interest} type="sent" />
+                  ))}
+                </div>
               ) : (
                 <EmptyState type="sent" filter={sentFilter} />
               )}

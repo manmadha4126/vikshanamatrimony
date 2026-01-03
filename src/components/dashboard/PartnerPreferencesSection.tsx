@@ -292,6 +292,53 @@ const PartnerPreferencesSection = ({ userId }: PartnerPreferencesSectionProps) =
     }
   };
 
+  const [showMatchingProfiles, setShowMatchingProfiles] = useState(false);
+  const [matchingProfiles, setMatchingProfiles] = useState<any[]>([]);
+  const [loadingMatches, setLoadingMatches] = useState(false);
+
+  const fetchMatchingProfiles = async () => {
+    setLoadingMatches(true);
+    try {
+      // Get user's gender from their profile
+      const { data: userProfile } = await supabase
+        .from('profiles')
+        .select('gender')
+        .eq('user_id', userId)
+        .single();
+
+      if (!userProfile) return;
+
+      // Fetch profiles of opposite gender
+      let query = supabase
+        .from('profiles')
+        .select('id, name, photo_url, profile_id, date_of_birth, height, city, state, education, occupation, religion')
+        .eq('is_complete', true)
+        .neq('gender', userProfile.gender)
+        .limit(10);
+
+      // Apply filters based on preferences
+      if (formData.religion.length > 0 && !formData.religion.includes('Any')) {
+        query = query.in('religion', formData.religion);
+      }
+      if (formData.education.length > 0) {
+        query = query.in('education', formData.education);
+      }
+      if (formData.residing_state.length > 0) {
+        query = query.in('state', formData.residing_state);
+      }
+
+      const { data, error } = await query;
+
+      if (error) throw error;
+      setMatchingProfiles(data || []);
+      setShowMatchingProfiles(true);
+    } catch (error) {
+      console.error('Error fetching matching profiles:', error);
+    } finally {
+      setLoadingMatches(false);
+    }
+  };
+
   const saveCurrentStep = async () => {
     setIsSaving(true);
     try {
@@ -338,10 +385,12 @@ const PartnerPreferencesSection = ({ userId }: PartnerPreferencesSectionProps) =
           description: `${steps[currentIndex].label} saved. Moving to ${steps[currentIndex + 1].label}...`,
         });
       } else {
+        // Final step - show matching profiles
         toast({
           title: "All Preferences Saved!",
-          description: "Your partner preferences have been saved successfully. Matching profiles will now appear based on your preferences.",
+          description: "Finding matching profiles based on your preferences...",
         });
+        fetchMatchingProfiles();
       }
     } catch (error: any) {
       toast({
@@ -677,6 +726,67 @@ const PartnerPreferencesSection = ({ userId }: PartnerPreferencesSectionProps) =
                 Save Preferences
               </Button>
             </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Matching Profiles Section */}
+      {showMatchingProfiles && (
+        <Card className="shadow-card">
+          <CardHeader className="pb-3">
+            <CardTitle className="font-display text-lg flex items-center gap-2">
+              <Heart className="h-5 w-5 text-primary" />
+              Matching Profiles
+              <Badge variant="secondary" className="ml-2">
+                {matchingProfiles.length} found
+              </Badge>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {loadingMatches ? (
+              <div className="flex items-center justify-center py-8">
+                <Loader2 className="h-6 w-6 animate-spin text-primary" />
+              </div>
+            ) : matchingProfiles.length === 0 ? (
+              <div className="text-center py-8">
+                <p className="text-muted-foreground">No matching profiles found. Try adjusting your preferences.</p>
+              </div>
+            ) : (
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {matchingProfiles.map((profile) => {
+                  const age = profile.date_of_birth ? Math.floor((new Date().getTime() - new Date(profile.date_of_birth).getTime()) / (365.25 * 24 * 60 * 60 * 1000)) : null;
+                  return (
+                    <Card key={profile.id} className="overflow-hidden hover:shadow-lg transition-shadow">
+                      <div className="aspect-square bg-muted relative">
+                        {profile.photo_url ? (
+                          <img
+                            src={profile.photo_url}
+                            alt={profile.name}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/10 to-primary/5">
+                            <User className="h-12 w-12 text-primary/30" />
+                          </div>
+                        )}
+                      </div>
+                      <CardContent className="p-3">
+                        <h4 className="font-semibold truncate">{profile.name}</h4>
+                        <p className="text-xs text-muted-foreground">{profile.profile_id}</p>
+                        <p className="text-sm text-muted-foreground mt-1">
+                          {[
+                            age ? `${age} yrs` : null,
+                            profile.height,
+                            profile.religion,
+                            profile.city
+                          ].filter(Boolean).join(' • ')}
+                        </p>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
+              </div>
+            )}
           </CardContent>
         </Card>
       )}
