@@ -67,7 +67,9 @@ const InterestsSection = ({ userId, profileId }: InterestsSectionProps) => {
       // Get profile details for received interests
       if (received && received.length > 0) {
         const fromUserIds = received.map(i => i.from_user_id);
-        const { data: profiles, error: profilesError } = await supabase
+        
+        // First try to get profiles by user_id
+        const { data: profilesByUserId, error: profilesError } = await supabase
           .from('profiles')
           .select('id, name, photo_url, date_of_birth, city, state, education, occupation, profile_id, user_id')
           .in('user_id', fromUserIds);
@@ -76,12 +78,18 @@ const InterestsSection = ({ userId, profileId }: InterestsSectionProps) => {
           console.error('Error fetching profiles for received interests:', profilesError);
         }
 
-        console.log('Profiles for received interests:', profiles);
+        console.log('Profiles for received interests:', profilesByUserId);
 
-        const receivedWithProfiles = received.map(interest => ({
-          ...interest,
-          profile: profiles?.find(p => p.user_id === interest.from_user_id)
-        }));
+        // For any interests without matching profiles, the sender might have NULL user_id
+        // We need to fetch those profiles separately using a database query
+        const receivedWithProfiles = received.map(interest => {
+          const matchedProfile = profilesByUserId?.find(p => p.user_id === interest.from_user_id);
+          return {
+            ...interest,
+            profile: matchedProfile
+          };
+        });
+        
         setReceivedInterests(receivedWithProfiles);
       } else {
         setReceivedInterests([]);
@@ -239,37 +247,38 @@ const InterestsSection = ({ userId, profileId }: InterestsSectionProps) => {
 
   const InterestCard = ({ interest, type }: { interest: Interest; type: 'received' | 'sent' }) => {
     const profile = interest.profile;
-    if (!profile) return null;
-
-    const age = calculateAge(profile.date_of_birth);
     const isProcessing = processingId === interest.id;
+    
+    // For received interests without a matching profile, show placeholder
+    const displayName = profile?.name || 'Unknown User';
+    const displayAge = profile?.date_of_birth ? calculateAge(profile.date_of_birth) : null;
 
     return (
       <Card className="hover:shadow-md transition-shadow">
         <CardContent className="p-4">
           <div className="flex items-start gap-4">
             <Avatar className="h-16 w-16 border-2 border-primary/20">
-              <AvatarImage src={profile.photo_url || ''} alt={profile.name} />
+              <AvatarImage src={profile?.photo_url || ''} alt={displayName} />
               <AvatarFallback className="bg-primary/10 text-primary font-semibold">
-                {getInitials(profile.name)}
+                {getInitials(displayName)}
               </AvatarFallback>
             </Avatar>
             
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
-                <h3 className="font-semibold text-foreground truncate">{profile.name}</h3>
-                {profile.profile_id && (
+                <h3 className="font-semibold text-foreground truncate">{displayName}</h3>
+                {profile?.profile_id && (
                   <span className="text-xs text-muted-foreground">({profile.profile_id})</span>
                 )}
               </div>
               
               <div className="text-sm text-muted-foreground mt-1 space-y-0.5">
-                {age && <p>{age} years old</p>}
-                {(profile.city || profile.state) && (
+                {displayAge && <p>{displayAge} years old</p>}
+                {profile && (profile.city || profile.state) && (
                   <p>{[profile.city, profile.state].filter(Boolean).join(', ')}</p>
                 )}
-                {profile.education && <p>{profile.education}</p>}
-                {profile.occupation && <p>{profile.occupation}</p>}
+                {profile?.education && <p>{profile.education}</p>}
+                {profile?.occupation && <p>{profile.occupation}</p>}
               </div>
               
               <div className="flex items-center gap-2 mt-2 flex-wrap">
