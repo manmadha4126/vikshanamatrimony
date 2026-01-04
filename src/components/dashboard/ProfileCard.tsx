@@ -2,9 +2,10 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Heart, Bookmark, Eye, MapPin, Briefcase, GraduationCap, Shield, ChevronLeft, ChevronRight } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import placeholderMale from '@/assets/placeholder-male.png';
+import placeholderFemale from '@/assets/placeholder-female.png';
 
 interface ProfileCardProps {
   profile: {
@@ -19,6 +20,7 @@ interface ProfileCardProps {
     education: string | null;
     occupation: string | null;
     verification_status: string | null;
+    gender?: string;
   };
   onViewProfile?: () => void;
   onSendInterest?: () => void;
@@ -78,13 +80,9 @@ const ProfileCard = ({
     return age;
   };
 
-  const getInitials = (name: string) => {
-    return name
-      .split(' ')
-      .map((n) => n[0])
-      .join('')
-      .toUpperCase()
-      .slice(0, 2);
+  const getPlaceholderImage = () => {
+    const gender = profile.gender?.toLowerCase();
+    return gender === 'male' ? placeholderMale : placeholderFemale;
   };
 
   const handlePrevPhoto = (e: React.MouseEvent) => {
@@ -107,21 +105,11 @@ const ProfileCard = ({
       <div className="relative">
         {/* Profile Image */}
         <div className="aspect-square bg-muted relative overflow-hidden">
-          {currentPhoto ? (
-            <img
-              src={currentPhoto}
-              alt={profile.name}
-              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 ease-out"
-            />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/10 to-secondary/10">
-              <Avatar className="h-16 w-16 sm:h-24 sm:w-24">
-                <AvatarFallback className="text-xl sm:text-3xl bg-primary text-primary-foreground">
-                  {getInitials(profile.name)}
-                </AvatarFallback>
-              </Avatar>
-            </div>
-          )}
+          <img
+            src={currentPhoto || getPlaceholderImage()}
+            alt={profile.name}
+            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 ease-out"
+          />
 
           {/* Photo Navigation Arrows - Always visible on mobile */}
           {hasMultiplePhotos && (
