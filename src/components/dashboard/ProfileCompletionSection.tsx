@@ -27,6 +27,7 @@ interface ProfileCompletionSectionProps {
     hobbies: string[] | null;
     horoscope_url: string | null;
     profile_completion_percentage: number | null;
+    verification_status?: string | null;
   };
   onProfileUpdate: () => void;
 }
@@ -263,82 +264,82 @@ const ProfileCompletionSection = ({ profile, onProfileUpdate }: ProfileCompletio
     }
   };
 
+  const isProfileVerified = profile.verification_status === 'verified';
+
   const completionCards = [
     {
       icon: Phone,
-      title: 'Verify Profile',
+      title: isProfileVerified ? 'Verified' : 'Verify Profile',
       description: profile.phone,
-      action: profile.phone_verified ? 'Verified' : 'Call & Verify',
-      isComplete: profile.phone_verified,
-      onClick: () => !profile.phone_verified && setIsVerifyOpen(true),
+      action: isProfileVerified ? 'Verified' : 'Call & Verify',
+      isComplete: isProfileVerified,
+      onClick: () => !isProfileVerified && setIsVerifyOpen(true),
+      iconBg: 'bg-green-100',
+      iconColor: 'text-green-600',
     },
     {
       icon: FileText,
       title: 'Add Horoscope',
       description: 'Upload your horoscope',
-      action: profile.horoscope_url ? 'View/Update' : 'Upload PDF',
+      action: profile.horoscope_url ? 'View/Update' : 'Upload',
       isComplete: !!profile.horoscope_url,
       onClick: () => setIsHoroscopeOpen(true),
+      iconBg: 'bg-purple-100',
+      iconColor: 'text-purple-600',
     },
     {
       icon: Sparkles,
       title: 'Add Hobbies',
-      description: profile.hobbies?.length ? `${profile.hobbies.length} hobbies added` : 'Share your interests',
+      description: profile.hobbies?.length ? `${profile.hobbies.length} hobbies` : 'Share interests',
       action: profile.hobbies?.length ? 'Edit' : 'Add',
       isComplete: !!(profile.hobbies && profile.hobbies.length > 0),
       onClick: () => setIsHobbiesOpen(true),
+      iconBg: 'bg-amber-100',
+      iconColor: 'text-amber-600',
     },
     {
       icon: User,
-      title: 'Add About You',
-      description: profile.about_me ? 'Description added' : 'Tell about yourself',
+      title: 'About You',
+      description: profile.about_me ? 'Added' : 'Tell about yourself',
       action: profile.about_me ? 'Edit' : 'Add',
       isComplete: !!profile.about_me,
       onClick: () => setIsAboutOpen(true),
+      iconBg: 'bg-blue-100',
+      iconColor: 'text-blue-600',
     },
   ];
 
   return (
-    <div className="container mx-auto px-4 py-3">
-      <Card className="shadow-card">
-        <CardHeader className="py-3 px-4">
-          <CardTitle className="font-display text-base flex items-center gap-2">
-            Complete Your Profile <span className="text-lg font-bold text-primary">{completionPercentage}%</span>
-          </CardTitle>
-          <Progress value={completionPercentage} className="h-2 mt-1.5" />
+    <div className="container mx-auto px-4 py-2">
+      <Card className="shadow-sm bg-gradient-to-br from-slate-50 to-blue-50/30 dark:from-slate-900 dark:to-blue-950/20 border-0">
+        <CardHeader className="py-2 px-3">
+          <div className="flex items-center justify-between">
+            <CardTitle className="font-semibold text-sm">Complete Your Profile</CardTitle>
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-muted-foreground">Profile completeness score</span>
+              <span className="text-sm font-bold text-primary">{completionPercentage}%</span>
+            </div>
+          </div>
+          <Progress value={completionPercentage} className="h-1.5 mt-1" />
         </CardHeader>
-        <CardContent className="py-3 px-4">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <CardContent className="py-2 px-3">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
             {completionCards.map((card, index) => (
-              <Card
+              <div
                 key={index}
-                className={`cursor-pointer transition-all hover:shadow-md ${
-                  card.isComplete ? 'bg-primary/5 border-primary/20' : ''
-                }`}
+                className="flex items-center gap-2 p-2 bg-background rounded-xl cursor-pointer hover:shadow-md transition-all border border-border/50"
                 onClick={card.onClick}
               >
-                <CardContent className="p-3">
-                  <div className="flex items-start gap-2">
-                    <div className={`p-1.5 rounded-full ${
-                      card.isComplete ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'
-                    }`}>
-                      <card.icon className="h-4 w-4" />
+                <div className={`p-2 rounded-xl ${card.iconBg} relative`}>
+                  <card.icon className={`h-4 w-4 ${card.iconColor}`} />
+                  {!card.isComplete && (
+                    <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-primary rounded-full flex items-center justify-center">
+                      <span className="text-[8px] text-primary-foreground font-bold">+</span>
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold text-xs">{card.title}</h3>
-                      <p className="text-[10px] text-muted-foreground truncate">{card.description}</p>
-                      <Button
-                        variant={card.isComplete ? 'outline' : 'default'}
-                        size="sm"
-                        className="mt-1.5 w-full text-[10px] h-7"
-                      >
-                        {card.isComplete && <Check className="h-3 w-3 mr-1" />}
-                        {card.action}
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+                  )}
+                </div>
+                <span className="text-xs font-medium text-foreground truncate">{card.title}</span>
+              </div>
             ))}
           </div>
         </CardContent>
