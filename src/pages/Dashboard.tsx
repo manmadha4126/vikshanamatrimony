@@ -329,7 +329,10 @@ const Dashboard = () => {
                     hobbies: profile.hobbies,
                     horoscope_url: profile.horoscope_url,
                     profile_completion_percentage: profile.profile_completion_percentage,
+                    verification_status: profile.verification_status,
                   }}
+                  userId={user.id}
+                  userName={profile.name}
                   onProfileUpdate={refreshProfile}
                 />
 

@@ -6,6 +6,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Camera, Edit, Settings, Crown, LogOut, BadgeCheck, Home, Eye, Heart, MessageCircle, Bell, Gem, Users, Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import PrimeSubscriptionModal from './PrimeSubscriptionModal';
 
 type DashboardView = 'home' | 'preferences' | 'search' | 'edit-profile' | 'view-profile' | 'interests' | 'messages' | 'notifications' | 'matches' | 'who-viewed-me';
 
@@ -50,6 +51,7 @@ const ProfileSidebar = ({
   activeView = 'home' 
 }: ProfileSidebarProps) => {
   const [uploading, setUploading] = useState(false);
+  const [isPrimeModalOpen, setIsPrimeModalOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
@@ -241,6 +243,7 @@ const ProfileSidebar = ({
                 <Button
                   size="sm"
                   className="mt-3 bg-orange-500 hover:bg-orange-600 text-white"
+                  onClick={() => setIsPrimeModalOpen(true)}
                 >
                   <Crown className="mr-1.5 h-4 w-4" />
                   Upgrade now
@@ -344,6 +347,15 @@ const ProfileSidebar = ({
           <span className="text-sm font-medium">Log out</span>
         </button>
       </ScrollArea>
+
+      {/* Prime Subscription Modal */}
+      <PrimeSubscriptionModal
+        isOpen={isPrimeModalOpen}
+        onClose={() => setIsPrimeModalOpen(false)}
+        userId={userId || ''}
+        profileId={profile.id || ''}
+        userName={profile.name}
+      />
     </aside>
   );
 };
