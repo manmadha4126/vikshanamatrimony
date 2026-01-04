@@ -472,16 +472,16 @@ const MatchesSection = ({ userId, userGender, onViewProfile }: MatchesSectionPro
             )}
           </div>
         ) : (
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <div className="grid gap-2 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
             {filteredMatches.map((match) => {
               const age = calculateAge(match.date_of_birth);
               const hasSentInterest = sentInterests.includes(match.id);
               
               return (
-                <Card key={match.id} className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer" onClick={() => onViewProfile?.(match.id)}>
+                <Card key={match.id} className="overflow-hidden hover:shadow-md transition-shadow cursor-pointer" onClick={() => onViewProfile?.(match.id)}>
                   {/* Profile Image */}
                   <div className="relative group/photo">
-                    <AspectRatio ratio={4/5}>
+                    <AspectRatio ratio={1}>
                       <img
                         src={match.photo_url || getPlaceholderImage(match.gender)}
                         alt={match.name}
@@ -496,69 +496,58 @@ const MatchesSection = ({ userId, userGender, onViewProfile }: MatchesSectionPro
                           e.stopPropagation();
                           setZoomedPhoto({ url: match.photo_url!, name: match.name });
                         }}
-                        className="absolute bottom-1.5 left-1.5 p-1.5 rounded-full bg-black/50 text-white opacity-0 group-hover/photo:opacity-100 transition-opacity hover:bg-black/70"
+                        className="absolute bottom-1 left-1 p-1 rounded-full bg-black/50 text-white opacity-0 group-hover/photo:opacity-100 transition-opacity hover:bg-black/70"
                         aria-label="Zoom photo"
                       >
-                        <ZoomIn className="h-3 w-3" />
+                        <ZoomIn className="h-2.5 w-2.5" />
                       </button>
                     )}
                     
                     {/* Compatibility Badge */}
-                    <div className="absolute top-1.5 right-1.5">
+                    <div className="absolute top-1 right-1">
                       <Badge 
-                        className={`text-xs px-1.5 py-0.5 ${
+                        className={`text-[10px] px-1 py-0 ${
                           match.compatibilityScore >= 80 ? 'bg-green-500' :
                           match.compatibilityScore >= 60 ? 'bg-blue-500' :
                           match.compatibilityScore >= 40 ? 'bg-yellow-500' :
                           'bg-orange-500'
-                        } text-white font-bold`}
+                        } text-white font-semibold`}
                       >
-                        {match.compatibilityScore}% Match
+                        {match.compatibilityScore}%
                       </Badge>
                     </div>
                   </div>
 
-                  <CardContent className="p-2.5">
-                    <div className="space-y-1.5">
+                  <CardContent className="p-1.5">
+                    <div className="space-y-1">
                       {/* Name and Profile ID */}
                       <div>
-                        <h3 className="font-semibold text-sm text-foreground truncate">{match.name}</h3>
+                        <h3 className="font-medium text-xs text-foreground truncate">{match.name}</h3>
                         {match.profile_id && (
-                          <p className="text-[10px] text-muted-foreground">{match.profile_id}</p>
+                          <p className="text-[9px] text-muted-foreground">{match.profile_id}</p>
                         )}
                       </div>
 
                       {/* Details */}
-                      <div className="space-y-0.5 text-xs text-muted-foreground">
-                        {age && <p>{age} years{match.height ? `, ${match.height}` : ''}</p>}
-                        {(match.city || match.state) && (
-                          <p className="flex items-center gap-0.5 truncate">
-                            <MapPin className="h-2.5 w-2.5 flex-shrink-0" />
-                            <span className="truncate">{[match.city, match.state].filter(Boolean).join(', ')}</span>
-                          </p>
-                        )}
+                      <div className="text-[10px] text-muted-foreground">
+                        {age && <p className="truncate">{age} yrs{match.height ? `, ${match.height}` : ''}</p>}
                       </div>
 
                       {/* Matched Criteria */}
                       {match.matchedCriteria.length > 0 && (
                         <div className="flex flex-wrap gap-0.5">
-                          {match.matchedCriteria.slice(0, 2).map((criteria) => (
-                            <Badge key={criteria} variant="secondary" className="text-[10px] px-1 py-0">
+                          {match.matchedCriteria.slice(0, 1).map((criteria) => (
+                            <Badge key={criteria} variant="secondary" className="text-[9px] px-1 py-0">
                               {criteria}
                             </Badge>
                           ))}
-                          {match.matchedCriteria.length > 2 && (
-                            <Badge variant="secondary" className="text-[10px] px-1 py-0">
-                              +{match.matchedCriteria.length - 2}
-                            </Badge>
-                          )}
                         </div>
                       )}
 
                       {/* Send Interest Button */}
                       <Button
                         size="sm"
-                        className="w-full h-7 text-xs"
+                        className="w-full h-6 text-[10px]"
                         disabled={hasSentInterest || sendingInterest === match.id}
                         onClick={(e) => {
                           e.stopPropagation();
@@ -566,11 +555,11 @@ const MatchesSection = ({ userId, userGender, onViewProfile }: MatchesSectionPro
                         }}
                       >
                         {sendingInterest === match.id ? (
-                          <Loader2 className="h-3 w-3 animate-spin mr-1" />
+                          <Loader2 className="h-2.5 w-2.5 animate-spin" />
                         ) : (
-                          <Heart className={`h-3 w-3 mr-1 ${hasSentInterest ? 'fill-current' : ''}`} />
+                          <Heart className={`h-2.5 w-2.5 ${hasSentInterest ? 'fill-current' : ''}`} />
                         )}
-                        {hasSentInterest ? 'Interest Sent' : 'Send Interest'}
+                        <span className="ml-0.5">{hasSentInterest ? 'Sent' : 'Interest'}</span>
                       </Button>
                     </div>
                   </CardContent>
