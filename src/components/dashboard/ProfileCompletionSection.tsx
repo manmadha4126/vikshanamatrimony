@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { toast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import PrimeSubscriptionModal from './PrimeSubscriptionModal';
 import {
   Phone,
   FileText,
@@ -29,6 +30,8 @@ interface ProfileCompletionSectionProps {
     profile_completion_percentage: number | null;
     verification_status?: string | null;
   };
+  userId: string;
+  userName: string;
   onProfileUpdate: () => void;
 }
 
@@ -38,11 +41,12 @@ const SUGGESTED_HOBBIES = [
   'Yoga', 'Writing', 'Shopping', 'Meditation'
 ];
 
-const ProfileCompletionSection = ({ profile, onProfileUpdate }: ProfileCompletionSectionProps) => {
+const ProfileCompletionSection = ({ profile, userId, userName, onProfileUpdate }: ProfileCompletionSectionProps) => {
   const [isVerifyOpen, setIsVerifyOpen] = useState(false);
   const [isHoroscopeOpen, setIsHoroscopeOpen] = useState(false);
   const [isHobbiesOpen, setIsHobbiesOpen] = useState(false);
   const [isAboutOpen, setIsAboutOpen] = useState(false);
+  const [isPrimeModalOpen, setIsPrimeModalOpen] = useState(false);
   
   const [aboutMe, setAboutMe] = useState(profile.about_me || '');
   const [selectedHobbies, setSelectedHobbies] = useState<string[]>(profile.hobbies || []);
@@ -472,8 +476,18 @@ const ProfileCompletionSection = ({ profile, onProfileUpdate }: ProfileCompletio
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Prime Subscription Modal */}
+      <PrimeSubscriptionModal
+        isOpen={isPrimeModalOpen}
+        onClose={() => setIsPrimeModalOpen(false)}
+        userId={userId}
+        profileId={profile.id}
+        userName={userName}
+      />
     </div>
   );
 };
 
+export { ProfileCompletionSection };
 export default ProfileCompletionSection;
