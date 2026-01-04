@@ -101,7 +101,10 @@ const ProfileCard = ({
   const currentPhoto = allPhotos[currentPhotoIndex] || profile.photo_url;
 
   return (
-    <Card className="overflow-hidden hover:shadow-xl hover:shadow-primary/10 transition-all duration-300 group cursor-pointer hover:-translate-y-1 active:scale-[0.98]">
+    <Card 
+      className="overflow-hidden hover:shadow-xl hover:shadow-primary/10 transition-all duration-300 group cursor-pointer hover:-translate-y-1 active:scale-[0.98]"
+      onClick={onViewProfile}
+    >
       <div className="relative">
         {/* Profile Image */}
         <div className="aspect-square bg-muted relative overflow-hidden">
@@ -164,7 +167,10 @@ const ProfileCard = ({
                 size="sm"
                 variant="secondary"
                 className="flex-1 h-7 sm:h-9 text-xs sm:text-sm px-1 sm:px-3"
-                onClick={onViewProfile}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onViewProfile?.();
+                }}
               >
                 <Eye className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" />
                 <span className="hidden xs:inline">View</span>
@@ -173,7 +179,10 @@ const ProfileCard = ({
                 size="sm"
                 variant="default"
                 className="flex-1 h-7 sm:h-9 text-xs sm:text-sm px-1 sm:px-3"
-                onClick={onSendInterest}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onSendInterest?.();
+                }}
               >
                 <Heart className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" />
                 <span className="hidden xs:inline">Interest</span>
@@ -181,7 +190,10 @@ const ProfileCard = ({
               <Button
                 size="icon"
                 variant={isShortlisted ? 'default' : 'outline'}
-                onClick={onShortlist}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onShortlist?.();
+                }}
                 className="shrink-0 h-7 w-7 sm:h-9 sm:w-9"
               >
                 <Bookmark className={`h-3 w-3 sm:h-4 sm:w-4 ${isShortlisted ? 'fill-current' : ''}`} />
