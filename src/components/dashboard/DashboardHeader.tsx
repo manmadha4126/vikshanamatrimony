@@ -168,17 +168,17 @@ const DashboardHeader = ({
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center gap-1">
+          <nav className="hidden lg:flex items-center gap-2">
             {navItems.map((item) => (
               <Button 
                 key={item.label} 
                 variant={item.label === 'Search' && isSearchOpen ? 'default' : 'ghost'}
-                size="sm" 
-                className="gap-2"
+                size="lg" 
+                className="gap-2.5 text-foreground hover:bg-foreground/10 hover:text-foreground hover:scale-105 transition-all duration-200 font-medium px-5"
                 onClick={item.action}
               >
-                <item.icon className="h-4 w-4" />
-                <span>{item.label}</span>
+                <item.icon className="h-5 w-5" />
+                <span className="text-base">{item.label}</span>
               </Button>
             ))}
           </nav>
@@ -319,12 +319,13 @@ const DashboardHeader = ({
         {/* Mobile Navigation */}
         {isMobileMenuOpen && (
           <nav className="lg:hidden py-4 border-t border-border">
-            <div className="flex flex-col gap-1">
+            <div className="flex flex-col gap-2">
               {navItems.map((item) => (
                 <Button 
                   key={item.label} 
                   variant="ghost" 
-                  className="w-full justify-start gap-2"
+                  size="lg"
+                  className="w-full justify-start gap-3 text-foreground hover:bg-foreground/10 hover:text-foreground hover:scale-[1.02] transition-all duration-200 font-medium"
                   onClick={() => {
                     item.action?.();
                     if (item.label !== 'Search') {
@@ -332,8 +333,8 @@ const DashboardHeader = ({
                     }
                   }}
                 >
-                  <item.icon className="h-4 w-4" />
-                  <span>{item.label}</span>
+                  <item.icon className="h-5 w-5" />
+                  <span className="text-base">{item.label}</span>
                 </Button>
               ))}
             </div>
