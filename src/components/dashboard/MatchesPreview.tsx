@@ -3,8 +3,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { AspectRatio } from '@/components/ui/aspect-ratio';
 import { Progress } from '@/components/ui/progress';
-import { Users, ArrowRight, MapPin, GraduationCap, User } from 'lucide-react';
+import { Users, ArrowRight, MapPin, GraduationCap } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import placeholderMale from '@/assets/placeholder-male.png';
+import placeholderFemale from '@/assets/placeholder-female.png';
 
 interface Profile {
   id: string;
@@ -15,6 +17,7 @@ interface Profile {
   city: string | null;
   state: string | null;
   education: string | null;
+  gender?: string;
 }
 
 interface MatchedProfile extends Profile {
@@ -50,7 +53,7 @@ const MatchesPreview = ({ userId, userGender, onViewAllClick }: MatchesPreviewPr
         
         const { data: profiles, error } = await supabase
           .from('profiles')
-          .select('id, name, photo_url, profile_id, date_of_birth, city, state, education')
+          .select('id, name, photo_url, profile_id, date_of_birth, city, state, education, gender')
           .eq('is_complete', true)
           .eq('gender', targetGender)
           .neq('id', userId)
@@ -75,13 +78,8 @@ const MatchesPreview = ({ userId, userGender, onViewAllClick }: MatchesPreviewPr
     fetchTopMatches();
   }, [userId, userGender]);
 
-  const getInitials = (name: string) => {
-    return name
-      .split(' ')
-      .map(n => n[0])
-      .join('')
-      .toUpperCase()
-      .slice(0, 2);
+  const getPlaceholderImage = (gender?: string) => {
+    return gender?.toLowerCase() === 'male' ? placeholderMale : placeholderFemale;
   };
 
   const getScoreColor = (score: number) => {
@@ -133,17 +131,11 @@ const MatchesPreview = ({ userId, userGender, onViewAllClick }: MatchesPreviewPr
                 {/* Square Profile Image */}
                 <div className="relative">
                   <AspectRatio ratio={1}>
-                    {match.photo_url ? (
-                      <img
-                        src={match.photo_url}
-                        alt={match.name}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <div className="w-full h-full bg-muted flex items-center justify-center">
-                        <User className="h-12 w-12 text-muted-foreground" />
-                      </div>
-                    )}
+                    <img
+                      src={match.photo_url || getPlaceholderImage(match.gender)}
+                      alt={match.name}
+                      className="w-full h-full object-cover"
+                    />
                   </AspectRatio>
                   
                   {/* Compatibility Badge */}

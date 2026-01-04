@@ -9,9 +9,11 @@ import { Slider } from '@/components/ui/slider';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
-import { Gem, Heart, Loader2, MapPin, GraduationCap, Briefcase, Star, User, Filter, SlidersHorizontal, X, ZoomIn } from 'lucide-react';
+import { Gem, Heart, Loader2, MapPin, GraduationCap, Briefcase, Star, Filter, SlidersHorizontal, X, ZoomIn } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import placeholderMale from '@/assets/placeholder-male.png';
+import placeholderFemale from '@/assets/placeholder-female.png';
 
 interface Profile {
   id: string;
@@ -29,6 +31,7 @@ interface Profile {
   mother_tongue: string | null;
   marital_status: string | null;
   annual_income: string | null;
+  gender?: string;
 }
 
 interface MatchedProfile extends Profile {
@@ -211,7 +214,7 @@ const MatchesSection = ({ userId, userGender, onViewProfile }: MatchesSectionPro
       // Fetch profiles of opposite gender
       const { data: profiles, error: profilesError } = await supabase
         .from('profiles')
-        .select('id, name, photo_url, profile_id, date_of_birth, height, city, state, education, occupation, religion, caste, mother_tongue, marital_status, annual_income')
+        .select('id, name, photo_url, profile_id, date_of_birth, height, city, state, education, occupation, religion, caste, mother_tongue, marital_status, annual_income, gender')
         .eq('is_complete', true)
         .neq('gender', userGender)
         .limit(50);
@@ -320,8 +323,8 @@ const MatchesSection = ({ userId, userGender, onViewProfile }: MatchesSectionPro
     fetchMatches();
   }, [userId, userGender]);
 
-  const getInitials = (name: string) => {
-    return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+  const getPlaceholderImage = (gender?: string) => {
+    return gender?.toLowerCase() === 'male' ? placeholderMale : placeholderFemale;
   };
 
   const clearFilters = () => {
@@ -479,17 +482,11 @@ const MatchesSection = ({ userId, userGender, onViewProfile }: MatchesSectionPro
                   {/* Square Profile Image */}
                   <div className="relative group/photo">
                     <AspectRatio ratio={1}>
-                      {match.photo_url ? (
-                        <img
-                          src={match.photo_url}
-                          alt={match.name}
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <div className="w-full h-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center">
-                          <User className="h-16 w-16 text-primary/40" />
-                        </div>
-                      )}
+                      <img
+                        src={match.photo_url || getPlaceholderImage(match.gender)}
+                        alt={match.name}
+                        className="w-full h-full object-cover"
+                      />
                     </AspectRatio>
                     
                     {/* Photo Zoom Button */}
