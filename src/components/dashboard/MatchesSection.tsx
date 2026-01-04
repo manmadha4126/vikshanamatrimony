@@ -472,22 +472,28 @@ const MatchesSection = ({ userId, userGender, onViewProfile }: MatchesSectionPro
             )}
           </div>
         ) : (
-          <div className="grid gap-2 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
-            {filteredMatches.map((match) => {
+          <div className="columns-2 sm:columns-3 md:columns-4 lg:columns-5 xl:columns-6 gap-2 space-y-2">
+            {filteredMatches.map((match, index) => {
               const age = calculateAge(match.date_of_birth);
               const hasSentInterest = sentInterests.includes(match.id);
+              // Vary card content to create masonry effect
+              const showLocation = index % 3 !== 0;
+              const showEducation = index % 4 === 0;
+              const showOccupation = index % 5 === 0;
               
               return (
-                <Card key={match.id} className="overflow-hidden hover:shadow-md transition-shadow cursor-pointer" onClick={() => onViewProfile?.(match.id)}>
+                <Card 
+                  key={match.id} 
+                  className="overflow-hidden hover:shadow-md transition-shadow cursor-pointer break-inside-avoid mb-2" 
+                  onClick={() => onViewProfile?.(match.id)}
+                >
                   {/* Profile Image */}
                   <div className="relative group/photo">
-                    <AspectRatio ratio={1}>
-                      <img
-                        src={match.photo_url || getPlaceholderImage(match.gender)}
-                        alt={match.name}
-                        className="w-full h-full object-cover"
-                      />
-                    </AspectRatio>
+                    <img
+                      src={match.photo_url || getPlaceholderImage(match.gender)}
+                      alt={match.name}
+                      className="w-full h-auto object-cover"
+                    />
                     
                     {/* Photo Zoom Button */}
                     {match.photo_url && (
@@ -529,18 +535,41 @@ const MatchesSection = ({ userId, userGender, onViewProfile }: MatchesSectionPro
                       </div>
 
                       {/* Details */}
-                      <div className="text-[10px] text-muted-foreground">
+                      <div className="text-[10px] text-muted-foreground space-y-0.5">
                         {age && <p className="truncate">{age} yrs{match.height ? `, ${match.height}` : ''}</p>}
+                        {showLocation && (match.city || match.state) && (
+                          <p className="flex items-center gap-0.5 truncate">
+                            <MapPin className="h-2.5 w-2.5 flex-shrink-0" />
+                            <span className="truncate">{[match.city, match.state].filter(Boolean).join(', ')}</span>
+                          </p>
+                        )}
+                        {showEducation && match.education && (
+                          <p className="flex items-center gap-0.5 truncate">
+                            <GraduationCap className="h-2.5 w-2.5 flex-shrink-0" />
+                            <span className="truncate">{match.education}</span>
+                          </p>
+                        )}
+                        {showOccupation && match.occupation && (
+                          <p className="flex items-center gap-0.5 truncate">
+                            <Briefcase className="h-2.5 w-2.5 flex-shrink-0" />
+                            <span className="truncate">{match.occupation}</span>
+                          </p>
+                        )}
                       </div>
 
                       {/* Matched Criteria */}
                       {match.matchedCriteria.length > 0 && (
                         <div className="flex flex-wrap gap-0.5">
-                          {match.matchedCriteria.slice(0, 1).map((criteria) => (
+                          {match.matchedCriteria.slice(0, 2).map((criteria) => (
                             <Badge key={criteria} variant="secondary" className="text-[9px] px-1 py-0">
                               {criteria}
                             </Badge>
                           ))}
+                          {match.matchedCriteria.length > 2 && (
+                            <Badge variant="secondary" className="text-[9px] px-1 py-0">
+                              +{match.matchedCriteria.length - 2}
+                            </Badge>
+                          )}
                         </div>
                       )}
 
