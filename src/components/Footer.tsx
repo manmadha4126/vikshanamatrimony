@@ -69,7 +69,7 @@ const Footer = () => {
             <div className="space-y-3">
               <div className="flex items-center gap-3 text-sm text-primary-foreground/80">
                 <MapPin size={16} className="text-secondary" />
-                <span>123 Marriage Lane, Chennai, India</span>
+                <span>20-1-244, Korlagunta junction, Tirupati Bypass road Tirupati, Andhrapradesh - India</span>
               </div>
               <div className="flex items-center gap-3 text-sm text-primary-foreground/80">
                 <Phone size={16} className="text-secondary" />
