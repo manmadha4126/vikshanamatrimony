@@ -1,7 +1,23 @@
-import { Link } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Facebook, Instagram, Phone, Mail, MapPin } from "lucide-react";
 
 const Footer = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const handleNavClick = (sectionId: string) => {
+    if (location.pathname === "/") {
+      // On homepage, scroll to section
+      const element = document.getElementById(sectionId);
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth" });
+      }
+    } else {
+      // On other pages, navigate to homepage with hash
+      navigate(`/#${sectionId}`);
+    }
+  };
+
   return (
     <footer className="bg-primary-dark text-white">
       <div className="container py-12">
@@ -26,15 +42,24 @@ const Footer = () => {
           <div className="space-y-4">
             <h4 className="font-display text-lg font-semibold">Quick Links</h4>
             <nav className="flex flex-col gap-2">
-              <Link to="/" className="text-sm text-primary-foreground/80 hover:text-secondary transition-colors">
+              <button 
+                onClick={() => handleNavClick("hero")} 
+                className="text-sm text-primary-foreground/80 hover:text-secondary transition-colors text-left"
+              >
                 Home
-              </Link>
-              <Link to="/about" className="text-sm text-primary-foreground/80 hover:text-secondary transition-colors">
+              </button>
+              <button 
+                onClick={() => handleNavClick("about")} 
+                className="text-sm text-primary-foreground/80 hover:text-secondary transition-colors text-left"
+              >
                 About Us
-              </Link>
-              <Link to="/contact" className="text-sm text-primary-foreground/80 hover:text-secondary transition-colors">
+              </button>
+              <button 
+                onClick={() => handleNavClick("contact")} 
+                className="text-sm text-primary-foreground/80 hover:text-secondary transition-colors text-left"
+              >
                 Contact Us
-              </Link>
+              </button>
             </nav>
           </div>
 
