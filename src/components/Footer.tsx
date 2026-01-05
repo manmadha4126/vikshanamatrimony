@@ -71,9 +71,12 @@ const Footer = () => {
                 <MapPin size={16} className="text-secondary" />
                 <span>20-1-244, Korlagunta junction, Tirupati Bypass road Tirupati, Andhrapradesh - India</span>
               </div>
-              <div className="flex items-center gap-3 text-sm text-primary-foreground/80">
-                <Phone size={16} className="text-secondary" />
-                <span>+91 98765 43210</span>
+              <div className="flex items-start gap-3 text-sm text-primary-foreground/80">
+                <Phone size={16} className="text-secondary mt-0.5" />
+                <div className="flex flex-col">
+                  <span>+91 9491449044</span>
+                  <span>+91 44 2345 6789</span>
+                </div>
               </div>
               <div className="flex items-center gap-3 text-sm text-primary-foreground/80">
                 <Mail size={16} className="text-secondary" />
