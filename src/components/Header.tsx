@@ -79,10 +79,10 @@ const Header = () => {
               <Link to="/register">Register Now</Link>
             </Button>
           )}
-          <Button className="bg-red-600 hover:bg-red-700 text-white" asChild>
+          <Button className="bg-black hover:bg-black/80 text-white" asChild>
             <Link to="/staff-login">Staff Login</Link>
           </Button>
-          <Button className="bg-red-600 hover:bg-red-700 text-white" asChild>
+          <Button className="bg-black hover:bg-black/80 text-white" asChild>
             <Link to="/login">Log In</Link>
           </Button>
         </div>
@@ -121,10 +121,10 @@ const Header = () => {
                   <Link to="/register">Register Now</Link>
                 </Button>
               )}
-              <Button className="w-full bg-red-600 hover:bg-red-700 text-white" asChild>
+              <Button className="w-full bg-black hover:bg-black/80 text-white" asChild>
                 <Link to="/staff-login">Staff Login</Link>
               </Button>
-              <Button className="w-full bg-red-600 hover:bg-red-700 text-white" asChild>
+              <Button className="w-full bg-black hover:bg-black/80 text-white" asChild>
                 <Link to="/login">Log In</Link>
               </Button>
             </div>
