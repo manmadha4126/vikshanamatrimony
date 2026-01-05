@@ -59,7 +59,7 @@ const Header = () => {
             <button
               key={link.href}
               onClick={() => handleNavClick(link.href)}
-              className="text-sm font-medium transition-colors hover:text-primary text-muted-foreground"
+              className="text-sm font-medium transition-all duration-200 hover:text-primary hover:scale-110 text-muted-foreground"
             >
               {link.name}
             </button>
@@ -104,7 +104,7 @@ const Header = () => {
               <button
                 key={link.href}
                 onClick={() => handleNavClick(link.href)}
-                className="text-sm font-medium py-2 transition-colors text-muted-foreground hover:text-primary text-left"
+                className="text-sm font-medium py-2 transition-all duration-200 text-muted-foreground hover:text-primary hover:translate-x-2 text-left"
               >
                 {link.name}
               </button>
