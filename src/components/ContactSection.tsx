@@ -106,7 +106,7 @@ const ContactSection = () => {
                     <h4 className="font-semibold text-foreground text-sm mb-0.5">Address</h4>
                     <p className="text-muted-foreground text-xs">
                       ​20-1-244, Korlagunta junction, Tirupati Bypass road     <br />
-                      Tirupati, Andhrapradesh -     <br />
+                      Tirupati, AndhraPradesh        <br />
                       India
                     </p>
                   </div>
@@ -120,7 +120,7 @@ const ContactSection = () => {
                     <h4 className="font-semibold text-foreground text-sm mb-0.5">Phone</h4>
                     <p className="text-muted-foreground text-xs">+91 9491449044
                     <br />
-                      +91 44 2345 6789
+                      +91 9100090883   
                     </p>
                   </div>
                 </div>

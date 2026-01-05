@@ -6,14 +6,7 @@ import weddingCarousel6 from "@/assets/wedding-carousel-6.jpg";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
-
-const weddingImages = [
-  weddingHero1,
-  weddingHero2,
-  weddingCarousel2,
-  weddingCarousel4,
-  weddingCarousel6,
-];
+const weddingImages = [weddingHero1, weddingHero2, weddingCarousel2, weddingCarousel4, weddingCarousel6];
 const HeroSection = () => {
   const navigate = useNavigate();
   const [currentImage, setCurrentImage] = useState(0);
@@ -42,8 +35,7 @@ const HeroSection = () => {
               <span className="text-secondary"> Special...!</span>
             </h1>
             <p className="text-lg text-muted-foreground leading-relaxed max-w-2xl mx-auto mb-8">
-              Join thousands of families who have found their perfect match through Vikshana Matrimony. Your journey to
-              a beautiful marriage begins here, rooted in tradition and trust.
+              ​Join thousands of families who have found their perfect match through Vikshana Matrimony. Your journey to a beautiful marriage begins here, rooted in tradition and trust.
             </p>
             <Button variant="primary" size="lg" className="text-lg px-8 py-6" onClick={() => navigate("/register")}>
               Register Now - It's Free
