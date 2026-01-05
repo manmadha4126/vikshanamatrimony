@@ -1,25 +1,23 @@
 import { useNavigate, useLocation } from "react-router-dom";
 import { Facebook, Instagram, Phone, Mail, MapPin } from "lucide-react";
-
 const Footer = () => {
   const navigate = useNavigate();
   const location = useLocation();
-
   const handleNavClick = (sectionId: string) => {
     if (location.pathname === "/") {
       // On homepage, scroll to section
       const element = document.getElementById(sectionId);
       if (element) {
-        element.scrollIntoView({ behavior: "smooth" });
+        element.scrollIntoView({
+          behavior: "smooth"
+        });
       }
     } else {
       // On other pages, navigate to homepage with hash
       navigate(`/#${sectionId}`);
     }
   };
-
-  return (
-    <footer className="bg-primary-dark text-white">
+  return <footer className="bg-primary-dark text-white">
       <div className="container py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Brand */}
@@ -42,22 +40,13 @@ const Footer = () => {
           <div className="space-y-4">
             <h4 className="font-display text-lg font-semibold">Quick Links</h4>
             <nav className="flex flex-col gap-2">
-              <button 
-                onClick={() => handleNavClick("hero")} 
-                className="text-sm text-primary-foreground/80 hover:text-secondary transition-colors text-left"
-              >
+              <button onClick={() => handleNavClick("hero")} className="text-sm text-primary-foreground/80 hover:text-secondary transition-colors text-left">
                 Home
               </button>
-              <button 
-                onClick={() => handleNavClick("about")} 
-                className="text-sm text-primary-foreground/80 hover:text-secondary transition-colors text-left"
-              >
+              <button onClick={() => handleNavClick("about")} className="text-sm text-primary-foreground/80 hover:text-secondary transition-colors text-left">
                 About Us
               </button>
-              <button 
-                onClick={() => handleNavClick("contact")} 
-                className="text-sm text-primary-foreground/80 hover:text-secondary transition-colors text-left"
-              >
+              <button onClick={() => handleNavClick("contact")} className="text-sm text-primary-foreground/80 hover:text-secondary transition-colors text-left">
                 Contact Us
               </button>
             </nav>
@@ -68,14 +57,14 @@ const Footer = () => {
             <h4 className="font-display text-lg font-semibold">Contact Us</h4>
             <div className="space-y-3">
               <div className="flex items-center gap-3 text-sm text-primary-foreground/80">
-                <MapPin size={16} className="text-secondary" />
+                <MapPin size={16} className="text-secondary mx-0 my-0 mr-0 w-[35px] h-[25px]" />
                 <span>20-1-244, Korlagunta junction, Tirupati Bypass road Tirupati, Andhrapradesh - India</span>
               </div>
               <div className="flex items-start gap-3 text-sm text-primary-foreground/80">
                 <Phone size={16} className="text-secondary mt-0.5" />
                 <div className="flex flex-col">
                   <span>+91 9491449044</span>
-                  <span>+91 44 2345 6789</span>
+                  <span>+91 9100090883</span>
                 </div>
               </div>
               <div className="flex items-center gap-3 text-sm text-primary-foreground/80">
@@ -89,22 +78,13 @@ const Footer = () => {
           <div className="space-y-4">
             <h4 className="font-display text-lg font-semibold">Follow Us</h4>
             <div className="flex gap-4">
-              <a 
-                href="#" 
-                className="w-10 h-10 rounded-full bg-primary-foreground/10 flex items-center justify-center hover:bg-secondary hover:text-primary transition-colors"
-              >
+              <a href="#" className="w-10 h-10 rounded-full bg-primary-foreground/10 flex items-center justify-center hover:bg-secondary hover:text-primary transition-colors">
                 <Facebook size={18} />
               </a>
-              <a 
-                href="#" 
-                className="w-10 h-10 rounded-full bg-primary-foreground/10 flex items-center justify-center hover:bg-secondary hover:text-primary transition-colors"
-              >
+              <a href="#" className="w-10 h-10 rounded-full bg-primary-foreground/10 flex items-center justify-center hover:bg-secondary hover:text-primary transition-colors">
                 <Instagram size={18} />
               </a>
-              <a 
-                href="#" 
-                className="w-10 h-10 rounded-full bg-primary-foreground/10 flex items-center justify-center hover:bg-secondary hover:text-primary transition-colors"
-              >
+              <a href="#" className="w-10 h-10 rounded-full bg-primary-foreground/10 flex items-center justify-center hover:bg-secondary hover:text-primary transition-colors">
                 <Phone size={18} />
               </a>
             </div>
@@ -125,8 +105,6 @@ const Footer = () => {
           </div>
         </div>
       </div>
-    </footer>
-  );
+    </footer>;
 };
-
 export default Footer;
