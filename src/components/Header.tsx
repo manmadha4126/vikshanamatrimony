@@ -39,7 +39,7 @@ const Header = () => {
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
+    <header className="sticky top-0 z-50 w-full glass-nav">
       <div className="container flex h-20 items-center justify-between">
         {/* Logo */}
         <button onClick={handleLogoClick} className="flex items-center gap-3">
@@ -98,7 +98,7 @@ const Header = () => {
 
       {/* Mobile Menu */}
       {isMenuOpen && (
-        <div className="md:hidden absolute top-20 left-0 right-0 bg-background border-b border-border shadow-lg animate-fade-in">
+        <div className="md:hidden absolute top-20 left-0 right-0 glass shadow-lg animate-fade-in">
           <nav className="container py-4 flex flex-col gap-4">
             {navLinks.map((link) => (
               <button
