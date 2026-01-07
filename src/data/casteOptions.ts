@@ -1,38 +1,10 @@
 export const castesByReligion: Record<string, string[]> = {
   "Hindu": [
-    // Brahmin Communities
-    "Brahmin - Iyer",
-    "Brahmin - Iyengar",
-    "Brahmin - Namboodiri",
-    "Brahmin - Saraswat",
-    "Brahmin - Kanyakubja",
-    "Brahmin - Maithil",
-    "Brahmin - Gaur",
-    "Brahmin - Konkanastha",
-    "Brahmin - Deshastha",
-    "Brahmin - Havyaka",
-    "Brahmin - Hoysala Karnataka",
-    "Brahmin - Smartha",
-    "Brahmin - Vadama",
-    "Brahmin - Vathima",
-    "Brahmin - Ashtasahasram",
-    "Brahmin - Other",
-    // Kshatriya Communities
-    "Rajput - Chauhan",
-    "Rajput - Rathore",
-    "Rajput - Sisodiya",
-    "Rajput - Parmar",
-    "Rajput - Solanki",
-    "Rajput - Bundela",
-    "Rajput - Chandela",
-    "Rajput - Other",
-    "Maratha - 96 Kuli",
-    "Maratha - Kunbi",
-    "Maratha - CKP",
-    "Maratha - Other",
+    "Brahmin",
+    "Rajput",
+    "Maratha",
     "Thakur",
     "Kshatriya Raju",
-    // Vaishya Communities
     "Agarwal",
     "Gupta",
     "Khandelwal",
@@ -41,63 +13,27 @@ export const castesByReligion: Record<string, string[]> = {
     "Baniya",
     "Arora",
     "Khatri",
-    "Vaishya - Other",
-    // South Indian Communities
-    "Reddy - Panta",
-    "Reddy - Deshmukh",
-    "Reddy - Motati",
-    "Reddy - Kapu",
-    "Reddy - Other",
-    "Kamma - Chowdary",
-    "Kamma - Naidu",
-    "Kamma - Other",
+    "Reddy",
+    "Kamma",
     "Kapu",
     "Balija Naidu",
     "Velama Naidu",
-    "Chettiar - Nattukotai",
-    "Chettiar - Devanga",
-    "Chettiar - Kaikkolars",
-    "Chettiar - Other",
-    "Nair - Menon",
-    "Nair - Pillai",
-    "Nair - Panicker",
-    "Nair - Kurup",
-    "Nair - Other",
-    "Pillai - Vellalar",
-    "Pillai - Other",
-    "Mudaliar - Sengunthar",
-    "Mudaliar - Agamudayar",
-    "Mudaliar - Thuluva Vellalar",
-    "Mudaliar - Arcot",
-    "Mudaliar - Other",
-    "Gounder - Kongu Vellalar",
-    "Gounder - Vanniyar",
-    "Gounder - Kurumba",
-    "Gounder - Other",
-    "Thevar - Maravar",
-    "Thevar - Kallar",
-    "Thevar - Agamudayar",
-    "Thevar - Other",
-    "Nadar - Gramani",
-    "Nadar - Nelamaikaran",
-    "Nadar - Other",
+    "Chettiar",
+    "Nair",
+    "Pillai",
+    "Mudaliar",
+    "Gounder",
+    "Thevar",
+    "Nadar",
     "Naicker",
     "Vellalar",
     "Vanniyar",
     "Devar / Mukkulathor",
     "Adi Dravidar",
-    // West & North Indian Communities
-    "Patel - Leva",
-    "Patel - Kadva",
-    "Patel - Anjana",
-    "Patel - Other",
+    "Patel",
     "Jat",
     "Gujjar",
-    "Ahir / Yadav",
-    "Yadav - Ahir",
-    "Yadav - Gowda",
-    "Yadav - Konar",
-    "Yadav - Other",
+    "Yadav",
     "Kurmi",
     "Lodhi",
     "Saini",
@@ -109,17 +45,8 @@ export const castesByReligion: Record<string, string[]> = {
     "Nai / Nayi",
     "Dhobi",
     "Darji / Tailor",
-    // Kayastha Communities
-    "Kayastha - Chitraguptavanshi",
-    "Kayastha - CKP",
-    "Kayastha - Bengali",
-    "Kayastha - Other",
-    // Lingayat Communities
-    "Lingayat - Veerashaiva",
-    "Lingayat - Jangama",
-    "Lingayat - Panchamasali",
-    "Lingayat - Other",
-    // East Indian Communities
+    "Kayastha",
+    "Lingayat",
     "Khandayat",
     "Bhumihar",
     "Baidya",
@@ -127,14 +54,12 @@ export const castesByReligion: Record<string, string[]> = {
     "Namasudra",
     "Rajbanshi",
     "Koch",
-    // Artisan & Craftsman Communities
     "Vishwakarma",
     "Padmashali",
     "Devanga",
     "Sali / Salvi",
     "Koshti",
     "Rangari",
-    // Other Hindu Communities
     "Goud",
     "Meena",
     "Bhil",
@@ -149,37 +74,12 @@ export const castesByReligion: Record<string, string[]> = {
     "Other Hindu"
   ],
   "Muslim": [
-    // Sunni Sects
-    "Sunni - Hanafi",
-    "Sunni - Shafi",
-    "Sunni - Maliki",
-    "Sunni - Hanbali",
-    "Sunni - Deobandi",
-    "Sunni - Barelvi",
-    "Sunni - Ahl-e-Hadith",
-    "Sunni - Other",
-    // Shia Sects
-    "Shia - Ithna Ashari",
-    "Shia - Ismaili",
-    "Shia - Bohra",
-    "Shia - Other",
-    // Lineage Based
-    "Syed - Bukhari",
-    "Syed - Rizvi",
-    "Syed - Kazmi",
-    "Syed - Naqvi",
-    "Syed - Other",
-    "Sheikh - Siddiqui",
-    "Sheikh - Usmani",
-    "Sheikh - Farooqui",
-    "Sheikh - Other",
-    "Pathan - Yusufzai",
-    "Pathan - Afridi",
-    "Pathan - Khattak",
-    "Pathan - Bangash",
-    "Pathan - Other",
+    "Sunni",
+    "Shia",
+    "Syed",
+    "Sheikh",
+    "Pathan",
     "Mughal",
-    // Regional Communities
     "Ansari / Julaha",
     "Qureshi",
     "Khan",
@@ -187,15 +87,12 @@ export const castesByReligion: Record<string, string[]> = {
     "Mirza",
     "Memon",
     "Khoja",
-    "Bohra - Dawoodi",
-    "Bohra - Sulemani",
-    "Bohra - Other",
+    "Bohra",
     "Mapilla / Moplah",
     "Labbay",
     "Marakkayar",
     "Rowther",
     "Lebbai",
-    // Occupation Based
     "Mansoori",
     "Qassab",
     "Darzi",
@@ -205,7 +102,6 @@ export const castesByReligion: Record<string, string[]> = {
     "Other Muslim"
   ],
   "Christian": [
-    // Catholic Denominations
     "Roman Catholic",
     "Latin Catholic",
     "Syro-Malabar Catholic",
@@ -214,70 +110,22 @@ export const castesByReligion: Record<string, string[]> = {
     "Goan Catholic",
     "Mangalorean Catholic",
     "East Indian Catholic",
-    // Syrian Christian
-    "Syrian Christian - Jacobite",
-    "Syrian Christian - Orthodox",
-    "Syrian Christian - Marthoma",
-    "Syrian Christian - Knanaya",
-    "Syrian Christian - Other",
-    // Protestant Denominations
-    "Protestant - CSI",
-    "Protestant - CNI",
-    "Protestant - Baptist",
-    "Protestant - Methodist",
-    "Protestant - Lutheran",
-    "Protestant - Presbyterian",
-    "Protestant - Anglican",
-    "Protestant - Evangelical",
-    "Protestant - Other",
-    // Pentecostal
-    "Pentecostal - Assemblies of God",
-    "Pentecostal - IPC",
-    "Pentecostal - TPM",
-    "Pentecostal - Other",
-    // Orthodox
-    "Orthodox - Malankara",
-    "Orthodox - Indian",
-    "Orthodox - Other",
-    // Other Christian
+    "Syrian Christian",
+    "Protestant",
+    "Pentecostal",
+    "Orthodox",
     "Seventh Day Adventist",
     "Jehovah's Witnesses",
     "Brethren",
     "Salvation Army",
-    "YWCA/YMCA",
     "Born Again",
     "Other Christian"
   ],
   "Sikh": [
-    // Jat Sikh
-    "Jat Sikh - Sandhu",
-    "Jat Sikh - Sidhu",
-    "Jat Sikh - Gill",
-    "Jat Sikh - Dhillon",
-    "Jat Sikh - Grewal",
-    "Jat Sikh - Bajwa",
-    "Jat Sikh - Virk",
-    "Jat Sikh - Randhawa",
-    "Jat Sikh - Mann",
-    "Jat Sikh - Brar",
-    "Jat Sikh - Cheema",
-    "Jat Sikh - Other",
-    // Khatri Sikh
-    "Khatri Sikh - Chopra",
-    "Khatri Sikh - Kapoor",
-    "Khatri Sikh - Malhotra",
-    "Khatri Sikh - Khanna",
-    "Khatri Sikh - Kohli",
-    "Khatri Sikh - Tandon",
-    "Khatri Sikh - Sethi",
-    "Khatri Sikh - Other",
-    // Arora Sikh
+    "Jat Sikh",
+    "Khatri Sikh",
     "Arora Sikh",
-    // Ramgarhia
-    "Ramgarhia - Tarkhan",
-    "Ramgarhia - Lohar",
-    "Ramgarhia - Other",
-    // Other Sikh Communities
+    "Ramgarhia",
     "Saini Sikh",
     "Labana Sikh",
     "Ahluwalia Sikh",
@@ -289,24 +137,8 @@ export const castesByReligion: Record<string, string[]> = {
     "Other Sikh"
   ],
   "Jain": [
-    // Digambar
-    "Digambar - Agrawal",
-    "Digambar - Porwal",
-    "Digambar - Khandelwal",
-    "Digambar - Saraogi",
-    "Digambar - Parwar",
-    "Digambar - Golalare",
-    "Digambar - Other",
-    // Shwetambar
-    "Shwetambar - Oswal",
-    "Shwetambar - Srimal",
-    "Shwetambar - Visa Oswal",
-    "Shwetambar - Dasa Oswal",
-    "Shwetambar - Sthanakvasi",
-    "Shwetambar - Terapanthi",
-    "Shwetambar - Deravasi",
-    "Shwetambar - Other",
-    // Other Jain
+    "Digambar",
+    "Shwetambar",
     "Agarwal Jain",
     "Oswal Jain",
     "Porwal Jain",
@@ -349,15 +181,438 @@ export const castesByReligion: Record<string, string[]> = {
 };
 
 export const subCastesByCaste: Record<string, string[]> = {
-  // Since castes are now comprehensive with sub-castes included,
-  // this mapping provides additional specifics where applicable
-  "Other Hindu": ["Specify in About Me"],
-  "Other Muslim": ["Specify in About Me"],
-  "Other Christian": ["Specify in About Me"],
-  "Other Sikh": ["Specify in About Me"],
-  "Other Jain": ["Specify in About Me"],
-  "Other Buddhist": ["Specify in About Me"],
-  "Other Parsi": ["Specify in About Me"],
-  "Other Jewish": ["Specify in About Me"],
-  "Other": ["Specify in About Me"]
+  // Hindu - Brahmin
+  "Brahmin": [
+    "Iyer",
+    "Iyengar",
+    "Namboodiri",
+    "Saraswat",
+    "Kanyakubja",
+    "Maithil",
+    "Gaur",
+    "Konkanastha",
+    "Deshastha",
+    "Havyaka",
+    "Hoysala Karnataka",
+    "Smartha",
+    "Vadama",
+    "Vathima",
+    "Ashtasahasram",
+    "Chitpavan",
+    "Karhade",
+    "Devrukhe",
+    "Thanjavur",
+    "Hebbar",
+    "Mandyam",
+    "Shivalli",
+    "Sthanika",
+    "Udupi",
+    "Other Brahmin"
+  ],
+  // Hindu - Rajput
+  "Rajput": [
+    "Chauhan",
+    "Rathore",
+    "Sisodiya",
+    "Parmar",
+    "Solanki",
+    "Bundela",
+    "Chandela",
+    "Gahlot",
+    "Kachwaha",
+    "Tomar",
+    "Panwar",
+    "Bhati",
+    "Jhala",
+    "Gohil",
+    "Jadeja",
+    "Dogra",
+    "Katoch",
+    "Bais",
+    "Chandel",
+    "Other Rajput"
+  ],
+  // Hindu - Maratha
+  "Maratha": [
+    "96 Kuli Maratha",
+    "Kunbi Maratha",
+    "CKP (Chandraseniya Kayastha Prabhu)",
+    "Deshmukh",
+    "Patil",
+    "More",
+    "Shinde",
+    "Jadhav",
+    "Pawar",
+    "Bhonsle",
+    "Chavan",
+    "Gaikwad",
+    "Holkar",
+    "Other Maratha"
+  ],
+  // Hindu - Reddy
+  "Reddy": [
+    "Panta Reddy",
+    "Deshmukh Reddy",
+    "Motati Reddy",
+    "Kapu Reddy",
+    "Pakanati Reddy",
+    "Veerashaiva Reddy",
+    "Gajula Reddy",
+    "Boya Reddy",
+    "Pedakanti Reddy",
+    "Other Reddy"
+  ],
+  // Hindu - Kamma
+  "Kamma": [
+    "Chowdary",
+    "Naidu",
+    "Chowdhary",
+    "Rao",
+    "Setty",
+    "Other Kamma"
+  ],
+  // Hindu - Chettiar
+  "Chettiar": [
+    "Nattukotai Chettiar",
+    "Devanga Chettiar",
+    "Kaikkolars",
+    "Beeri Chettiar",
+    "Arya Vysya",
+    "Nagarathar",
+    "Other Chettiar"
+  ],
+  // Hindu - Nair
+  "Nair": [
+    "Menon",
+    "Pillai",
+    "Panicker",
+    "Kurup",
+    "Nambiar",
+    "Unnithan",
+    "Kaimal",
+    "Kartha",
+    "Marar",
+    "Pothuval",
+    "Thampi",
+    "Other Nair"
+  ],
+  // Hindu - Pillai
+  "Pillai": [
+    "Vellalar Pillai",
+    "Nair Pillai",
+    "Saiva Pillai",
+    "Agamudayar Pillai",
+    "Other Pillai"
+  ],
+  // Hindu - Mudaliar
+  "Mudaliar": [
+    "Sengunthar Mudaliar",
+    "Agamudayar Mudaliar",
+    "Thuluva Vellalar",
+    "Arcot Mudaliar",
+    "Isai Vellalar",
+    "Karkarthar",
+    "Saiva Mudaliar",
+    "Other Mudaliar"
+  ],
+  // Hindu - Gounder
+  "Gounder": [
+    "Kongu Vellalar",
+    "Vanniyar Gounder",
+    "Kurumba Gounder",
+    "Nattu Gounder",
+    "Vettuva Gounder",
+    "Urali Gounder",
+    "Other Gounder"
+  ],
+  // Hindu - Thevar
+  "Thevar": [
+    "Maravar",
+    "Kallar",
+    "Agamudayar",
+    "Mukkulathor",
+    "Piramalai Kallar",
+    "Other Thevar"
+  ],
+  // Hindu - Nadar
+  "Nadar": [
+    "Gramani Nadar",
+    "Nelamaikaran",
+    "Nattathi Nadar",
+    "Karukku Nadar",
+    "Other Nadar"
+  ],
+  // Hindu - Patel
+  "Patel": [
+    "Leva Patel",
+    "Kadva Patel",
+    "Anjana Patel",
+    "Leuva Patidar",
+    "Kadva Patidar",
+    "Chaudhary Patel",
+    "Other Patel"
+  ],
+  // Hindu - Yadav
+  "Yadav": [
+    "Ahir",
+    "Gowda",
+    "Konar",
+    "Idayar",
+    "Goala",
+    "Gavli",
+    "Other Yadav"
+  ],
+  // Hindu - Kayastha
+  "Kayastha": [
+    "Chitraguptavanshi",
+    "CKP (Chandraseniya Kayastha Prabhu)",
+    "Bengali Kayastha",
+    "North Indian Kayastha",
+    "Mathur",
+    "Saxena",
+    "Srivastava",
+    "Nigam",
+    "Bhatnagar",
+    "Karan",
+    "Other Kayastha"
+  ],
+  // Hindu - Lingayat
+  "Lingayat": [
+    "Veerashaiva",
+    "Jangama",
+    "Panchamasali",
+    "Banajiga",
+    "Sadar",
+    "Ganiga",
+    "Reddy Lingayat",
+    "Other Lingayat"
+  ],
+  // Hindu - Jat
+  "Jat": [
+    "Hindu Jat",
+    "Jat Sikh",
+    "Dahiya",
+    "Sangwan",
+    "Malik",
+    "Dhankar",
+    "Ahlawat",
+    "Hooda",
+    "Deswal",
+    "Other Jat"
+  ],
+  // Hindu - Agarwal
+  "Agarwal": [
+    "Agarwal Baniya",
+    "Marwari Agarwal",
+    "Goel",
+    "Gupta Agarwal",
+    "Mittal",
+    "Singhal",
+    "Bansal",
+    "Jindal",
+    "Mangal",
+    "Other Agarwal"
+  ],
+  // Hindu - Gupta
+  "Gupta": [
+    "Vaish Gupta",
+    "Baniya Gupta",
+    "Agarwal Gupta",
+    "Rastogi",
+    "Other Gupta"
+  ],
+  // Hindu - Vishwakarma
+  "Vishwakarma": [
+    "Sutar / Carpenter",
+    "Lohar / Blacksmith",
+    "Sonar / Goldsmith",
+    "Kansari / Bronzesmith",
+    "Shilpi / Sculptor",
+    "Other Vishwakarma"
+  ],
+  // Muslim - Sunni
+  "Sunni": [
+    "Hanafi",
+    "Shafi",
+    "Maliki",
+    "Hanbali",
+    "Deobandi",
+    "Barelvi",
+    "Ahl-e-Hadith",
+    "Tableeghi",
+    "Other Sunni"
+  ],
+  // Muslim - Shia
+  "Shia": [
+    "Ithna Ashari (Twelver)",
+    "Ismaili",
+    "Bohra",
+    "Zaidi",
+    "Other Shia"
+  ],
+  // Muslim - Syed
+  "Syed": [
+    "Bukhari",
+    "Rizvi",
+    "Kazmi",
+    "Naqvi",
+    "Zaidi",
+    "Jafri",
+    "Abidi",
+    "Tirmizi",
+    "Gillani",
+    "Other Syed"
+  ],
+  // Muslim - Sheikh
+  "Sheikh": [
+    "Siddiqui",
+    "Usmani",
+    "Farooqui",
+    "Hashmi",
+    "Alvi",
+    "Abbasi",
+    "Other Sheikh"
+  ],
+  // Muslim - Pathan
+  "Pathan": [
+    "Yusufzai",
+    "Afridi",
+    "Khattak",
+    "Bangash",
+    "Orakzai",
+    "Wazir",
+    "Mehsud",
+    "Shinwari",
+    "Mohmand",
+    "Other Pathan"
+  ],
+  // Muslim - Bohra
+  "Bohra": [
+    "Dawoodi Bohra",
+    "Sulemani Bohra",
+    "Alavi Bohra",
+    "Other Bohra"
+  ],
+  // Christian - Roman Catholic
+  "Roman Catholic": [
+    "Latin Rite",
+    "Syro-Malabar Rite",
+    "Syro-Malankara Rite",
+    "Other Roman Catholic"
+  ],
+  // Christian - Syrian Christian
+  "Syrian Christian": [
+    "Jacobite",
+    "Orthodox",
+    "Marthoma",
+    "Knanaya",
+    "Syro-Malabar",
+    "Syro-Malankara",
+    "Other Syrian Christian"
+  ],
+  // Christian - Protestant
+  "Protestant": [
+    "CSI (Church of South India)",
+    "CNI (Church of North India)",
+    "Baptist",
+    "Methodist",
+    "Lutheran",
+    "Presbyterian",
+    "Anglican",
+    "Evangelical",
+    "Reformed",
+    "Other Protestant"
+  ],
+  // Christian - Pentecostal
+  "Pentecostal": [
+    "Assemblies of God",
+    "IPC (Indian Pentecostal Church)",
+    "TPM (The Pentecostal Mission)",
+    "CGI (Church of God India)",
+    "FGAI (Full Gospel Assembly India)",
+    "Other Pentecostal"
+  ],
+  // Christian - Orthodox
+  "Orthodox": [
+    "Malankara Orthodox",
+    "Indian Orthodox",
+    "Jacobite Syrian Orthodox",
+    "Other Orthodox"
+  ],
+  // Sikh - Jat Sikh
+  "Jat Sikh": [
+    "Sandhu",
+    "Sidhu",
+    "Gill",
+    "Dhillon",
+    "Grewal",
+    "Bajwa",
+    "Virk",
+    "Randhawa",
+    "Mann",
+    "Brar",
+    "Cheema",
+    "Aulakh",
+    "Dhaliwal",
+    "Sekhon",
+    "Chahal",
+    "Other Jat Sikh"
+  ],
+  // Sikh - Khatri Sikh
+  "Khatri Sikh": [
+    "Chopra",
+    "Kapoor",
+    "Malhotra",
+    "Khanna",
+    "Kohli",
+    "Tandon",
+    "Sethi",
+    "Mehra",
+    "Anand",
+    "Bedi",
+    "Puri",
+    "Sahni",
+    "Other Khatri Sikh"
+  ],
+  // Sikh - Ramgarhia
+  "Ramgarhia": [
+    "Tarkhan (Carpenter)",
+    "Lohar (Blacksmith)",
+    "Raj Mistri (Mason)",
+    "Other Ramgarhia"
+  ],
+  // Jain - Digambar
+  "Digambar": [
+    "Agrawal",
+    "Porwal",
+    "Khandelwal",
+    "Saraogi",
+    "Parwar",
+    "Golalare",
+    "Bagherwal",
+    "Humad",
+    "Other Digambar"
+  ],
+  // Jain - Shwetambar
+  "Shwetambar": [
+    "Oswal",
+    "Srimal",
+    "Visa Oswal",
+    "Dasa Oswal",
+    "Sthanakvasi",
+    "Terapanthi",
+    "Deravasi",
+    "Murtipujak",
+    "Other Shwetambar"
+  ],
+  // Default for others
+  "Other Hindu": ["Other"],
+  "Other Muslim": ["Other"],
+  "Other Christian": ["Other"],
+  "Other Sikh": ["Other"],
+  "Other Jain": ["Other"],
+  "Other Buddhist": ["Other"],
+  "Other Parsi": ["Other"],
+  "Other Jewish": ["Other"],
+  "Other": ["Other"]
 };
