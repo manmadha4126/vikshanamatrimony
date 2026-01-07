@@ -144,7 +144,7 @@ India<br />
                   </div>
                   <div>
                     <h4 className="font-semibold text-foreground text-sm mb-0.5">Working Hours</h4>
-                    <p className="text-muted-foreground text-xs">Monday - Saturday: 10:00 AM - 7:00 PM
+                    <p className="text-muted-foreground text-xs">Monday - Saturday: 10:00 AM - 7:00 PM 
 Sunday: Holiday<br />
                       Sunday: 10:00 AM - 5:00 PM
                     </p>
