@@ -82,7 +82,7 @@ export const doshamOptions = [
 ];
 
 export const familyStatusOptions = [
-  "Rich",
+  "Rich/Affluent",
   "Upper Middle Class",
   "Middle Class",
   "Lower Middle Class"
