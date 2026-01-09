@@ -2,6 +2,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Menu, X, Home } from "lucide-react";
 import { useState } from "react";
+import vikshanaLogo from "@/assets/vikshana-logo.png";
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
@@ -46,7 +47,8 @@ const Header = () => {
   return <header className="sticky top-0 z-50 w-full glass-nav">
       <div className="container flex h-20 items-center justify-between">
         {/* Logo */}
-        <button onClick={handleLogoClick} className="flex items-center gap-3">
+        <button onClick={handleLogoClick} className="flex items-center gap-2">
+          <img src={vikshanaLogo} alt="Vikshana Logo" className="h-12 w-12 object-contain" />
           <div className="flex items-center">
             <span className="font-display text-primary text-3xl font-extrabold mr-[4px] mb-[2px] text-left">
               Vikshana
