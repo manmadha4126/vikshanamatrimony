@@ -90,7 +90,8 @@ export const familyStatusOptions = [
 
 export const familyTypeOptions = [
   "Joint Family",
-  "Nuclear Family"
+  "Nuclear Family",
+  "Traditional Family"
 ];
 
 export const educationOptions = [
