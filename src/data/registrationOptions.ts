@@ -57,7 +57,8 @@ export const maritalStatusOptions = [
   "Never Married",
   "Divorced",
   "Widowed",
-  "Awaiting Divorce"
+  "Awaiting Divorce",
+  "Annulled"
 ];
 
 export const religionOptions = [
@@ -102,82 +103,153 @@ export const educationOptions = [
   "Diploma",
   "ITI",
   "Polytechnic",
+  "Diploma in Engineering",
+  "Diploma in Nursing",
+  "Diploma in Pharmacy",
+  "Diploma in Hotel Management",
+  "Diploma in Computer Applications",
   // Undergraduate - Arts & Humanities
   "B.A. (Bachelor of Arts)",
   "B.A. (Hons)",
   "BFA (Bachelor of Fine Arts)",
   "BJM (Bachelor of Journalism & Mass Communication)",
+  "B.Lib (Bachelor of Library Science)",
+  "BSW (Bachelor of Social Work)",
   // Undergraduate - Science
   "B.Sc. (Bachelor of Science)",
   "B.Sc. (Hons)",
   "B.Sc. Nursing",
   "B.Sc. Agriculture",
+  "B.Sc. Biotechnology",
+  "B.Sc. Microbiology",
+  "B.Sc. Biochemistry",
+  "B.Sc. Physics",
+  "B.Sc. Chemistry",
+  "B.Sc. Mathematics",
+  "B.Sc. Statistics",
+  "B.Sc. Zoology",
+  "B.Sc. Botany",
+  "B.Sc. Home Science",
   // Undergraduate - Commerce
   "B.Com (Bachelor of Commerce)",
   "B.Com (Hons)",
   "BBA (Bachelor of Business Administration)",
   "BBM (Bachelor of Business Management)",
+  "BBI (Bachelor of Banking & Insurance)",
+  "BMS (Bachelor of Management Studies)",
+  "BAF (Bachelor of Accounting & Finance)",
   // Undergraduate - Engineering & Technology
   "B.E. (Bachelor of Engineering)",
   "B.Tech (Bachelor of Technology)",
   "B.Arch (Bachelor of Architecture)",
+  "B.Plan (Bachelor of Planning)",
   // Undergraduate - Computer & IT
   "BCA (Bachelor of Computer Applications)",
   "B.Sc. IT",
   "B.Sc. Computer Science",
+  "B.Sc. Data Science",
+  "B.Sc. Artificial Intelligence",
   // Undergraduate - Law
   "LLB (Bachelor of Laws)",
   "BA LLB (Integrated)",
   "BBA LLB (Integrated)",
+  "BCom LLB (Integrated)",
+  "BSc LLB (Integrated)",
   // Undergraduate - Medicine & Healthcare
   "MBBS",
   "BDS (Bachelor of Dental Surgery)",
   "BAMS (Ayurveda)",
   "BHMS (Homeopathy)",
   "BUMS (Unani)",
+  "BSMS (Siddha Medicine)",
+  "BNYS (Naturopathy)",
   "B.Pharm (Bachelor of Pharmacy)",
   "BPT (Physiotherapy)",
+  "BOT (Occupational Therapy)",
   "BMLT (Medical Lab Technology)",
+  "B.Sc. Radiology",
+  "B.Sc. Optometry",
+  "B.Sc. Dialysis Technology",
+  "B.Sc. Cardiac Technology",
+  "BVSc (Veterinary Science)",
   // Undergraduate - Education
   "B.Ed (Bachelor of Education)",
   "B.P.Ed (Physical Education)",
+  "D.El.Ed (Diploma in Elementary Education)",
   // Undergraduate - Hotel & Hospitality
   "BHM (Bachelor of Hotel Management)",
   "BHMCT",
+  "BBA Hospitality",
+  "B.Sc. Culinary Arts",
   // Undergraduate - Design & Fashion
   "B.Des (Bachelor of Design)",
   "B.Sc. Fashion Design",
+  "B.Sc. Interior Design",
+  "BFTech (Fashion Technology)",
   // Undergraduate - Aviation
   "B.Sc. Aviation",
   "Commercial Pilot License",
+  "BBA Aviation Management",
+  // Undergraduate - Agriculture
+  "B.Sc. Agriculture",
+  "B.Sc. Horticulture",
+  "B.Sc. Forestry",
+  "B.Tech Agricultural Engineering",
+  "B.F.Sc. (Fisheries)",
   // Postgraduate - Arts & Humanities
   "M.A. (Master of Arts)",
   "MFA (Master of Fine Arts)",
   "MJM (Master of Journalism)",
+  "MSW (Master of Social Work)",
+  "M.Lib (Master of Library Science)",
   // Postgraduate - Science
   "M.Sc. (Master of Science)",
   "M.Sc. Nursing",
+  "M.Sc. Biotechnology",
+  "M.Sc. Microbiology",
+  "M.Sc. Biochemistry",
+  "M.Sc. Physics",
+  "M.Sc. Chemistry",
+  "M.Sc. Mathematics",
+  "M.Sc. Statistics",
   // Postgraduate - Commerce & Business
   "M.Com (Master of Commerce)",
   "MBA (Master of Business Administration)",
   "PGDM (Post Graduate Diploma in Management)",
   "MMS (Master of Management Studies)",
+  "MBA Finance",
+  "MBA Marketing",
+  "MBA HR",
+  "MBA Operations",
+  "MBA International Business",
+  "Executive MBA",
   // Postgraduate - Engineering & Technology
   "M.E. (Master of Engineering)",
   "M.Tech (Master of Technology)",
   "M.Arch (Master of Architecture)",
+  "M.Plan (Master of Planning)",
   // Postgraduate - Computer & IT
   "MCA (Master of Computer Applications)",
   "M.Sc. IT",
   "M.Sc. Computer Science",
+  "M.Sc. Data Science",
+  "M.Sc. Artificial Intelligence",
+  "M.Sc. Cybersecurity",
   // Postgraduate - Law
   "LLM (Master of Laws)",
+  "LLM Corporate Law",
+  "LLM Criminal Law",
+  "LLM Constitutional Law",
   // Postgraduate - Medicine & Healthcare
   "MD (Doctor of Medicine)",
   "MS (Master of Surgery)",
   "MDS (Master of Dental Surgery)",
   "M.Pharm (Master of Pharmacy)",
   "MPT (Master of Physiotherapy)",
+  "M.Sc. Medical Anatomy",
+  "M.Sc. Medical Physiology",
+  "M.Sc. Medical Biochemistry",
+  "DNB (Diplomate of National Board)",
   // Postgraduate - Education
   "M.Ed (Master of Education)",
   "M.P.Ed (Physical Education)",
@@ -188,16 +260,22 @@ export const educationOptions = [
   "MCh (Master of Chirurgiae)",
   "D.Sc. (Doctor of Science)",
   "D.Litt (Doctor of Literature)",
+  "Post Doctoral Fellow",
   // Professional Certifications
   "CA (Chartered Accountant)",
   "CS (Company Secretary)",
   "CMA / ICWA (Cost Accountant)",
   "CFA (Chartered Financial Analyst)",
   "FRM (Financial Risk Manager)",
+  "ACCA",
+  "CPA (Certified Public Accountant)",
+  "CFP (Certified Financial Planner)",
   // Trade & Technical Certifications
   "Trade Certificate (ITI)",
   "Technical Certificate",
   "Vocational Training",
+  "NTT (Nursery Teacher Training)",
+  "ECCE (Early Childhood Care Education)",
   // Other
   "Other"
 ];
@@ -696,7 +774,9 @@ export const incomeOptions = [
   "₹15-20 Lakhs",
   "₹20-30 Lakhs",
   "₹30-50 Lakhs",
-  "Above ₹50 Lakhs"
+  "₹50-75 Lakhs",
+  "₹75 Lakhs - ₹1 Crore",
+  "Above ₹1 Crore"
 ];
 
 export const stateOptions = [
