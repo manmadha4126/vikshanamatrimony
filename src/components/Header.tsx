@@ -50,10 +50,10 @@ const Header = () => {
         <button onClick={handleLogoClick} className="flex items-center gap-2">
           <img src={vikshanaLogo} alt="Vikshana Logo" className="h-12 w-12 object-contain" />
           <div className="flex items-center">
-            <span className="font-display text-primary text-4xl md:text-5xl font-black tracking-tight mr-1 drop-shadow-sm">
+            <span className="font-display text-primary text-3xl font-extrabold mr-[4px] mb-[2px] text-left">
               Vikshana
             </span>
-            <span className="text-green-900 text-4xl md:text-5xl font-serif font-extrabold tracking-tight drop-shadow-sm">
+            <span className="text-green-900 text-3xl font-serif font-bold text-right">
               {" "}Matrimony
             </span>
           </div>
