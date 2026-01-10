@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
+import vikshanaLogo from '@/assets/vikshana-logo.png';
 import { Input } from '@/components/ui/input';
 import {
   DropdownMenu,
@@ -156,9 +157,7 @@ const DashboardHeader = ({
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
           <Link to="/my-dashboard" className="flex items-center gap-2">
-            <div className="w-10 h-10 rounded-full gradient-primary flex items-center justify-center">
-              <span className="text-primary-foreground font-display font-bold text-lg">V</span>
-            </div>
+            <img src={vikshanaLogo} alt="Vikshana Logo" className="w-10 h-10 object-contain" />
             <span className="font-display font-bold text-xl hidden sm:block">
               <span className="bg-gradient-to-r from-primary via-primary/80 to-amber-500 bg-clip-text text-transparent">
                 Vikshana
