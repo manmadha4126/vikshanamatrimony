@@ -21,6 +21,7 @@ import MessagesSection from '@/components/dashboard/MessagesSection';
 import NotificationsSection from '@/components/dashboard/NotificationsSection';
 import MatchesSection from '@/components/dashboard/MatchesSection';
 import ProfileViewModal from '@/components/dashboard/ProfileViewModal';
+import MatchAssistantChat from '@/components/dashboard/MatchAssistantChat';
 import Footer from '@/components/Footer';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -700,6 +701,9 @@ const Dashboard = () => {
         onClose={() => setViewingProfileId(null)}
         currentUserIsPrime={profile?.is_prime || false}
       />
+
+      {/* AI Match Assistant Chat */}
+      <MatchAssistantChat userName={profile.name} />
 
       {/* Mobile Bottom Navigation */}
       <MobileBottomNav 
