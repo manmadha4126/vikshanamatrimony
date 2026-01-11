@@ -88,7 +88,8 @@ const SuccessStoriesSection = ({ userId, userName }: SuccessStoriesSectionProps)
           .select("user_id, name")
           .in("user_id", userIds);
 
-        const formattedStories: SuccessStory[] = data.map(s => {
+        const weddingImages = [weddingHero1, weddingHero2, weddingCarousel2];
+        const formattedStories: SuccessStory[] = data.map((s, index) => {
           const profile = profilesData?.find(p => p.user_id === s.user_id);
           return {
             id: s.id,
@@ -97,6 +98,7 @@ const SuccessStoriesSection = ({ userId, userName }: SuccessStoriesSectionProps)
             location: s.wedding_location,
             story: s.story,
             imageUrl: s.photo_url || undefined,
+            weddingImageUrl: s.photo_url || weddingImages[index % weddingImages.length],
           };
         });
 
