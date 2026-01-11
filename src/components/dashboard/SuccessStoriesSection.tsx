@@ -5,6 +5,9 @@ import { Badge } from "@/components/ui/badge";
 import { Heart, Quote, Star } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import ShareYourStoryForm from "./ShareYourStoryForm";
+import weddingHero1 from "@/assets/wedding-hero-1.jpg";
+import weddingHero2 from "@/assets/wedding-hero-2.jpg";
+import weddingCarousel2 from "@/assets/wedding-carousel-2.jpg";
 
 interface SuccessStory {
   id: string;
@@ -13,6 +16,7 @@ interface SuccessStory {
   location: string;
   story: string;
   imageUrl?: string;
+  weddingImageUrl?: string;
 }
 
 interface SuccessStoriesSectionProps {
@@ -29,6 +33,7 @@ const defaultStories: SuccessStory[] = [
     location: "Bangalore",
     story: "We found each other through Vikshana Matrimony and knew from our first conversation that we were meant to be together. Thank you for helping us find our perfect match!",
     imageUrl: undefined,
+    weddingImageUrl: weddingHero1,
   },
   {
     id: "2",
@@ -37,6 +42,7 @@ const defaultStories: SuccessStory[] = [
     location: "Chennai",
     story: "The partner preferences feature helped us find someone who shared our values and dreams. We are grateful for this wonderful platform that brought us together.",
     imageUrl: undefined,
+    weddingImageUrl: weddingHero2,
   },
   {
     id: "3",
@@ -45,6 +51,7 @@ const defaultStories: SuccessStory[] = [
     location: "Hyderabad",
     story: "After months of searching, we finally found each other here. The assisted service team was incredibly helpful throughout our journey.",
     imageUrl: undefined,
+    weddingImageUrl: weddingCarousel2,
   },
 ];
 
@@ -141,27 +148,48 @@ const SuccessStoriesSection = ({ userId, userName }: SuccessStoriesSectionProps)
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {stories.slice(0, 3).map((story) => (
                 <Card key={story.id} className="relative overflow-hidden group hover:shadow-lg transition-shadow">
-                  <div className="absolute top-3 right-3">
-                    <Quote className="h-8 w-8 text-primary/10" />
-                  </div>
-                  <CardContent className="pt-6">
-                    <div className="flex items-center gap-3 mb-4">
-                      <Avatar className="h-14 w-14 border-2 border-primary/20">
-                        <AvatarImage src={story.imageUrl} />
-                        <AvatarFallback className="bg-gradient-to-br from-primary/20 to-primary/10 text-primary font-semibold">
-                          {getInitials(story.coupleName)}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div>
-                        <h3 className="font-semibold text-foreground">{story.coupleName}</h3>
-                        <p className="text-xs text-muted-foreground">
+                  {/* Wedding Image */}
+                  {story.weddingImageUrl && (
+                    <div className="relative h-40 overflow-hidden">
+                      <img 
+                        src={story.weddingImageUrl} 
+                        alt={`${story.coupleName} wedding`}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                      <div className="absolute bottom-2 left-3 right-3">
+                        <h3 className="font-semibold text-white text-lg">{story.coupleName}</h3>
+                        <p className="text-xs text-white/80">
                           {story.weddingDate} • {story.location}
                         </p>
                       </div>
                     </div>
+                  )}
+                  
+                  <div className="absolute top-3 right-3 z-10">
+                    <Quote className="h-8 w-8 text-white/30" />
+                  </div>
+                  
+                  <CardContent className={story.weddingImageUrl ? "pt-4" : "pt-6"}>
+                    {!story.weddingImageUrl && (
+                      <div className="flex items-center gap-3 mb-4">
+                        <Avatar className="h-14 w-14 border-2 border-primary/20">
+                          <AvatarImage src={story.imageUrl} />
+                          <AvatarFallback className="bg-gradient-to-br from-primary/20 to-primary/10 text-primary font-semibold">
+                            {getInitials(story.coupleName)}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <h3 className="font-semibold text-foreground">{story.coupleName}</h3>
+                          <p className="text-xs text-muted-foreground">
+                            {story.weddingDate} • {story.location}
+                          </p>
+                        </div>
+                      </div>
+                    )}
                     
                     <div className="relative">
-                      <p className="text-sm text-muted-foreground italic leading-relaxed line-clamp-4">
+                      <p className="text-sm text-muted-foreground italic leading-relaxed line-clamp-3">
                         &quot;{story.story}&quot;
                       </p>
                     </div>
