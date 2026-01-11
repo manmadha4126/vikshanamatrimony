@@ -74,6 +74,8 @@ const MatchesSection = ({ userId, userGender, onViewProfile }: MatchesSectionPro
   const [sortBy, setSortBy] = useState<SortOption>('score');
   const [filterReligion, setFilterReligion] = useState<string>('all');
   const [filterEducation, setFilterEducation] = useState<string>('all');
+  const [filterCity, setFilterCity] = useState<string>('all');
+  const [ageRange, setAgeRange] = useState<[number, number]>([18, 60]);
   const [showFilters, setShowFilters] = useState(false);
   const [zoomedPhoto, setZoomedPhoto] = useState<{ url: string; name: string } | null>(null);
 
@@ -276,6 +278,18 @@ const MatchesSection = ({ userId, userGender, onViewProfile }: MatchesSectionPro
       result = result.filter(m => m.education === filterEducation);
     }
 
+    // Filter by city
+    if (filterCity && filterCity !== 'all') {
+      result = result.filter(m => m.city === filterCity);
+    }
+
+    // Filter by age range
+    result = result.filter(m => {
+      const age = calculateAge(m.date_of_birth);
+      if (age === null) return true; // Include profiles without DOB
+      return age >= ageRange[0] && age <= ageRange[1];
+    });
+
     // Sort
     if (sortBy === 'score') {
       result.sort((a, b) => b.compatibilityScore - a.compatibilityScore);
@@ -288,7 +302,7 @@ const MatchesSection = ({ userId, userGender, onViewProfile }: MatchesSectionPro
     }
 
     setFilteredMatches(result);
-  }, [matches, minScore, sortBy, filterReligion, filterEducation]);
+  }, [matches, minScore, sortBy, filterReligion, filterEducation, filterCity, ageRange]);
 
   const sendInterest = async (profileId: string) => {
     setSendingInterest(profileId);
@@ -332,13 +346,16 @@ const MatchesSection = ({ userId, userGender, onViewProfile }: MatchesSectionPro
     setSortBy('score');
     setFilterReligion('all');
     setFilterEducation('all');
+    setFilterCity('all');
+    setAgeRange([18, 60]);
   };
 
-  const hasActiveFilters = minScore > 0 || (filterReligion && filterReligion !== 'all') || (filterEducation && filterEducation !== 'all');
+  const hasActiveFilters = minScore > 0 || (filterReligion && filterReligion !== 'all') || (filterEducation && filterEducation !== 'all') || (filterCity && filterCity !== 'all') || ageRange[0] !== 18 || ageRange[1] !== 60;
 
   // Get unique values for filters
   const uniqueReligions = [...new Set(matches.map(m => m.religion).filter(Boolean))] as string[];
   const uniqueEducations = [...new Set(matches.map(m => m.education).filter(Boolean))] as string[];
+  const uniqueCities = [...new Set(matches.map(m => m.city).filter(Boolean))].sort() as string[];
 
   if (loading) {
     return (
@@ -444,6 +461,37 @@ const MatchesSection = ({ userId, userGender, onViewProfile }: MatchesSectionPro
                         ))}
                       </SelectContent>
                     </Select>
+                  </div>
+
+                  {/* City Filter */}
+                  <div className="space-y-2">
+                    <Label className="text-sm">City</Label>
+                    <Select value={filterCity} onValueChange={setFilterCity}>
+                      <SelectTrigger className="h-9">
+                        <SelectValue placeholder="All cities" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All cities</SelectItem>
+                        {uniqueCities.map(c => (
+                          <SelectItem key={c} value={c}>{c}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* Age Range Filter */}
+                  <div className="space-y-2">
+                    <Label className="text-sm">Age Range: {ageRange[0]} - {ageRange[1]} years</Label>
+                    <div className="pt-2">
+                      <Slider
+                        value={ageRange}
+                        onValueChange={(v) => setAgeRange(v as [number, number])}
+                        min={18}
+                        max={60}
+                        step={1}
+                        className="py-2"
+                      />
+                    </div>
                   </div>
                 </div>
               </PopoverContent>
