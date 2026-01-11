@@ -72,8 +72,8 @@ const MatchesSection = ({ userId, userGender, onViewProfile }: MatchesSectionPro
   // Filter states
   const [minScore, setMinScore] = useState<number>(0);
   const [sortBy, setSortBy] = useState<SortOption>('score');
-  const [filterReligion, setFilterReligion] = useState<string>('');
-  const [filterEducation, setFilterEducation] = useState<string>('');
+  const [filterReligion, setFilterReligion] = useState<string>('all');
+  const [filterEducation, setFilterEducation] = useState<string>('all');
   const [showFilters, setShowFilters] = useState(false);
   const [zoomedPhoto, setZoomedPhoto] = useState<{ url: string; name: string } | null>(null);
 
@@ -267,12 +267,12 @@ const MatchesSection = ({ userId, userGender, onViewProfile }: MatchesSectionPro
     }
 
     // Filter by religion
-    if (filterReligion) {
+    if (filterReligion && filterReligion !== 'all') {
       result = result.filter(m => m.religion === filterReligion);
     }
 
     // Filter by education
-    if (filterEducation) {
+    if (filterEducation && filterEducation !== 'all') {
       result = result.filter(m => m.education === filterEducation);
     }
 
@@ -330,11 +330,11 @@ const MatchesSection = ({ userId, userGender, onViewProfile }: MatchesSectionPro
   const clearFilters = () => {
     setMinScore(0);
     setSortBy('score');
-    setFilterReligion('');
-    setFilterEducation('');
+    setFilterReligion('all');
+    setFilterEducation('all');
   };
 
-  const hasActiveFilters = minScore > 0 || filterReligion || filterEducation;
+  const hasActiveFilters = minScore > 0 || (filterReligion && filterReligion !== 'all') || (filterEducation && filterEducation !== 'all');
 
   // Get unique values for filters
   const uniqueReligions = [...new Set(matches.map(m => m.religion).filter(Boolean))] as string[];
@@ -422,7 +422,7 @@ const MatchesSection = ({ userId, userGender, onViewProfile }: MatchesSectionPro
                         <SelectValue placeholder="All religions" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">All religions</SelectItem>
+                        <SelectItem value="all">All religions</SelectItem>
                         {uniqueReligions.map(r => (
                           <SelectItem key={r} value={r}>{r}</SelectItem>
                         ))}
@@ -438,7 +438,7 @@ const MatchesSection = ({ userId, userGender, onViewProfile }: MatchesSectionPro
                         <SelectValue placeholder="All education" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">All education</SelectItem>
+                        <SelectItem value="all">All education</SelectItem>
                         {uniqueEducations.map(e => (
                           <SelectItem key={e} value={e}>{e}</SelectItem>
                         ))}
