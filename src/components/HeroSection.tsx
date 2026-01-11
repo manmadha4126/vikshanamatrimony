@@ -24,7 +24,7 @@ const HeroSection = () => {
       </div>
 
       <div className="container relative z-10 pt-0 pb-8 lg:pb-12">
-        <div className="flex flex-col items-center text-center space-y-8">
+        <div className="text-center space-y-8 flex-col flex items-center justify-start">
           {/* Text Content */}
           <div className="animate-fade-up max-w-4xl">
             <span className="inline-block px-4 py-2 bg-secondary/20 text-secondary-foreground rounded-full text-sm font-medium mb-6">
