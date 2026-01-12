@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { Heart, HeartOff, Check, X, Loader2, Clock, CheckCircle, XCircle, MessageCircle, Phone, User } from 'lucide-react';
+import { Heart, HeartOff, Check, X, Loader2, Clock, CheckCircle, XCircle, MessageCircle, User } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
@@ -94,7 +94,7 @@ const InterestsSection = ({ userId, profileId, onMessageClick }: InterestsSectio
         const toProfileIds = sent.map(i => i.to_profile_id);
         const { data: profiles } = await supabase
           .from('profiles')
-          .select('id, name, photo_url, date_of_birth, city, state, education, occupation, profile_id, height, religion, employment_type')
+          .select('id, name, photo_url, date_of_birth, city, state, education, occupation, profile_id, user_id, height, religion, employment_type')
           .in('id', toProfileIds);
 
         const sentWithProfiles = sent.map(interest => ({
@@ -225,8 +225,17 @@ const InterestsSection = ({ userId, profileId, onMessageClick }: InterestsSectio
     const profileIdText = profile?.profile_id || 'N/A';
 
     const handleMessageClick = () => {
-      if (profile && interest.from_user_id && onMessageClick) {
+      if (!profile || !onMessageClick) return;
+      
+      // For received interests: use from_user_id (the person who sent the interest)
+      // For sent interests: we need the user_id from the profile we sent interest to
+      if (type === 'received') {
         onMessageClick(interest.from_user_id, profile.id, displayName);
+      } else {
+        // For sent interests, profile.user_id contains the recipient's user_id
+        if (profile.user_id) {
+          onMessageClick(profile.user_id, profile.id, displayName);
+        }
       }
     };
 
@@ -340,26 +349,16 @@ const InterestsSection = ({ userId, profileId, onMessageClick }: InterestsSectio
                   </>
                 )}
 
-                {/* For Accepted Interests - Show Message Button */}
+                {/* For Accepted Interests - Show Start Conversation Button */}
                 {interest.status === 'accepted' && profile && (
-                  <>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="gap-1.5"
-                    >
-                      <Phone className="h-4 w-4" />
-                      Call Now
-                    </Button>
-                    <Button
-                      size="sm"
-                      onClick={handleMessageClick}
-                      className="gap-1.5"
-                    >
-                      <MessageCircle className="h-4 w-4" />
-                      Send Message
-                    </Button>
-                  </>
+                  <Button
+                    size="sm"
+                    onClick={handleMessageClick}
+                    className="gap-1.5"
+                  >
+                    <MessageCircle className="h-4 w-4" />
+                    Start Conversation
+                  </Button>
                 )}
 
                 {/* For Sent Interests - Pending */}
