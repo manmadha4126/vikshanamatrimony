@@ -3,6 +3,8 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Headphones, UserCheck, Star, ArrowRight, Phone, Mail, Clock, Users, MessageSquare, Calendar, X } from 'lucide-react';
+import assistedExpertImage from '@/assets/assisted-matrimony-expert.jpg';
+
 const AssistedServiceSection = () => {
   const [isKnowMoreOpen, setIsKnowMoreOpen] = useState(false);
   const [isContactOpen, setIsContactOpen] = useState(false);
@@ -106,17 +108,14 @@ const AssistedServiceSection = () => {
                 </div>
               </div>
 
-              {/* Decorative Image Placeholder */}
-              <div className="hidden md:flex justify-center">
-                <div className="relative w-64 h-64">
-                  <div className="absolute inset-0 rounded-full bg-gradient-to-br from-primary/20 to-secondary/20 animate-pulse" />
-                  <div className="absolute inset-4 rounded-full bg-gradient-to-br from-primary/30 to-secondary/30 flex items-center justify-center">
-                    <div className="text-center">
-                      <Headphones className="h-16 w-16 mx-auto text-primary mb-2" />
-                      <p className="font-display font-semibold text-lg">Expert Help</p>
-                      <p className="text-xs text-muted-foreground">Available 24/7</p>
-                    </div>
-                  </div>
+              {/* Expert Image */}
+              <div className="hidden md:flex justify-center items-center">
+                <div className="relative">
+                  <img 
+                    src={assistedExpertImage} 
+                    alt="Assisted Matrimony Expert" 
+                    className="w-80 h-96 object-cover object-top rounded-2xl shadow-lg"
+                  />
                 </div>
               </div>
             </div>
