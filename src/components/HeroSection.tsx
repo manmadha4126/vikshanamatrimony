@@ -2,10 +2,15 @@ import weddingHero1 from "@/assets/wedding-hero-1.jpg";
 import weddingHero2 from "@/assets/wedding-hero-2.jpg";
 import weddingCarousel2 from "@/assets/wedding-carousel-2.jpg";
 import weddingCarousel4 from "@/assets/wedding-carousel-4.jpg";
+import weddingHindu5 from "@/assets/wedding-hindu-5.jpg";
+import weddingHindu6 from "@/assets/wedding-hindu-6.jpg";
+import weddingHindu7 from "@/assets/wedding-hindu-7.jpg";
+import weddingHindu8 from "@/assets/wedding-hindu-8.jpg";
+import weddingHindu9 from "@/assets/wedding-hindu-9.jpg";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
-const weddingImages = [weddingHero1, weddingHero2, weddingCarousel2, weddingCarousel4];
+const weddingImages = [weddingHero1, weddingHero2, weddingCarousel2, weddingCarousel4, weddingHindu5, weddingHindu6, weddingHindu7, weddingHindu8, weddingHindu9];
 const HeroSection = () => {
   const navigate = useNavigate();
   const [currentImage, setCurrentImage] = useState(0);
