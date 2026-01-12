@@ -85,6 +85,7 @@ interface Profile {
 }
 
 type VerificationFilter = "all" | "pending" | "verified" | "rejected";
+type GenderFilter = "all" | "male" | "female";
 
 const StaffDashboard = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -98,6 +99,8 @@ const StaffDashboard = () => {
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [totalCount, setTotalCount] = useState(0);
   const [statusCounts, setStatusCounts] = useState({ all: 0, verified: 0, pending: 0, rejected: 0 });
+  const [genderCounts, setGenderCounts] = useState({ all: 0, male: 0, female: 0 });
+  const [genderFilter, setGenderFilter] = useState<GenderFilter>("all");
   const [selectedProfile, setSelectedProfile] = useState<Profile | null>(null);
   const [activeSection, setActiveSection] = useState<"profiles" | "add" | "verification">("profiles");
   const [deleteProfile, setDeleteProfile] = useState<Profile | null>(null);
@@ -121,7 +124,7 @@ const StaffDashboard = () => {
   // Reset to page 1 when filter changes
   useEffect(() => {
     setCurrentPage(1);
-  }, [verificationFilter]);
+  }, [verificationFilter, genderFilter]);
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
@@ -172,11 +175,13 @@ const StaffDashboard = () => {
   // Fetch status counts for dashboard stats
   const fetchStatusCounts = async () => {
     try {
-      const [allCount, verifiedCount, pendingCount, rejectedCount] = await Promise.all([
+      const [allCount, verifiedCount, pendingCount, rejectedCount, maleCount, femaleCount] = await Promise.all([
         supabase.from("profiles").select("*", { count: "exact", head: true }),
         supabase.from("profiles").select("*", { count: "exact", head: true }).eq("verification_status", "verified"),
         supabase.from("profiles").select("*", { count: "exact", head: true }).or("verification_status.is.null,verification_status.eq.pending"),
         supabase.from("profiles").select("*", { count: "exact", head: true }).eq("verification_status", "rejected"),
+        supabase.from("profiles").select("*", { count: "exact", head: true }).eq("gender", "male"),
+        supabase.from("profiles").select("*", { count: "exact", head: true }).eq("gender", "female"),
       ]);
       
       setStatusCounts({
@@ -184,6 +189,12 @@ const StaffDashboard = () => {
         verified: verifiedCount.count || 0,
         pending: pendingCount.count || 0,
         rejected: rejectedCount.count || 0,
+      });
+      
+      setGenderCounts({
+        all: allCount.count || 0,
+        male: maleCount.count || 0,
+        female: femaleCount.count || 0,
       });
     } catch (error) {
       console.error("Error fetching status counts:", error);
@@ -208,6 +219,13 @@ const StaffDashboard = () => {
         query = query.or("verification_status.is.null,verification_status.eq.pending");
       } else if (verificationFilter === "rejected") {
         query = query.eq("verification_status", "rejected");
+      }
+
+      // Apply gender filter
+      if (genderFilter === "male") {
+        query = query.eq("gender", "male");
+      } else if (genderFilter === "female") {
+        query = query.eq("gender", "female");
       }
 
       // Apply search filter (server-side)
@@ -244,7 +262,7 @@ const StaffDashboard = () => {
     if (userRole) {
       fetchProfiles();
     }
-  }, [currentPage, itemsPerPage, verificationFilter, debouncedSearch, userRole]);
+  }, [currentPage, itemsPerPage, verificationFilter, genderFilter, debouncedSearch, userRole]);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -599,6 +617,15 @@ const StaffDashboard = () => {
                     <TabsTrigger value="verified" className="text-xs sm:text-sm text-green-700">Verified ({verifiedProfiles})</TabsTrigger>
                     <TabsTrigger value="pending" className="text-xs sm:text-sm text-yellow-700">Pending ({pendingVerification})</TabsTrigger>
                     <TabsTrigger value="rejected" className="text-xs sm:text-sm text-red-700">Rejected ({rejectedProfiles})</TabsTrigger>
+                  </TabsList>
+                </Tabs>
+
+                {/* Gender Filter Tabs */}
+                <Tabs value={genderFilter} onValueChange={(v) => setGenderFilter(v as GenderFilter)}>
+                  <TabsList className="grid grid-cols-3 w-full sm:w-auto">
+                    <TabsTrigger value="all" className="text-xs sm:text-sm">All ({genderCounts.all})</TabsTrigger>
+                    <TabsTrigger value="male" className="text-xs sm:text-sm text-blue-700">Males ({genderCounts.male})</TabsTrigger>
+                    <TabsTrigger value="female" className="text-xs sm:text-sm text-pink-700">Females ({genderCounts.female})</TabsTrigger>
                   </TabsList>
                 </Tabs>
               </div>
