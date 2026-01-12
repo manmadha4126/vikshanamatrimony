@@ -180,8 +180,8 @@ const StaffDashboard = () => {
         supabase.from("profiles").select("*", { count: "exact", head: true }).eq("verification_status", "verified"),
         supabase.from("profiles").select("*", { count: "exact", head: true }).or("verification_status.is.null,verification_status.eq.pending"),
         supabase.from("profiles").select("*", { count: "exact", head: true }).eq("verification_status", "rejected"),
-        supabase.from("profiles").select("*", { count: "exact", head: true }).eq("gender", "male"),
-        supabase.from("profiles").select("*", { count: "exact", head: true }).eq("gender", "female"),
+        supabase.from("profiles").select("*", { count: "exact", head: true }).eq("gender", "Male"),
+        supabase.from("profiles").select("*", { count: "exact", head: true }).eq("gender", "Female"),
       ]);
       
       setStatusCounts({
@@ -223,9 +223,9 @@ const StaffDashboard = () => {
 
       // Apply gender filter
       if (genderFilter === "male") {
-        query = query.eq("gender", "male");
+        query = query.eq("gender", "Male");
       } else if (genderFilter === "female") {
-        query = query.eq("gender", "female");
+        query = query.eq("gender", "Female");
       }
 
       // Apply search filter (server-side)
