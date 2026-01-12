@@ -73,31 +73,40 @@ const AssistedServiceSection = () => {
             <div className="absolute top-0 right-0 w-full h-full bg-[radial-gradient(circle_at_70%_50%,rgba(0,0,0,0.1)_0%,transparent_50%)]" />
           </div>
 
-          <CardContent className="relative p-8 md:p-12">
-            <div className="grid md:grid-cols-2 gap-8 items-center">
+          <CardContent className="relative p-6 md:p-12">
+            <div className="flex flex-col md:grid md:grid-cols-2 gap-6 md:gap-8 items-center">
+              {/* Expert Image - Mobile (shown first on mobile) */}
+              <div className="flex md:hidden justify-center items-center w-full">
+                <img 
+                  src={assistedExpertImage} 
+                  alt="Assisted Matrimony Expert" 
+                  className="w-48 h-56 object-cover object-top rounded-xl shadow-lg"
+                />
+              </div>
+
               {/* Content */}
               <div>
-                <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground mb-4">
+                <h2 className="font-display text-xl md:text-3xl font-bold text-foreground mb-3 md:mb-4 text-center md:text-left">
                   Assisted Matrimony Service
                 </h2>
-                <p className="text-muted-foreground mb-6">
+                <p className="text-muted-foreground mb-4 md:mb-6 text-sm md:text-base text-center md:text-left">
                   Let our expert relationship managers help you find your perfect life partner.
                   We understand that finding the right match takes time and effort, and we're here to help.
                 </p>
 
-                <div className="space-y-4 mb-8">
+                <div className="space-y-3 md:space-y-4 mb-6 md:mb-8">
                   {features.map((feature, index) => <div key={index} className="flex items-start gap-3">
                       <div className="p-2 rounded-full bg-primary/10 text-primary shrink-0">
-                        <feature.icon className="h-5 w-5" />
+                        <feature.icon className="h-4 w-4 md:h-5 md:w-5" />
                       </div>
                       <div>
-                        <h3 className="font-semibold text-sm">{feature.title}</h3>
+                        <h3 className="font-semibold text-xs md:text-sm">{feature.title}</h3>
                         <p className="text-xs text-muted-foreground">{feature.description}</p>
                       </div>
                     </div>)}
                 </div>
 
-                <div className="flex flex-wrap gap-3">
+                <div className="flex flex-wrap gap-3 justify-center md:justify-start">
                   <Button size="lg" className="gradient-primary" onClick={() => setIsKnowMoreOpen(true)}>
                     Know More
                     <ArrowRight className="h-4 w-4 ml-2" />
@@ -108,15 +117,13 @@ const AssistedServiceSection = () => {
                 </div>
               </div>
 
-              {/* Expert Image */}
+              {/* Expert Image - Desktop */}
               <div className="hidden md:flex justify-center items-center">
-                <div className="relative">
-                  <img 
-                    src={assistedExpertImage} 
-                    alt="Assisted Matrimony Expert" 
-                    className="w-80 h-96 object-cover object-top rounded-2xl shadow-lg"
-                  />
-                </div>
+                <img 
+                  src={assistedExpertImage} 
+                  alt="Assisted Matrimony Expert" 
+                  className="w-80 h-96 object-cover object-top rounded-2xl shadow-lg"
+                />
               </div>
             </div>
           </CardContent>
