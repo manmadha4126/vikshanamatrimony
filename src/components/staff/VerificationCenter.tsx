@@ -201,20 +201,20 @@ const VerificationCenter = () => {
   const getStatusBadge = (status: string | null) => {
     switch (status) {
       case 'verified':
-        return <Badge className="bg-green-100 text-green-700">Verified</Badge>;
+        return <Badge className="bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-300">Verified</Badge>;
       case 'rejected':
-        return <Badge className="bg-red-100 text-red-700">Rejected</Badge>;
+        return <Badge className="bg-red-100 dark:bg-red-900/50 text-red-700 dark:text-red-300">Rejected</Badge>;
       default:
-        return <Badge className="bg-yellow-100 text-yellow-700">Pending</Badge>;
+        return <Badge className="bg-yellow-100 dark:bg-yellow-900/50 text-yellow-700 dark:text-yellow-300">Pending</Badge>;
     }
   };
 
   return (
-    <Card className="shadow-card">
+    <Card className="shadow-card dark:bg-gray-800 dark:border-gray-700">
       <CardHeader>
         <div className="flex items-center justify-between">
-          <CardTitle className="text-xl font-display">Verification Center</CardTitle>
-          <Button variant="outline" size="sm" onClick={() => { fetchProfiles(); fetchCounts(); }}>
+          <CardTitle className="text-xl font-display dark:text-white">Verification Center</CardTitle>
+          <Button variant="outline" size="sm" onClick={() => { fetchProfiles(); fetchCounts(); }} className="dark:border-gray-600 dark:hover:bg-gray-700">
             <RefreshCw className="h-4 w-4 mr-1" />
             Refresh
           </Button>
@@ -222,26 +222,26 @@ const VerificationCenter = () => {
       </CardHeader>
       <CardContent>
         <Tabs value={filter} onValueChange={(v) => setFilter(v as typeof filter)}>
-          <TabsList className="mb-4 grid grid-cols-4 w-full">
+          <TabsList className="mb-4 grid grid-cols-4 w-full dark:bg-gray-700">
             <TabsTrigger value="pending" className="flex items-center gap-2">
               <Clock className="h-4 w-4" />
               <span className="hidden sm:inline">Pending</span>
-              <Badge variant="secondary" className="ml-1 bg-yellow-100 text-yellow-700">{counts.pending}</Badge>
+              <Badge variant="secondary" className="ml-1 bg-yellow-100 dark:bg-yellow-900/50 text-yellow-700 dark:text-yellow-300">{counts.pending}</Badge>
             </TabsTrigger>
             <TabsTrigger value="verified" className="flex items-center gap-2">
               <CheckCircle className="h-4 w-4" />
               <span className="hidden sm:inline">Verified</span>
-              <Badge variant="secondary" className="ml-1 bg-green-100 text-green-700">{counts.verified}</Badge>
+              <Badge variant="secondary" className="ml-1 bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-300">{counts.verified}</Badge>
             </TabsTrigger>
             <TabsTrigger value="rejected" className="flex items-center gap-2">
               <XCircle className="h-4 w-4" />
               <span className="hidden sm:inline">Rejected</span>
-              <Badge variant="secondary" className="ml-1 bg-red-100 text-red-700">{counts.rejected}</Badge>
+              <Badge variant="secondary" className="ml-1 bg-red-100 dark:bg-red-900/50 text-red-700 dark:text-red-300">{counts.rejected}</Badge>
             </TabsTrigger>
             <TabsTrigger value="all" className="flex items-center gap-2">
               <Users className="h-4 w-4" />
               <span className="hidden sm:inline">All</span>
-              <Badge variant="secondary" className="ml-1">{counts.all}</Badge>
+              <Badge variant="secondary" className="ml-1 dark:bg-gray-600">{counts.all}</Badge>
             </TabsTrigger>
           </TabsList>
 
@@ -260,7 +260,7 @@ const VerificationCenter = () => {
                 {profiles.map((profile) => (
                   <Card
                     key={profile.id}
-                    className="cursor-pointer hover:shadow-md transition-all"
+                    className="cursor-pointer hover:shadow-md transition-all dark:bg-gray-700 dark:border-gray-600"
                     onClick={() => {
                       setSelectedProfile(profile);
                       setAdminNotes(profile.admin_notes || '');
@@ -270,7 +270,7 @@ const VerificationCenter = () => {
                       <div className="flex items-center gap-4">
                         <Avatar className="h-14 w-14">
                           <AvatarImage src={profile.photo_url || ''} />
-                          <AvatarFallback className="bg-primary/10 text-primary">
+                          <AvatarFallback className="bg-primary/10 dark:bg-primary/20 text-primary">
                             {getInitials(profile.name)}
                           </AvatarFallback>
                         </Avatar>

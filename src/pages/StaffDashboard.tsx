@@ -523,9 +523,9 @@ const StaffDashboard = () => {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white rounded-xl shadow-md p-6 border border-gold/20">
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 border border-gold/20 dark:border-gray-700">
             <div className="flex items-center gap-4">
-              <div className="p-3 bg-primary/10 rounded-lg">
+              <div className="p-3 bg-primary/10 dark:bg-primary/20 rounded-lg">
                 <Users className="w-6 h-6 text-primary" />
               </div>
               <div>
@@ -535,10 +535,10 @@ const StaffDashboard = () => {
             </div>
           </div>
 
-          <div className="bg-white rounded-xl shadow-md p-6 border border-gold/20">
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 border border-gold/20 dark:border-gray-700">
             <div className="flex items-center gap-4">
-              <div className="p-3 bg-green-100 rounded-lg">
-                <CheckCircle className="w-6 h-6 text-green-600" />
+              <div className="p-3 bg-green-100 dark:bg-green-900/50 rounded-lg">
+                <CheckCircle className="w-6 h-6 text-green-600 dark:text-green-400" />
               </div>
               <div>
                 <h3 className="text-sm font-medium text-muted-foreground">Verified Profiles</h3>
@@ -547,10 +547,10 @@ const StaffDashboard = () => {
             </div>
           </div>
 
-          <div className="bg-white rounded-xl shadow-md p-6 border border-gold/20">
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 border border-gold/20 dark:border-gray-700">
             <div className="flex items-center gap-4">
-              <div className="p-3 bg-yellow-100 rounded-lg">
-                <Clock className="w-6 h-6 text-yellow-600" />
+              <div className="p-3 bg-yellow-100 dark:bg-yellow-900/50 rounded-lg">
+                <Clock className="w-6 h-6 text-yellow-600 dark:text-yellow-400" />
               </div>
               <div>
                 <h3 className="text-sm font-medium text-muted-foreground">Pending Verification</h3>
@@ -559,10 +559,10 @@ const StaffDashboard = () => {
             </div>
           </div>
 
-          <div className="bg-white rounded-xl shadow-md p-6 border border-gold/20">
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 border border-gold/20 dark:border-gray-700">
             <div className="flex items-center gap-4">
-              <div className="p-3 bg-red-100 rounded-lg">
-                <XCircle className="w-6 h-6 text-red-600" />
+              <div className="p-3 bg-red-100 dark:bg-red-900/50 rounded-lg">
+                <XCircle className="w-6 h-6 text-red-600 dark:text-red-400" />
               </div>
               <div>
                 <h3 className="text-sm font-medium text-muted-foreground">Rejected Profiles</h3>
@@ -669,15 +669,16 @@ const StaffDashboard = () => {
 
         {/* Profiles Table - Only show when activeSection is "profiles" */}
         {activeSection === "profiles" && (
-          <div className="bg-white rounded-xl shadow-md border border-gold/20 overflow-hidden">
-            <div className="p-6 border-b border-border space-y-4">
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gold/20 dark:border-gray-700 overflow-hidden">
+            <div className="p-6 border-b border-border dark:border-gray-700 space-y-4">
               <div className="flex justify-between items-center">
-                <h2 className="text-xl font-bold text-maroon">Registered Profiles</h2>
+                <h2 className="text-xl font-bold text-maroon dark:text-primary">Registered Profiles</h2>
                 <Button
                   onClick={fetchProfiles}
                   variant="outline"
                   size="sm"
                   disabled={loadingProfiles}
+                  className="dark:border-gray-600 dark:hover:bg-gray-700"
                 >
                   <RefreshCw className={`w-4 h-4 mr-2 ${loadingProfiles ? "animate-spin" : ""}`} />
                   Refresh
@@ -693,26 +694,26 @@ const StaffDashboard = () => {
                     placeholder="Search by Profile ID, Name, or Email..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-10"
+                    className="pl-10 dark:bg-gray-700 dark:border-gray-600"
                   />
                 </div>
 
                 {/* Status Filter Tabs */}
                 <Tabs value={verificationFilter} onValueChange={(v) => setVerificationFilter(v as VerificationFilter)}>
-                  <TabsList className="grid grid-cols-4 w-full sm:w-auto">
+                  <TabsList className="grid grid-cols-4 w-full sm:w-auto dark:bg-gray-700">
                     <TabsTrigger value="all" className="text-xs sm:text-sm">All ({statusCounts.all})</TabsTrigger>
-                    <TabsTrigger value="verified" className="text-xs sm:text-sm text-green-700">Verified ({verifiedProfiles})</TabsTrigger>
-                    <TabsTrigger value="pending" className="text-xs sm:text-sm text-yellow-700">Pending ({pendingVerification})</TabsTrigger>
-                    <TabsTrigger value="rejected" className="text-xs sm:text-sm text-red-700">Rejected ({rejectedProfiles})</TabsTrigger>
+                    <TabsTrigger value="verified" className="text-xs sm:text-sm text-green-700 dark:text-green-400">Verified ({verifiedProfiles})</TabsTrigger>
+                    <TabsTrigger value="pending" className="text-xs sm:text-sm text-yellow-700 dark:text-yellow-400">Pending ({pendingVerification})</TabsTrigger>
+                    <TabsTrigger value="rejected" className="text-xs sm:text-sm text-red-700 dark:text-red-400">Rejected ({rejectedProfiles})</TabsTrigger>
                   </TabsList>
                 </Tabs>
 
                 {/* Gender Filter Tabs */}
                 <Tabs value={genderFilter} onValueChange={(v) => setGenderFilter(v as GenderFilter)}>
-                  <TabsList className="grid grid-cols-3 w-full sm:w-auto">
+                  <TabsList className="grid grid-cols-3 w-full sm:w-auto dark:bg-gray-700">
                     <TabsTrigger value="all" className="text-xs sm:text-sm">All ({genderCounts.all})</TabsTrigger>
-                    <TabsTrigger value="male" className="text-xs sm:text-sm text-blue-700">Males ({genderCounts.male})</TabsTrigger>
-                    <TabsTrigger value="female" className="text-xs sm:text-sm text-pink-700">Females ({genderCounts.female})</TabsTrigger>
+                    <TabsTrigger value="male" className="text-xs sm:text-sm text-blue-700 dark:text-blue-400">Males ({genderCounts.male})</TabsTrigger>
+                    <TabsTrigger value="female" className="text-xs sm:text-sm text-pink-700 dark:text-pink-400">Females ({genderCounts.female})</TabsTrigger>
                   </TabsList>
                 </Tabs>
               </div>
@@ -727,21 +728,21 @@ const StaffDashboard = () => {
             <div className="overflow-x-auto">
               <Table>
                 <TableHeader>
-                  <TableRow>
-                    <TableHead>Profile ID</TableHead>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Profile For</TableHead>
-                    <TableHead>Gender</TableHead>
-                    <TableHead>Email</TableHead>
-                    <TableHead>Phone</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Registered On</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
+                  <TableRow className="dark:border-gray-700">
+                    <TableHead className="dark:text-gray-300">Profile ID</TableHead>
+                    <TableHead className="dark:text-gray-300">Name</TableHead>
+                    <TableHead className="dark:text-gray-300">Profile For</TableHead>
+                    <TableHead className="dark:text-gray-300">Gender</TableHead>
+                    <TableHead className="dark:text-gray-300">Email</TableHead>
+                    <TableHead className="dark:text-gray-300">Phone</TableHead>
+                    <TableHead className="dark:text-gray-300">Status</TableHead>
+                    <TableHead className="dark:text-gray-300">Registered On</TableHead>
+                    <TableHead className="text-right dark:text-gray-300">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {profiles.length === 0 ? (
-                    <TableRow>
+                    <TableRow className="dark:border-gray-700">
                       <TableCell colSpan={9} className="text-center py-8 text-muted-foreground">
                         {loadingProfiles ? "Loading profiles..." : (debouncedSearch ? "No profiles match your search" : "No profiles found")}
                       </TableCell>
@@ -750,7 +751,7 @@ const StaffDashboard = () => {
                     profiles.map((profile) => (
                       <TableRow 
                         key={profile.id} 
-                        className="cursor-pointer hover:bg-muted/50 transition-colors"
+                        className="cursor-pointer hover:bg-muted/50 dark:hover:bg-gray-700/50 transition-colors dark:border-gray-700"
                         onClick={() => {
                           setSelectedProfile(profile);
                           setAdminNotes(profile.admin_notes || "");
