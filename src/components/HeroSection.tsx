@@ -51,7 +51,7 @@ const HeroSection = () => {
           animationDelay: "0.2s"
         }}>
             <div className="relative rounded-2xl overflow-hidden shadow-card">
-              {weddingImages.map((img, index) => <img key={index} src={img} alt={`Happy Indian Wedding Couple ${index + 1}`} className={`w-full h-[500px] lg:h-[600px] object-cover transition-opacity duration-1000 ${index === currentImage ? "opacity-100" : "opacity-0 absolute inset-0"} ${index === 4 ? "scale-125 object-top" : ""}`} />)}
+              {weddingImages.map((img, index) => <img key={index} src={img} alt={`Happy Indian Wedding Couple ${index + 1}`} className={`w-full h-[500px] lg:h-[600px] object-cover transition-opacity duration-1000 ${index === currentImage ? "opacity-100" : "opacity-0 absolute inset-0"} ${index === 4 ? "scale-[0.8] object-top" : ""}`} />)}
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
 
               {/* Text Overlay on Image */}
