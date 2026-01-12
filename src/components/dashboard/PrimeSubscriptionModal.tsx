@@ -3,7 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Crown, Phone, MessageCircle, Check, Star, Award, Heart } from 'lucide-react';
+import { Crown, Phone, MessageCircle, Check, X } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
@@ -20,8 +20,12 @@ interface SubscriptionPlan {
   name: string;
   category: 'support' | 'affluent' | 'till_marry';
   duration: string;
-  price: number;
-  validity?: string;
+  durationMonths: number;
+  bonusDays?: number;
+  originalPrice: number;
+  discountedPrice: number;
+  discountPercent: number;
+  phoneViewLimit?: string;
   benefits: string[];
   badge?: string;
   highlighted?: boolean;
@@ -30,106 +34,60 @@ interface SubscriptionPlan {
 const SUPPORT_PHONE = '7397734496';
 
 const plans: SubscriptionPlan[] = [
-  // Support Matrimony
-  {
-    id: 'support_1m',
-    name: 'Support Matrimony',
-    category: 'support',
-    duration: '1 Month',
-    price: 7000,
-    benefits: [
-      'Dedicated relationship manager',
-      'Weekly profile sharing',
-      'Selected profiles processed',
-      'Feedback updates after each process'
-    ]
-  },
+  // Support Matrimony (Gold)
   {
     id: 'support_3m',
     name: 'Support Matrimony',
     category: 'support',
-    duration: '3 Months',
-    price: 12000,
+    duration: '3 months',
+    durationMonths: 3,
+    bonusDays: 5,
+    originalPrice: 5500,
+    discountedPrice: 3400,
+    discountPercent: 38,
+    phoneViewLimit: 'View 40 Phone Nos',
     benefits: [
-      'Dedicated relationship manager',
-      'Weekly profile sharing',
-      'Selected profiles processed',
-      'Feedback updates after each process'
+      'Send unlimited messages',
+      'Unlimited horoscope views',
+      'View verified profiles with photos'
     ]
   },
-  {
-    id: 'support_6m',
-    name: 'Support Matrimony',
-    category: 'support',
-    duration: '6 Months',
-    price: 18000,
-    benefits: [
-      'Dedicated relationship manager',
-      'Weekly profile sharing',
-      'Selected profiles processed',
-      'Feedback updates after each process'
-    ]
-  },
-  // Affluent Matrimony
+  // Affluent Matrimony (Prime Gold)
   {
     id: 'affluent_3m',
     name: 'Affluent Matrimony',
     category: 'affluent',
-    duration: '3 Months',
-    price: 18000,
-    validity: '6 Months',
-    badge: 'Premium',
+    duration: '3 months',
+    durationMonths: 3,
+    bonusDays: 10,
+    originalPrice: 7900,
+    discountedPrice: 4000,
+    discountPercent: 49,
+    phoneViewLimit: 'View unlimited Phone Nos*',
     benefits: [
-      'Affluent family profiles',
-      'Curated weekly matches',
-      'Priority processing',
-      'Personal enquiry support'
+      'Send unlimited messages',
+      'Unlimited horoscope views',
+      'View verified profiles with photos'
     ]
   },
-  {
-    id: 'affluent_6m',
-    name: 'Affluent Matrimony',
-    category: 'affluent',
-    duration: '6 Months',
-    price: 25000,
-    badge: 'Premium',
-    benefits: [
-      'Affluent family profiles',
-      'Curated weekly matches',
-      'Priority processing',
-      'Personal enquiry support'
-    ]
-  },
-  {
-    id: 'affluent_1y',
-    name: 'Affluent Matrimony',
-    category: 'affluent',
-    duration: '1 Year',
-    price: 55000,
-    badge: 'Premium',
-    benefits: [
-      'Affluent family profiles',
-      'Curated weekly matches',
-      'Priority processing',
-      'Personal enquiry support'
-    ]
-  },
-  // Till You Marry
+  // Prime - Till U Marry
   {
     id: 'till_marry',
-    name: 'Till You Marry',
+    name: 'Prime - Till U Marry',
     category: 'till_marry',
     duration: 'Lifetime',
-    price: 85000,
-    validity: 'Till Marriage',
+    durationMonths: 12,
+    originalPrice: 23700,
+    discountedPrice: 9900,
+    discountPercent: 58,
+    phoneViewLimit: 'View unlimited Phone Nos*',
     badge: 'Best Seller',
     highlighted: true,
     benefits: [
-      'Unlimited profiles',
-      'Weekly calls / WhatsApp updates',
-      'Dedicated relationship manager',
-      'Two-day once feedback',
-      'Full background enquiry'
+      'Longest validity plan',
+      'Send unlimited messages',
+      'Unlimited horoscope views',
+      'View verified profiles with photos'
     ]
   }
 ];
@@ -164,7 +122,7 @@ const PrimeSubscriptionModal = ({ isOpen, onClose, userId, profileId, userName }
     }
   };
 
-  const handleCallToSubscribe = (plan: SubscriptionPlan) => {
+  const handlePayNow = (plan: SubscriptionPlan) => {
     setSelectedPlan(plan.id);
     logCall('prime_subscription', `${plan.name} - ${plan.duration}`);
   };
@@ -178,275 +136,176 @@ const PrimeSubscriptionModal = ({ isOpen, onClose, userId, profileId, userName }
   };
 
   const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('en-IN', {
-      style: 'currency',
-      currency: 'INR',
-      maximumFractionDigits: 0
-    }).format(price);
+    return `₹${price.toLocaleString('en-IN')}`;
   };
 
-  const getCategoryIcon = (category: string) => {
-    switch (category) {
-      case 'support':
-        return <Heart className="h-5 w-5" />;
-      case 'affluent':
-        return <Star className="h-5 w-5" />;
-      case 'till_marry':
-        return <Award className="h-5 w-5" />;
-      default:
-        return <Crown className="h-5 w-5" />;
-    }
+  const getMonthlyPrice = (plan: SubscriptionPlan) => {
+    return Math.round(plan.discountedPrice / plan.durationMonths);
   };
-
-  const getCategoryColor = (category: string, highlighted?: boolean) => {
-    if (highlighted) {
-      return 'from-amber-500 to-yellow-500';
-    }
-    switch (category) {
-      case 'support':
-        return 'from-primary to-primary/80';
-      case 'affluent':
-        return 'from-purple-500 to-indigo-500';
-      case 'till_marry':
-        return 'from-amber-500 to-yellow-500';
-      default:
-        return 'from-primary to-primary/80';
-    }
-  };
-
-  // Group plans by category for display
-  const supportPlans = plans.filter(p => p.category === 'support');
-  const affluentPlans = plans.filter(p => p.category === 'affluent');
-  const tillMarryPlan = plans.find(p => p.category === 'till_marry');
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto p-4 sm:p-6">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2 text-lg sm:text-2xl">
-            <Crown className="h-5 w-5 sm:h-7 sm:w-7 text-amber-500" />
-            Prime Membership Plans
-          </DialogTitle>
+      <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto p-0">
+        <DialogHeader className="p-4 sm:p-6 pb-0">
+          <div className="flex items-center justify-between">
+            <DialogTitle className="flex items-center gap-2 text-lg sm:text-2xl">
+              <Crown className="h-5 w-5 sm:h-7 sm:w-7 text-amber-500" />
+              Choose Your Plan
+            </DialogTitle>
+          </div>
         </DialogHeader>
 
-        <div className="space-y-6 sm:space-y-8 py-2 sm:py-4">
-          {/* Support Matrimony Section */}
-          <div>
-            <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 flex items-center gap-2">
-              <Heart className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
-              Support Matrimony
-            </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
-              {supportPlans.map((plan) => (
-                <Card 
-                  key={plan.id} 
-                  className={`p-3 sm:p-5 relative overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1 ${
-                    selectedPlan === plan.id ? 'ring-2 ring-primary' : ''
-                  }`}
-                >
-                  <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${getCategoryColor(plan.category)}`} />
-                  
-                  <div className="space-y-3 sm:space-y-4">
-                    <div>
-                      <p className="text-xs sm:text-sm text-muted-foreground">{plan.duration}</p>
-                      <p className="text-xl sm:text-2xl font-bold text-primary">{formatPrice(plan.price)}</p>
-                    </div>
-
-                    <ul className="space-y-1.5 sm:space-y-2">
-                      {plan.benefits.slice(0, 3).map((benefit, idx) => (
-                        <li key={idx} className="flex items-start gap-1.5 sm:gap-2 text-xs sm:text-sm">
-                          <Check className="h-3 w-3 sm:h-4 sm:w-4 text-primary mt-0.5 shrink-0" />
-                          <span className="line-clamp-2">{benefit}</span>
-                        </li>
-                      ))}
-                      {plan.benefits.length > 3 && (
-                        <li className="text-xs text-muted-foreground ml-5">+{plan.benefits.length - 3} more</li>
-                      )}
-                    </ul>
-
-                    <div className="flex gap-1.5 sm:gap-2 pt-2">
-                      <Button 
-                        size="sm" 
-                        className="flex-1 gap-1 h-8 sm:h-9 text-xs sm:text-sm"
-                        onClick={() => handleCallToSubscribe(plan)}
-                        disabled={isLogging}
-                      >
-                        <Phone className="h-3 w-3 sm:h-4 sm:w-4" />
-                        Call
-                      </Button>
-                      <Button 
-                        size="sm" 
-                        variant="outline" 
-                        className="flex-1 gap-1 h-8 sm:h-9 text-xs sm:text-sm"
-                        onClick={handleWhatsApp}
-                      >
-                        <MessageCircle className="h-3 w-3 sm:h-4 sm:w-4" />
-                        Chat
-                      </Button>
-                    </div>
-                  </div>
-                </Card>
-              ))}
-            </div>
-          </div>
-
-          {/* Affluent Matrimony Section */}
-          <div>
-            <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 flex items-center gap-2 flex-wrap">
-              <Star className="h-4 w-4 sm:h-5 sm:w-5 text-purple-500" />
-              Affluent Matrimony
-              <Badge className="bg-purple-500 text-white text-xs">Premium</Badge>
-            </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
-              {affluentPlans.map((plan) => (
-                <Card 
-                  key={plan.id} 
-                  className={`p-3 sm:p-5 relative overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1 border-purple-200 ${
-                    selectedPlan === plan.id ? 'ring-2 ring-purple-500' : ''
-                  }`}
-                >
-                  <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${getCategoryColor(plan.category)}`} />
-                  
-                  <div className="space-y-3 sm:space-y-4">
-                    <div>
-                      <p className="text-xs sm:text-sm text-muted-foreground">{plan.duration}</p>
-                      <p className="text-xl sm:text-2xl font-bold text-purple-600">{formatPrice(plan.price)}</p>
-                      {plan.validity && (
-                        <p className="text-[10px] sm:text-xs text-muted-foreground">Validity: {plan.validity}</p>
-                      )}
-                    </div>
-
-                    <ul className="space-y-1.5 sm:space-y-2">
-                      {plan.benefits.slice(0, 3).map((benefit, idx) => (
-                        <li key={idx} className="flex items-start gap-1.5 sm:gap-2 text-xs sm:text-sm">
-                          <Check className="h-3 w-3 sm:h-4 sm:w-4 text-purple-500 mt-0.5 shrink-0" />
-                          <span className="line-clamp-2">{benefit}</span>
-                        </li>
-                      ))}
-                      {plan.benefits.length > 3 && (
-                        <li className="text-xs text-muted-foreground ml-5">+{plan.benefits.length - 3} more</li>
-                      )}
-                    </ul>
-
-                    <div className="flex gap-1.5 sm:gap-2 pt-2">
-                      <Button 
-                        size="sm" 
-                        className="flex-1 gap-1 bg-purple-500 hover:bg-purple-600 h-8 sm:h-9 text-xs sm:text-sm"
-                        onClick={() => handleCallToSubscribe(plan)}
-                        disabled={isLogging}
-                      >
-                        <Phone className="h-3 w-3 sm:h-4 sm:w-4" />
-                        Call
-                      </Button>
-                      <Button 
-                        size="sm" 
-                        variant="outline" 
-                        className="flex-1 gap-1 border-purple-300 text-purple-600 hover:bg-purple-50 h-8 sm:h-9 text-xs sm:text-sm"
-                        onClick={handleWhatsApp}
-                      >
-                        <MessageCircle className="h-3 w-3 sm:h-4 sm:w-4" />
-                        Chat
-                      </Button>
-                    </div>
-                  </div>
-                </Card>
-              ))}
-            </div>
-          </div>
-
-          {/* Till You Marry Section */}
-          {tillMarryPlan && (
-            <div>
-              <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 flex items-center gap-2 flex-wrap">
-                <Award className="h-4 w-4 sm:h-5 sm:w-5 text-amber-500" />
-                Till You Marry
-                <Badge className="bg-gradient-to-r from-amber-500 to-yellow-500 text-white text-xs">Best Seller</Badge>
-              </h3>
+        <div className="p-4 sm:p-6 pt-4 space-y-6">
+          {/* Plans Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
+            {plans.map((plan) => (
               <Card 
-                className={`p-4 sm:p-6 relative overflow-hidden transition-all duration-300 hover:shadow-xl border-amber-200 bg-gradient-to-br from-amber-50 to-yellow-50 ${
-                  selectedPlan === tillMarryPlan.id ? 'ring-2 ring-amber-500' : ''
-                }`}
+                key={plan.id} 
+                className={`relative overflow-hidden transition-all duration-300 hover:shadow-xl ${
+                  plan.highlighted 
+                    ? 'border-2 border-amber-400 bg-gradient-to-b from-amber-50/50 to-background' 
+                    : 'border border-border hover:border-primary/50'
+                } ${selectedPlan === plan.id ? 'ring-2 ring-primary' : ''}`}
               >
-                <div className="absolute top-0 left-0 right-0 h-1.5 sm:h-2 bg-gradient-to-r from-amber-500 to-yellow-500" />
-                <div className="absolute top-2 right-2 sm:top-4 sm:right-4">
-                  <Badge className="bg-gradient-to-r from-amber-500 to-yellow-500 text-white text-[10px] sm:text-sm px-2 sm:px-3 py-0.5 sm:py-1">
-                    Best Seller
-                  </Badge>
-                </div>
-                
-                <div className="grid sm:grid-cols-2 gap-4 sm:gap-6 pt-6 sm:pt-0">
-                  <div className="space-y-2 sm:space-y-4">
-                    <div>
-                      <p className="text-xs sm:text-sm text-muted-foreground">{tillMarryPlan.validity}</p>
-                      <p className="text-2xl sm:text-4xl font-bold bg-gradient-to-r from-amber-600 to-yellow-600 bg-clip-text text-transparent">
-                        {formatPrice(tillMarryPlan.price)}
-                      </p>
-                      <p className="text-xs sm:text-sm text-amber-700 font-medium mt-1">One-time payment • Lifetime benefits</p>
+                {/* Best Seller Badge */}
+                {plan.badge && (
+                  <div className="absolute -top-0 -right-0">
+                    <Badge className="rounded-none rounded-bl-lg bg-rose-500 text-white text-xs px-3 py-1">
+                      {plan.badge}
+                    </Badge>
+                  </div>
+                )}
+
+                <div className="p-4 sm:p-6 space-y-4">
+                  {/* Plan Name */}
+                  <div className="text-center border-b pb-4">
+                    <h3 className="text-lg sm:text-xl font-semibold text-foreground">
+                      {plan.name}
+                    </h3>
+                  </div>
+
+                  {/* Discount & Pricing */}
+                  <div className="text-center space-y-2">
+                    <div className="flex items-center justify-center gap-2">
+                      <span className="text-rose-500 font-bold text-sm">
+                        {plan.discountPercent}% OFF!
+                      </span>
+                      <span className="text-muted-foreground text-sm">Valid for today</span>
+                    </div>
+
+                    <div className="flex items-center justify-center gap-2">
+                      <span className="text-muted-foreground line-through text-sm">
+                        {formatPrice(plan.originalPrice)}
+                      </span>
+                      <span className="text-2xl sm:text-3xl font-bold text-foreground">
+                        {formatPrice(plan.discountedPrice)}
+                      </span>
+                    </div>
+
+                    <div className="inline-block border border-border rounded-full px-3 py-1">
+                      <span className="text-xs sm:text-sm text-muted-foreground">
+                        {formatPrice(getMonthlyPrice(plan))} per month
+                      </span>
                     </div>
                   </div>
 
-                  <div>
-                    <ul className="space-y-2 sm:space-y-3">
-                      {tillMarryPlan.benefits.map((benefit, idx) => (
-                        <li key={idx} className="flex items-start gap-1.5 sm:gap-2 text-xs sm:text-sm">
-                          <Check className="h-4 w-4 sm:h-5 sm:w-5 text-amber-500 mt-0.5 shrink-0" />
-                          <span className="font-medium">{benefit}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
+                  {/* Benefits */}
+                  <ul className="space-y-3 pt-2">
+                    {/* Duration */}
+                    <li className="flex items-start gap-2 text-sm">
+                      <Check className="h-4 w-4 text-emerald-500 mt-0.5 shrink-0" />
+                      <span>
+                        {plan.category === 'till_marry' 
+                          ? 'Longest validity plan' 
+                          : `Valid for ${plan.duration}${plan.bonusDays ? `+${plan.bonusDays} days🎉` : ''}`
+                        }
+                      </span>
+                    </li>
 
-                <div className="flex flex-col xs:flex-row gap-2 sm:gap-3 mt-4 sm:mt-6">
+                    {/* Phone View */}
+                    <li className="flex items-start gap-2 text-sm">
+                      <Check className="h-4 w-4 text-emerald-500 mt-0.5 shrink-0" />
+                      <span>{plan.phoneViewLimit}</span>
+                    </li>
+
+                    {/* Other Benefits */}
+                    {plan.benefits.slice(0, 3).map((benefit, idx) => (
+                      <li key={idx} className="flex items-start gap-2 text-sm">
+                        <Check className="h-4 w-4 text-emerald-500 mt-0.5 shrink-0" />
+                        <span>{benefit}</span>
+                      </li>
+                    ))}
+                  </ul>
+
+                  {/* Know More Link for Till U Marry */}
+                  {plan.category === 'till_marry' && (
+                    <div className="text-center pt-2">
+                      <button 
+                        className="text-primary text-sm hover:underline flex items-center justify-center gap-1 mx-auto"
+                        onClick={handleWhatsApp}
+                      >
+                        Know More <span>›</span>
+                      </button>
+                    </div>
+                  )}
+
+                  {/* Pay Now Button */}
                   <Button 
-                    className="flex-1 gap-2 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-foreground h-10 sm:h-12 text-sm sm:text-base"
-                    onClick={() => handleCallToSubscribe(tillMarryPlan)}
+                    className="w-full h-11 bg-amber-500 hover:bg-amber-600 text-foreground font-semibold text-base rounded-full"
+                    onClick={() => handlePayNow(plan)}
                     disabled={isLogging}
                   >
-                    <Phone className="h-4 w-4 sm:h-5 sm:w-5" />
-                    Call to Subscribe
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    className="flex-1 gap-2 border-amber-400 text-amber-700 hover:bg-amber-100 h-10 sm:h-12 text-sm sm:text-base"
-                    onClick={handleWhatsApp}
-                  >
-                    <MessageCircle className="h-4 w-4 sm:h-5 sm:w-5" />
-                    Chat with us
+                    Pay Now
                   </Button>
                 </div>
               </Card>
-            </div>
-          )}
+            ))}
+          </div>
+
+          {/* View All Packages Link */}
+          <div className="text-center">
+            <button 
+              className="text-primary text-sm hover:underline flex items-center justify-center gap-1 mx-auto"
+              onClick={handleWhatsApp}
+            >
+              View All Packages <span>›</span>
+            </button>
+          </div>
 
           {/* Need Assistance Section */}
-          <Card className="p-4 sm:p-6 bg-muted/50 border-dashed">
-            <div className="flex flex-col items-center gap-3 sm:gap-4 text-center sm:text-left sm:flex-row sm:justify-between">
-              <div>
-                <h4 className="font-semibold text-sm sm:text-lg">Need assistance to take Prime Membership?</h4>
-                <p className="text-xs sm:text-sm text-muted-foreground">Our team is here to help you choose the right plan</p>
-              </div>
-              <div className="flex flex-col xs:flex-row gap-2 sm:gap-3 w-full sm:w-auto">
+          <div className="border-t pt-6">
+            <div className="text-center space-y-4">
+              <h4 className="font-semibold text-base sm:text-lg">
+                Need any help in making payment?
+              </h4>
+              
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
                 <Button 
                   variant="outline" 
-                  className="gap-2 text-xs sm:text-sm h-9 sm:h-10"
+                  className="gap-2 rounded-full px-6 h-10"
+                  onClick={handleWhatsApp}
+                >
+                  <MessageCircle className="h-4 w-4 text-emerald-500" />
+                  Chat with us
+                </Button>
+                <Button 
+                  variant="outline" 
+                  className="gap-2 rounded-full px-6 h-10"
                   onClick={handleAssistanceCall}
                   disabled={isLogging}
                 >
-                  <Phone className="h-3 w-3 sm:h-4 sm:w-4" />
-                  Call: {SUPPORT_PHONE}
-                </Button>
-                <Button 
-                  variant="outline" 
-                  className="gap-2 text-xs sm:text-sm h-9 sm:h-10"
-                  onClick={handleWhatsApp}
-                >
-                  <MessageCircle className="h-3 w-3 sm:h-4 sm:w-4" />
-                  Chat with us
+                  <Phone className="h-4 w-4 text-emerald-500" />
+                  {SUPPORT_PHONE}
                 </Button>
               </div>
+
+              <p className="text-xs text-muted-foreground">
+                Note: 21 Days money back guarantee{' '}
+                <button className="text-primary hover:underline">Terms & Conditions</button>
+                {' '}applied
+              </p>
             </div>
-          </Card>
+          </div>
         </div>
       </DialogContent>
     </Dialog>
