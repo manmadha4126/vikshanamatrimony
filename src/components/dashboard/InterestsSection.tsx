@@ -66,15 +66,20 @@ const InterestsSection = ({ userId, profileId, onMessageClick }: InterestsSectio
       if (received && received.length > 0) {
         const fromUserIds = received.map(i => i.from_user_id);
         
-        const { data: profilesByUserId } = await supabase
+        // Fetch all profiles and match by user_id
+        const { data: allProfiles } = await supabase
           .from('profiles')
           .select('id, name, photo_url, date_of_birth, city, state, education, occupation, profile_id, user_id, height, religion, employment_type')
           .in('user_id', fromUserIds);
 
-        const receivedWithProfiles = received.map(interest => ({
-          ...interest,
-          profile: profilesByUserId?.find(p => p.user_id === interest.from_user_id)
-        }));
+        const receivedWithProfiles = received.map(interest => {
+          // Try to find profile by user_id
+          const matchedProfile = allProfiles?.find(p => p.user_id === interest.from_user_id);
+          return {
+            ...interest,
+            profile: matchedProfile
+          };
+        });
         
         setReceivedInterests(receivedWithProfiles);
       } else {
