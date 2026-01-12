@@ -459,8 +459,9 @@ const Dashboard = () => {
 
             {activeView === 'messages' && (
               <MessagesSection
-                userId={user.id}
+                odBCqt={user.id}
                 profileId={profile.id}
+                userName={profile.name}
                 initialRecipient={messageRecipient || undefined}
               />
             )}
