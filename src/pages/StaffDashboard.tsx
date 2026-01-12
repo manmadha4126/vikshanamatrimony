@@ -594,8 +594,25 @@ const StaffDashboard = () => {
                 </div>
               </div>
             </CardHeader>
-            <CardContent>
-              <p className="text-3xl font-bold text-foreground">{pendingVerification} Pending</p>
+            <CardContent className="space-y-3">
+              <div className="grid grid-cols-2 gap-3">
+                <div className="bg-blue-50 rounded-lg p-3 text-center">
+                  <p className="text-2xl font-bold text-blue-600">{totalRegistrations}</p>
+                  <p className="text-xs text-blue-600/80 font-medium">All Profiles</p>
+                </div>
+                <div className="bg-yellow-50 rounded-lg p-3 text-center">
+                  <p className="text-2xl font-bold text-yellow-600">{pendingVerification}</p>
+                  <p className="text-xs text-yellow-600/80 font-medium">Pending</p>
+                </div>
+                <div className="bg-green-50 rounded-lg p-3 text-center">
+                  <p className="text-2xl font-bold text-green-600">{verifiedProfiles}</p>
+                  <p className="text-xs text-green-600/80 font-medium">Verified</p>
+                </div>
+                <div className="bg-red-50 rounded-lg p-3 text-center">
+                  <p className="text-2xl font-bold text-red-600">{rejectedProfiles}</p>
+                  <p className="text-xs text-red-600/80 font-medium">Rejected</p>
+                </div>
+              </div>
             </CardContent>
           </Card>
 
