@@ -52,7 +52,7 @@ export const useAuth = () => {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const fetchProfile = async (userEmail: string) => {
+  const fetchProfile = async (userEmail: string, authUserId?: string) => {
     // Find profile by email directly
     const { data, error } = await supabase
       .from('profiles')
@@ -61,6 +61,16 @@ export const useAuth = () => {
       .maybeSingle();
 
     if (!error && data) {
+      // Auto-sync user_id if it's missing (prevents data integrity issues)
+      if (!data.user_id && authUserId) {
+        await supabase
+          .from('profiles')
+          .update({ user_id: authUserId })
+          .eq('id', data.id);
+        
+        // Update the data with the new user_id
+        data.user_id = authUserId;
+      }
       setProfile(data as Profile);
     } else {
       setProfile(null);
@@ -76,7 +86,7 @@ export const useAuth = () => {
         
         if (session?.user?.email) {
           setTimeout(() => {
-            fetchProfile(session.user.email!);
+            fetchProfile(session.user.email!, session.user.id);
           }, 0);
         } else {
           setProfile(null);
@@ -90,7 +100,7 @@ export const useAuth = () => {
       setSession(session);
       setUser(session?.user ?? null);
       if (session?.user?.email) {
-        fetchProfile(session.user.email);
+        fetchProfile(session.user.email, session.user.id);
       }
       setLoading(false);
     });
