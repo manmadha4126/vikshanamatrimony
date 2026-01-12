@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { Heart, HeartOff, Check, X, Loader2, Clock, CheckCircle, XCircle, MessageCircle, User } from 'lucide-react';
+import { Heart, HeartOff, Check, X, Loader2, Clock, CheckCircle, XCircle, MessageCircle, User, Eye } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
@@ -38,11 +38,12 @@ interface InterestsSectionProps {
   userId: string;
   profileId: string;
   onMessageClick?: (userId: string, profileId: string, name: string) => void;
+  onViewProfile?: (profileId: string) => void;
 }
 
 type StatusFilter = 'all' | 'pending' | 'accepted' | 'rejected';
 
-const InterestsSection = ({ userId, profileId, onMessageClick }: InterestsSectionProps) => {
+const InterestsSection = ({ userId, profileId, onMessageClick, onViewProfile }: InterestsSectionProps) => {
   const [receivedInterests, setReceivedInterests] = useState<Interest[]>([]);
   const [sentInterests, setSentInterests] = useState<Interest[]>([]);
   const [loading, setLoading] = useState(true);
@@ -323,6 +324,19 @@ const InterestsSection = ({ userId, profileId, onMessageClick }: InterestsSectio
 
               {/* Action Buttons */}
               <div className="flex flex-wrap items-center gap-2 mt-3 pt-3 border-t border-border/50">
+                {/* View Full Profile Button - Always show when profile exists */}
+                {profile && onViewProfile && (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => onViewProfile(profile.id)}
+                    className="gap-1.5"
+                  >
+                    <Eye className="h-4 w-4" />
+                    View Profile
+                  </Button>
+                )}
+
                 {/* For Received Interests - Pending */}
                 {type === 'received' && interest.status === 'pending' && (
                   <>

@@ -454,6 +454,7 @@ const Dashboard = () => {
                 userId={user.id}
                 profileId={profile.id}
                 onMessageClick={handleMessageClick}
+                onViewProfile={(profileId) => setViewingProfileId(profileId)}
               />
             )}
 
