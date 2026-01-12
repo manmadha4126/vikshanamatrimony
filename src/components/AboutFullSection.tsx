@@ -1,4 +1,5 @@
 import { Heart, Shield, Users, Eye, Award, Handshake } from "lucide-react";
+import AssistedServiceSection from "@/components/dashboard/AssistedServiceSection";
 
 const coreValues = [
   {
@@ -135,6 +136,11 @@ const AboutFullSection = () => {
             ))}
           </div>
         </div>
+      </section>
+
+      {/* Assisted Matrimony Service */}
+      <section className="py-16 bg-background">
+        <AssistedServiceSection />
       </section>
 
       {/* CTA Section */}
