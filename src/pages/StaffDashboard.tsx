@@ -13,7 +13,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { RefreshCw, Users, CheckCircle, Clock, Search, ChevronLeft, ChevronRight, UserPlus, Edit, Trash2, Home, XCircle, Phone, Mail, MapPin, Briefcase, GraduationCap, User as UserIcon, Calendar, Heart } from "lucide-react";
+import { RefreshCw, Users, CheckCircle, Clock, Search, ChevronLeft, ChevronRight, UserPlus, Edit, Trash2, Home, XCircle, Phone, Mail, MapPin, Briefcase, GraduationCap, User as UserIcon, Calendar, Heart, LogOut, Shield } from "lucide-react";
+import vikshanaLogo from "@/assets/vikshana-logo.png";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -419,33 +420,87 @@ const StaffDashboard = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-cream via-white to-cream">
+      {/* Decorative Top Border */}
+      <div className="h-1 bg-gradient-to-r from-primary via-gold to-green-600" />
+      
       {/* Header */}
-      <header className="bg-white shadow-sm border-b border-gold/20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-          <div className="flex items-center gap-4">
-            <Button
-              onClick={() => navigate("/")}
-              variant="outline"
-              size="sm"
-              className="border-primary text-primary hover:bg-primary hover:text-primary-foreground"
-            >
-              <Home className="w-4 h-4 mr-2" />
-              Back to Home
-            </Button>
-            <div>
-              <h1 className="text-2xl font-bold text-maroon">Staff Dashboard</h1>
-              <p className="text-sm text-muted-foreground">
-                Welcome, {user?.email} • <span className="capitalize font-medium">{userRole}</span>
-              </p>
+      <header className="bg-white/95 backdrop-blur-sm shadow-lg border-b border-gold/30 sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+          <div className="flex justify-between items-center">
+            {/* Left Side - Logo and Branding */}
+            <div className="flex items-center gap-4">
+              <div 
+                className="flex items-center gap-3 cursor-pointer group"
+                onClick={() => navigate("/")}
+              >
+                <div className="relative">
+                  <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-gold/20 rounded-full blur-md group-hover:blur-lg transition-all" />
+                  <img 
+                    src={vikshanaLogo} 
+                    alt="Vikshana Matrimony" 
+                    className="h-12 w-12 object-contain relative z-10 group-hover:scale-105 transition-transform"
+                  />
+                </div>
+                <div className="hidden sm:block">
+                  <h1 className="text-xl font-bold">
+                    <span className="text-primary">Vikshana</span>
+                    <span className="text-green-600"> Matrimony</span>
+                  </h1>
+                  <div className="flex items-center gap-2">
+                    <Badge variant="outline" className="text-xs bg-primary/10 text-primary border-primary/30">
+                      <Shield className="w-3 h-3 mr-1" />
+                      Staff Dashboard
+                    </Badge>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Decorative Separator */}
+              <div className="hidden lg:block h-10 w-px bg-gradient-to-b from-transparent via-gold/50 to-transparent mx-2" />
+              
+              {/* Welcome Message - Desktop */}
+              <div className="hidden lg:block">
+                <p className="text-sm text-muted-foreground">
+                  Welcome back,
+                </p>
+                <p className="text-sm font-medium text-foreground flex items-center gap-1">
+                  {user?.email}
+                  <span className="text-xs text-primary bg-primary/10 px-2 py-0.5 rounded-full capitalize">
+                    {userRole}
+                  </span>
+                </p>
+              </div>
+            </div>
+            
+            {/* Right Side - Actions */}
+            <div className="flex items-center gap-3">
+              <Button
+                onClick={() => navigate("/")}
+                variant="outline"
+                size="sm"
+                className="border-primary/30 text-primary hover:bg-primary hover:text-white transition-all duration-300 shadow-sm"
+              >
+                <Home className="w-4 h-4 sm:mr-2" />
+                <span className="hidden sm:inline">Home</span>
+              </Button>
+              <Button
+                onClick={handleLogout}
+                variant="outline"
+                size="sm"
+                className="border-maroon/30 text-maroon hover:bg-maroon hover:text-white transition-all duration-300 shadow-sm"
+              >
+                <LogOut className="w-4 h-4 sm:mr-2" />
+                <span className="hidden sm:inline">Logout</span>
+              </Button>
             </div>
           </div>
-          <Button
-            onClick={handleLogout}
-            variant="outline"
-            className="border-maroon text-maroon hover:bg-maroon hover:text-white"
-          >
-            Logout
-          </Button>
+          
+          {/* Mobile Welcome Message */}
+          <div className="sm:hidden mt-2 pt-2 border-t border-gold/20">
+            <p className="text-xs text-muted-foreground text-center">
+              {user?.email} • <span className="capitalize text-primary font-medium">{userRole}</span>
+            </p>
+          </div>
         </div>
       </header>
 
