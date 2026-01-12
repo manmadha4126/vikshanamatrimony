@@ -558,89 +558,89 @@ const StaffDashboard = () => {
         </div>
 
         {/* Action Boxes */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
           <Card 
-            className={`cursor-pointer transition-all hover:shadow-lg ${activeSection === "profiles" ? "ring-2 ring-primary border-primary" : "border-gold/20"}`}
+            className={`cursor-pointer transition-all hover:shadow-md hover:scale-[1.02] ${activeSection === "profiles" ? "ring-2 ring-primary" : ""} bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-blue-950 dark:to-indigo-900 border-blue-200 dark:border-blue-800`}
             onClick={() => setActiveSection("profiles")}
           >
-            <CardHeader className="pb-3">
-              <div className="flex items-center gap-4">
-                <div className="p-3 bg-primary/10 rounded-lg">
-                  <Users className="w-8 h-8 text-primary" />
+            <CardHeader className="pb-2 pt-4 px-4">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-blue-500/20 dark:bg-blue-400/20 rounded-lg">
+                  <Users className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                 </div>
                 <div>
-                  <CardTitle className="text-xl text-maroon">Registered Profiles</CardTitle>
-                  <CardDescription>View and manage all registered profiles</CardDescription>
+                  <CardTitle className="text-base text-blue-900 dark:text-blue-100">Registered Profiles</CardTitle>
+                  <CardDescription className="text-xs text-blue-600/70 dark:text-blue-300/70">View and manage profiles</CardDescription>
                 </div>
               </div>
             </CardHeader>
-            <CardContent>
-              <p className="text-3xl font-bold text-foreground">{totalRegistrations} Profiles</p>
+            <CardContent className="pb-4 px-4">
+              <p className="text-2xl font-bold text-blue-700 dark:text-blue-300">{totalRegistrations} Profiles</p>
             </CardContent>
           </Card>
 
           <Card 
-            className={`cursor-pointer transition-all hover:shadow-lg ${activeSection === "verification" ? "ring-2 ring-primary border-primary" : "border-gold/20"}`}
+            className={`cursor-pointer transition-all hover:shadow-md hover:scale-[1.02] ${activeSection === "verification" ? "ring-2 ring-primary" : ""} bg-gradient-to-br from-amber-50 to-orange-100 dark:from-amber-950 dark:to-orange-900 border-amber-200 dark:border-amber-800`}
             onClick={() => setActiveSection("verification")}
           >
-            <CardHeader className="pb-3">
-              <div className="flex items-center gap-4">
-                <div className="p-3 bg-yellow-100 rounded-lg">
-                  <CheckCircle className="w-8 h-8 text-yellow-600" />
+            <CardHeader className="pb-2 pt-4 px-4">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-amber-500/20 dark:bg-amber-400/20 rounded-lg">
+                  <CheckCircle className="w-5 h-5 text-amber-600 dark:text-amber-400" />
                 </div>
                 <div>
-                  <CardTitle className="text-xl text-maroon">Verification Center</CardTitle>
-                  <CardDescription>Review and verify user profiles</CardDescription>
+                  <CardTitle className="text-base text-amber-900 dark:text-amber-100">Verification Center</CardTitle>
+                  <CardDescription className="text-xs text-amber-600/70 dark:text-amber-300/70">Review profiles</CardDescription>
                 </div>
               </div>
             </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="grid grid-cols-2 gap-3">
-                <div className="bg-blue-50 rounded-lg p-3 text-center">
-                  <p className="text-2xl font-bold text-blue-600">{totalRegistrations}</p>
-                  <p className="text-xs text-blue-600/80 font-medium">All Profiles</p>
+            <CardContent className="pb-4 px-4">
+              <div className="grid grid-cols-4 gap-2">
+                <div className="bg-blue-100/80 dark:bg-blue-800/50 rounded-md p-2 text-center">
+                  <p className="text-lg font-bold text-blue-600 dark:text-blue-300">{totalRegistrations}</p>
+                  <p className="text-[10px] text-blue-600/80 dark:text-blue-300/80">All</p>
                 </div>
-                <div className="bg-yellow-50 rounded-lg p-3 text-center">
-                  <p className="text-2xl font-bold text-yellow-600">{pendingVerification}</p>
-                  <p className="text-xs text-yellow-600/80 font-medium">Pending</p>
+                <div className="bg-yellow-100/80 dark:bg-yellow-800/50 rounded-md p-2 text-center">
+                  <p className="text-lg font-bold text-yellow-600 dark:text-yellow-300">{pendingVerification}</p>
+                  <p className="text-[10px] text-yellow-600/80 dark:text-yellow-300/80">Pending</p>
                 </div>
-                <div className="bg-green-50 rounded-lg p-3 text-center">
-                  <p className="text-2xl font-bold text-green-600">{verifiedProfiles}</p>
-                  <p className="text-xs text-green-600/80 font-medium">Verified</p>
+                <div className="bg-green-100/80 dark:bg-green-800/50 rounded-md p-2 text-center">
+                  <p className="text-lg font-bold text-green-600 dark:text-green-300">{verifiedProfiles}</p>
+                  <p className="text-[10px] text-green-600/80 dark:text-green-300/80">Verified</p>
                 </div>
-                <div className="bg-red-50 rounded-lg p-3 text-center">
-                  <p className="text-2xl font-bold text-red-600">{rejectedProfiles}</p>
-                  <p className="text-xs text-red-600/80 font-medium">Rejected</p>
+                <div className="bg-red-100/80 dark:bg-red-800/50 rounded-md p-2 text-center">
+                  <p className="text-lg font-bold text-red-600 dark:text-red-300">{rejectedProfiles}</p>
+                  <p className="text-[10px] text-red-600/80 dark:text-red-300/80">Rejected</p>
                 </div>
               </div>
             </CardContent>
           </Card>
 
           <Card 
-            className={`cursor-pointer transition-all hover:shadow-lg ${activeSection === "add" ? "ring-2 ring-primary border-primary" : "border-gold/20"}`}
+            className={`cursor-pointer transition-all hover:shadow-md hover:scale-[1.02] ${activeSection === "add" ? "ring-2 ring-primary" : ""} bg-gradient-to-br from-emerald-50 to-teal-100 dark:from-emerald-950 dark:to-teal-900 border-emerald-200 dark:border-emerald-800`}
             onClick={() => setActiveSection("add")}
           >
-            <CardHeader className="pb-3">
-              <div className="flex items-center gap-4">
-                <div className="p-3 bg-green-100 rounded-lg">
-                  <UserPlus className="w-8 h-8 text-green-600" />
+            <CardHeader className="pb-2 pt-4 px-4">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-emerald-500/20 dark:bg-emerald-400/20 rounded-lg">
+                  <UserPlus className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
                 </div>
                 <div>
-                  <CardTitle className="text-xl text-maroon">Add New Profile</CardTitle>
-                  <CardDescription>Create a new profile manually</CardDescription>
+                  <CardTitle className="text-base text-emerald-900 dark:text-emerald-100">Add New Profile</CardTitle>
+                  <CardDescription className="text-xs text-emerald-600/70 dark:text-emerald-300/70">Create manually</CardDescription>
                 </div>
               </div>
             </CardHeader>
-            <CardContent>
+            <CardContent className="pb-4 px-4">
               <Button 
-                variant="primary" 
-                className="w-full"
+                size="sm"
+                className="w-full bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-500 dark:hover:bg-emerald-600 text-white"
                 onClick={(e) => {
                   e.stopPropagation();
                   navigate("/register?from=staff");
                 }}
               >
-                <UserPlus className="w-4 h-4 mr-2" />
+                <UserPlus className="w-3 h-3 mr-1" />
                 Create New Profile
               </Button>
             </CardContent>
