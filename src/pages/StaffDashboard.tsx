@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTheme } from "next-themes";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
@@ -13,7 +14,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { RefreshCw, Users, CheckCircle, Clock, Search, ChevronLeft, ChevronRight, UserPlus, Edit, Trash2, Home, XCircle, Phone, Mail, MapPin, Briefcase, GraduationCap, User as UserIcon, Calendar, Heart, LogOut, Shield } from "lucide-react";
+import { RefreshCw, Users, CheckCircle, Clock, Search, ChevronLeft, ChevronRight, UserPlus, Edit, Trash2, Home, XCircle, Phone, Mail, MapPin, Briefcase, GraduationCap, User as UserIcon, Calendar, Heart, LogOut, Shield, Sun, Moon } from "lucide-react";
 import vikshanaLogo from "@/assets/vikshana-logo.png";
 import { Input } from "@/components/ui/input";
 import {
@@ -89,6 +90,7 @@ type VerificationFilter = "all" | "pending" | "verified" | "rejected";
 type GenderFilter = "all" | "male" | "female";
 
 const StaffDashboard = () => {
+  const { theme, setTheme } = useTheme();
   const [user, setUser] = useState<User | null>(null);
   const [userRole, setUserRole] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -419,12 +421,12 @@ const StaffDashboard = () => {
   const rejectedProfiles = statusCounts.rejected;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-cream via-white to-cream">
+    <div className="min-h-screen bg-gradient-to-br from-cream via-white to-cream dark:from-gray-900 dark:via-gray-950 dark:to-gray-900">
       {/* Decorative Top Border */}
       <div className="h-1 bg-gradient-to-r from-primary via-gold to-green-600" />
       
       {/* Header */}
-      <header className="bg-white/95 backdrop-blur-sm shadow-lg border-b border-gold/30 sticky top-0 z-50">
+      <header className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm shadow-lg border-b border-gold/30 dark:border-gold/20 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
           <div className="flex justify-between items-center">
             {/* Left Side - Logo and Branding */}
@@ -473,7 +475,20 @@ const StaffDashboard = () => {
             </div>
             
             {/* Right Side - Actions */}
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
+              {/* Dark Mode Toggle */}
+              <Button
+                onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                variant="outline"
+                size="sm"
+                className="border-gold/30 text-foreground hover:bg-muted transition-all duration-300 shadow-sm"
+              >
+                {theme === "dark" ? (
+                  <Sun className="w-4 h-4" />
+                ) : (
+                  <Moon className="w-4 h-4" />
+                )}
+              </Button>
               <Button
                 onClick={() => navigate("/")}
                 variant="outline"
