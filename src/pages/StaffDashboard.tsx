@@ -14,7 +14,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { RefreshCw, Users, CheckCircle, Clock, Search, ChevronLeft, ChevronRight, UserPlus, Edit, Trash2, Home, XCircle, Phone, Mail, MapPin, Briefcase, GraduationCap, User as UserIcon, Calendar, Heart, LogOut, Shield, Sun, Moon } from "lucide-react";
+import { RefreshCw, Users, CheckCircle, Clock, Search, ChevronLeft, ChevronRight, UserPlus, Edit, Trash2, Home, XCircle, Phone, Mail, MapPin, Briefcase, GraduationCap, User as UserIcon, Calendar, Heart, LogOut, Shield, Sun, Moon, KeyRound } from "lucide-react";
 import vikshanaLogo from "@/assets/vikshana-logo.png";
 import { Input } from "@/components/ui/input";
 import {
@@ -112,6 +112,7 @@ const StaffDashboard = () => {
   const [verifyingProfile, setVerifyingProfile] = useState(false);
   const [adminNotes, setAdminNotes] = useState("");
   const [editProfile, setEditProfile] = useState<Profile | null>(null);
+  const [sendingPasswordReset, setSendingPasswordReset] = useState<string | null>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -307,6 +308,38 @@ const StaffDashboard = () => {
 
   const handleEditProfile = (profile: Profile) => {
     setEditProfile(profile);
+  };
+
+  const handleSendPasswordReset = async (email: string) => {
+    setSendingPasswordReset(email);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      const response = await supabase.functions.invoke('send-password-reset', {
+        body: { email },
+        headers: {
+          Authorization: `Bearer ${session?.access_token}`,
+        },
+      });
+
+      if (response.error) {
+        throw new Error(response.error.message || 'Failed to send password reset email');
+      }
+
+      toast({
+        title: "Password Reset Sent",
+        description: `A password reset email has been sent to ${email}`,
+      });
+    } catch (error: any) {
+      console.error("Error sending password reset:", error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to send password reset email",
+        variant: "destructive",
+      });
+    } finally {
+      setSendingPasswordReset(null);
+    }
   };
 
   const handleVerifyProfile = async (status: "verified" | "rejected") => {
@@ -927,10 +960,22 @@ const StaffDashboard = () => {
                         {selectedProfile.phone}
                       </span>
                     </div>
-                    <p className="text-sm">
-                      <span className="text-muted-foreground">Profile For:</span>{" "}
-                      <span className="capitalize font-medium">{selectedProfile.profile_for || "-"}</span>
-                    </p>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <p className="text-sm">
+                        <span className="text-muted-foreground">Profile For:</span>{" "}
+                        <span className="capitalize font-medium">{selectedProfile.profile_for || "-"}</span>
+                      </p>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleSendPasswordReset(selectedProfile.email)}
+                        disabled={sendingPasswordReset === selectedProfile.email}
+                        className="gap-1.5 text-xs h-7"
+                      >
+                        <KeyRound className="w-3 h-3" />
+                        {sendingPasswordReset === selectedProfile.email ? "Sending..." : "Send Password Reset"}
+                      </Button>
+                    </div>
                   </div>
                 </div>
 
