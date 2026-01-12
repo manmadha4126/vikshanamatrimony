@@ -220,7 +220,8 @@ const InterestsSection = ({ userId, profileId, onMessageClick }: InterestsSectio
     const profile = interest.profile;
     const isProcessing = processingId === interest.id;
     
-    const displayName = profile?.name || 'Unknown User';
+    // Always show profile name and details without any restrictions
+    const displayName = profile?.name || 'Profile Not Found';
     const displayAge = profile?.date_of_birth ? calculateAge(profile.date_of_birth) : null;
     const profileIdText = profile?.profile_id || 'N/A';
 
@@ -239,17 +240,17 @@ const InterestsSection = ({ userId, profileId, onMessageClick }: InterestsSectio
       }
     };
 
-    // Build profile details string
+    // Build profile details string - show all details without restrictions
     const detailParts = [
       displayAge ? `${displayAge} yrs` : null,
       profile?.height,
       profile?.religion,
       profile?.education,
-      profile?.employment_type || (profile?.occupation ? 'Working' : null),
+      profile?.employment_type || profile?.occupation,
       [profile?.city, profile?.state].filter(Boolean).join(', ')
     ].filter(Boolean);
 
-    const detailsString = detailParts.join(' • ');
+    const detailsString = detailParts.length > 0 ? detailParts.join(' • ') : 'Details not available';
 
     // Status text
     const statusText = type === 'sent' 
