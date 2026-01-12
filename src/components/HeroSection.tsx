@@ -1,12 +1,11 @@
-import weddingCarousel1 from "@/assets/wedding-carousel-1.jpg";
+import weddingHero1 from "@/assets/wedding-hero-1.jpg";
+import weddingHero2 from "@/assets/wedding-hero-2.jpg";
 import weddingCarousel2 from "@/assets/wedding-carousel-2.jpg";
-import weddingCarousel3 from "@/assets/wedding-carousel-3.jpg";
 import weddingCarousel4 from "@/assets/wedding-carousel-4.jpg";
-import weddingCarousel5 from "@/assets/wedding-carousel-5.jpg";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
-const weddingImages = [weddingCarousel1, weddingCarousel2, weddingCarousel3, weddingCarousel4, weddingCarousel5];
+const weddingImages = [weddingHero1, weddingHero2, weddingCarousel2, weddingCarousel4];
 const HeroSection = () => {
   const navigate = useNavigate();
   const [currentImage, setCurrentImage] = useState(0);
@@ -47,7 +46,7 @@ const HeroSection = () => {
           animationDelay: "0.2s"
         }}>
             <div className="relative rounded-2xl overflow-hidden shadow-card">
-              {weddingImages.map((img, index) => <img key={index} src={img} alt={`Happy Indian Wedding Couple ${index + 1}`} className={`w-full h-[500px] lg:h-[700px] object-cover object-center transition-opacity duration-1000 ${index === currentImage ? "opacity-100" : "opacity-0 absolute inset-0"}`} style={{ imageRendering: 'crisp-edges' }} loading="eager" />)}
+              {weddingImages.map((img, index) => <img key={index} src={img} alt={`Happy Indian Wedding Couple ${index + 1}`} className={`w-full h-[500px] lg:h-[600px] object-cover transition-opacity duration-1000 ${index === currentImage ? "opacity-100" : "opacity-0 absolute inset-0"}`} />)}
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
 
               {/* Text Overlay on Image */}
