@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Separator } from '@/components/ui/separator';
+import { Button } from '@/components/ui/button';
 import {
   User,
   Heart,
@@ -15,6 +15,9 @@ import {
   CheckCircle2,
   XCircle,
   Star,
+  Lock,
+  Crown,
+  FileText,
 } from 'lucide-react';
 import { format, formatDistanceToNow } from 'date-fns';
 
@@ -50,6 +53,7 @@ interface ViewProfileSectionProps {
     family_type: string | null;
     about_me: string | null;
     hobbies: string[] | null;
+    horoscope_url: string | null;
     is_prime: boolean | null;
     phone_verified: boolean | null;
     email_verified: boolean | null;
@@ -58,9 +62,11 @@ interface ViewProfileSectionProps {
     updated_at: string;
     created_at: string;
   };
+  currentUserIsPrime?: boolean;
+  onUpgradeToPrime?: () => void;
 }
 
-const ViewProfileSection = ({ profile }: ViewProfileSectionProps) => {
+const ViewProfileSection = ({ profile, currentUserIsPrime = false, onUpgradeToPrime }: ViewProfileSectionProps) => {
   const calculateAge = (dateOfBirth: string | null) => {
     if (!dateOfBirth) return null;
     const today = new Date();
@@ -75,10 +81,23 @@ const ViewProfileSection = ({ profile }: ViewProfileSectionProps) => {
 
   const age = calculateAge(profile.date_of_birth);
 
-  const InfoRow = ({ label, value }: { label: string; value: string | null | undefined }) => (
+  const InfoRow = ({ label, value, isRestricted = false }: { label: string; value: string | null | undefined; isRestricted?: boolean }) => (
     <div className="flex justify-between py-2 border-b border-border/50 last:border-0">
       <span className="text-muted-foreground text-sm">{label}</span>
-      <span className="font-medium text-sm text-right max-w-[60%]">{value || 'Not specified'}</span>
+      {isRestricted && !currentUserIsPrime ? (
+        <Button 
+          variant="outline" 
+          size="sm" 
+          className="h-6 text-xs gap-1"
+          onClick={onUpgradeToPrime}
+        >
+          <Lock className="h-3 w-3" />
+          <Crown className="h-3 w-3 text-amber-500" />
+          Upgrade
+        </Button>
+      ) : (
+        <span className="font-medium text-sm text-right max-w-[60%]">{value || 'Not specified'}</span>
+      )}
     </div>
   );
 
@@ -216,10 +235,53 @@ const ViewProfileSection = ({ profile }: ViewProfileSectionProps) => {
           </CardHeader>
           <CardContent>
             <InfoRow label="Email" value={profile.email} />
-            <InfoRow label="Phone" value={profile.phone} />
+            <InfoRow label="Phone" value={profile.phone} isRestricted={true} />
             <InfoRow label="Country" value={profile.country} />
             <InfoRow label="State" value={profile.state} />
             <InfoRow label="City" value={profile.city} />
+          </CardContent>
+        </Card>
+
+        {/* Horoscope Section */}
+        <Card className="shadow-card">
+          <CardHeader className="pb-2">
+            <CardTitle className="font-display text-lg flex items-center gap-2">
+              <FileText className="h-5 w-5 text-primary" />
+              Horoscope
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {profile.horoscope_url ? (
+              currentUserIsPrime ? (
+                <div className="space-y-2">
+                  <p className="text-sm text-muted-foreground">Horoscope document is available</p>
+                  <Button size="sm" variant="outline" asChild>
+                    <a href={profile.horoscope_url} target="_blank" rel="noopener noreferrer">
+                      <FileText className="h-4 w-4 mr-2" />
+                      View Horoscope
+                    </a>
+                  </Button>
+                </div>
+              ) : (
+                <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+                  <div className="flex items-center gap-2">
+                    <Lock className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-sm text-muted-foreground">Horoscope available</span>
+                  </div>
+                  <Button 
+                    size="sm" 
+                    variant="outline" 
+                    className="gap-1"
+                    onClick={onUpgradeToPrime}
+                  >
+                    <Crown className="h-3 w-3 text-amber-500" />
+                    Upgrade to View
+                  </Button>
+                </div>
+              )
+            ) : (
+              <p className="text-sm text-muted-foreground">No horoscope uploaded</p>
+            )}
           </CardContent>
         </Card>
 

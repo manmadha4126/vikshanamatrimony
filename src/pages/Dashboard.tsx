@@ -436,6 +436,7 @@ const Dashboard = () => {
                   family_type: profile.family_type,
                   about_me: profile.about_me,
                   hobbies: profile.hobbies,
+                  horoscope_url: profile.horoscope_url,
                   is_prime: profile.is_prime,
                   phone_verified: profile.phone_verified,
                   email_verified: profile.email_verified,
@@ -444,6 +445,7 @@ const Dashboard = () => {
                   updated_at: profile.updated_at,
                   created_at: profile.created_at,
                 }}
+                currentUserIsPrime={profile.is_prime || false}
               />
             )}
 
