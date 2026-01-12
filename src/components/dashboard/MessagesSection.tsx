@@ -247,7 +247,7 @@ const MessagesSection = ({ userId, profileId, initialRecipient }: MessagesSectio
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  // Real-time subscription for new messages
+  // Real-time subscription for new messages (both sent and received)
   useEffect(() => {
     const channel = supabase
       .channel('messages-channel')
@@ -257,13 +257,25 @@ const MessagesSection = ({ userId, profileId, initialRecipient }: MessagesSectio
           event: 'INSERT',
           schema: 'public',
           table: 'messages',
-          filter: `to_user_id=eq.${userId}`,
         },
         (payload) => {
-          if (selectedConversation && payload.new.from_user_id === selectedConversation.userId) {
-            setMessages(prev => [...prev, payload.new as Message]);
+          const newMsg = payload.new as Message;
+          // Only process messages relevant to this user
+          if (newMsg.to_user_id === userId || newMsg.from_user_id === userId) {
+            if (selectedConversation) {
+              // Add message if it's from/to the selected conversation partner
+              if (newMsg.from_user_id === selectedConversation.userId || 
+                  newMsg.to_user_id === selectedConversation.userId) {
+                setMessages(prev => {
+                  // Avoid duplicates
+                  if (prev.find(m => m.id === newMsg.id)) return prev;
+                  return [...prev, newMsg];
+                });
+              }
+            }
+            // Refresh conversations list
+            fetchConversations();
           }
-          fetchConversations();
         }
       )
       .subscribe();
