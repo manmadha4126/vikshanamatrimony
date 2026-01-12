@@ -8,7 +8,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Dialog,
   DialogContent,
@@ -28,72 +28,83 @@ import {
   Briefcase,
   GraduationCap,
   FileText,
+  Users,
 } from 'lucide-react';
 
-interface VerificationRequest {
+interface Profile {
   id: string;
-  profile_id: string;
-  user_id: string;
-  status: string;
-  requested_at: string;
-  processed_at: string | null;
+  profile_id: string | null;
+  name: string;
+  email: string;
+  phone: string;
+  gender: string;
+  photo_url: string | null;
+  date_of_birth: string | null;
+  city: string | null;
+  state: string | null;
+  education: string | null;
+  occupation: string | null;
+  religion: string | null;
+  caste: string | null;
+  verification_status: string | null;
+  horoscope_url: string | null;
+  created_at: string;
   admin_notes: string | null;
-  profile: {
-    id: string;
-    profile_id: string | null;
-    name: string;
-    email: string;
-    phone: string;
-    gender: string;
-    photo_url: string | null;
-    date_of_birth: string | null;
-    city: string | null;
-    state: string | null;
-    education: string | null;
-    occupation: string | null;
-    religion: string | null;
-    caste: string | null;
-    verification_status: string | null;
-    horoscope_url: string | null;
-  };
+  user_id: string | null;
 }
 
 const VerificationCenter = () => {
-  const [requests, setRequests] = useState<VerificationRequest[]>([]);
+  const [profiles, setProfiles] = useState<Profile[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedRequest, setSelectedRequest] = useState<VerificationRequest | null>(null);
+  const [selectedProfile, setSelectedProfile] = useState<Profile | null>(null);
   const [adminNotes, setAdminNotes] = useState('');
   const [processing, setProcessing] = useState(false);
   const [filter, setFilter] = useState<'pending' | 'verified' | 'rejected' | 'all'>('pending');
+  const [counts, setCounts] = useState({ all: 0, pending: 0, verified: 0, rejected: 0 });
 
-  const fetchRequests = async () => {
+  const fetchCounts = async () => {
+    try {
+      const [allRes, verifiedRes, pendingRes, rejectedRes] = await Promise.all([
+        supabase.from("profiles").select("*", { count: "exact", head: true }),
+        supabase.from("profiles").select("*", { count: "exact", head: true }).eq("verification_status", "verified"),
+        supabase.from("profiles").select("*", { count: "exact", head: true }).or("verification_status.is.null,verification_status.eq.pending"),
+        supabase.from("profiles").select("*", { count: "exact", head: true }).eq("verification_status", "rejected"),
+      ]);
+      
+      setCounts({
+        all: allRes.count || 0,
+        verified: verifiedRes.count || 0,
+        pending: pendingRes.count || 0,
+        rejected: rejectedRes.count || 0,
+      });
+    } catch (error) {
+      console.error('Error fetching counts:', error);
+    }
+  };
+
+  const fetchProfiles = async () => {
     setLoading(true);
     try {
       let query = supabase
-        .from('verification_requests')
-        .select(`
-          *,
-          profile:profiles!verification_requests_profile_id_fkey (
-            id, profile_id, name, email, phone, gender, photo_url,
-            date_of_birth, city, state, education, occupation,
-            religion, caste, verification_status, horoscope_url
-          )
-        `)
-        .order('requested_at', { ascending: false });
+        .from('profiles')
+        .select('*')
+        .order('created_at', { ascending: false });
 
-      if (filter !== 'all') {
-        query = query.eq('status', filter);
+      if (filter === 'pending') {
+        query = query.or('verification_status.is.null,verification_status.eq.pending');
+      } else if (filter !== 'all') {
+        query = query.eq('verification_status', filter);
       }
 
       const { data, error } = await query;
 
       if (error) throw error;
-      setRequests(data || []);
+      setProfiles(data || []);
     } catch (error: any) {
-      console.error('Error fetching requests:', error);
+      console.error('Error fetching profiles:', error);
       toast({
         title: 'Error',
-        description: 'Failed to load verification requests',
+        description: 'Failed to load profiles',
         variant: 'destructive',
       });
     } finally {
@@ -102,62 +113,54 @@ const VerificationCenter = () => {
   };
 
   useEffect(() => {
-    fetchRequests();
+    fetchProfiles();
+    fetchCounts();
   }, [filter]);
 
   const handleVerification = async (status: 'verified' | 'rejected') => {
-    if (!selectedRequest) return;
+    if (!selectedProfile) return;
     setProcessing(true);
 
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
-      // Update verification request
-      const { error: requestError } = await supabase
-        .from('verification_requests')
-        .update({
-          status,
-          processed_at: new Date().toISOString(),
-          processed_by: user.id,
-          admin_notes: adminNotes || null,
-        })
-        .eq('id', selectedRequest.id);
-
-      if (requestError) throw requestError;
-
       // Update profile verification status
       const { error: profileError } = await supabase
         .from('profiles')
         .update({
           verification_status: status,
+          admin_notes: adminNotes || null,
           phone_verified: status === 'verified',
         })
-        .eq('id', selectedRequest.profile_id);
+        .eq('id', selectedProfile.id);
 
       if (profileError) throw profileError;
 
-      // Create notification for user
-      await supabase
-        .from('notifications')
-        .insert({
-          user_id: selectedRequest.user_id,
-          type: 'verification',
-          title: status === 'verified' ? 'Profile Verified!' : 'Verification Rejected',
-          message: status === 'verified'
-            ? 'Congratulations! Your profile has been verified successfully.'
-            : `Your verification request was rejected. ${adminNotes || 'Please contact support for more details.'}`,
-          related_profile_id: selectedRequest.profile_id,
-        });
+      // Create notification for user if they have a user_id
+      if (selectedProfile.user_id) {
+        await supabase
+          .from('notifications')
+          .insert({
+            user_id: selectedProfile.user_id,
+            type: 'verification',
+            title: status === 'verified' ? 'Profile Verified!' : 'Verification Rejected',
+            message: status === 'verified'
+              ? 'Congratulations! Your profile has been verified successfully.'
+              : `Your verification request was rejected. ${adminNotes || 'Please contact support for more details.'}`,
+            related_profile_id: selectedProfile.id,
+          });
+      }
 
       toast({
-        title: status === 'verified' ? 'Profile Verified' : 'Request Rejected',
+        title: status === 'verified' ? 'Profile Verified' : 'Profile Rejected',
         description: `Profile has been ${status} successfully.`,
       });
 
-      setSelectedRequest(null);
+      setSelectedProfile(null);
       setAdminNotes('');
-      fetchRequests();
+      fetchProfiles();
+      fetchCounts();
     } catch (error: any) {
       toast({
         title: 'Error',
@@ -195,7 +198,7 @@ const VerificationCenter = () => {
     });
   };
 
-  const getStatusBadge = (status: string) => {
+  const getStatusBadge = (status: string | null) => {
     switch (status) {
       case 'verified':
         return <Badge className="bg-green-100 text-green-700">Verified</Badge>;
@@ -211,7 +214,7 @@ const VerificationCenter = () => {
       <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle className="text-xl font-display">Verification Center</CardTitle>
-          <Button variant="outline" size="sm" onClick={fetchRequests}>
+          <Button variant="outline" size="sm" onClick={() => { fetchProfiles(); fetchCounts(); }}>
             <RefreshCw className="h-4 w-4 mr-1" />
             Refresh
           </Button>
@@ -219,71 +222,88 @@ const VerificationCenter = () => {
       </CardHeader>
       <CardContent>
         <Tabs value={filter} onValueChange={(v) => setFilter(v as typeof filter)}>
-          <TabsList className="mb-4">
-            <TabsTrigger value="pending">Pending</TabsTrigger>
-            <TabsTrigger value="verified">Verified</TabsTrigger>
-            <TabsTrigger value="rejected">Rejected</TabsTrigger>
-            <TabsTrigger value="all">All</TabsTrigger>
+          <TabsList className="mb-4 grid grid-cols-4 w-full">
+            <TabsTrigger value="pending" className="flex items-center gap-2">
+              <Clock className="h-4 w-4" />
+              <span className="hidden sm:inline">Pending</span>
+              <Badge variant="secondary" className="ml-1 bg-yellow-100 text-yellow-700">{counts.pending}</Badge>
+            </TabsTrigger>
+            <TabsTrigger value="verified" className="flex items-center gap-2">
+              <CheckCircle className="h-4 w-4" />
+              <span className="hidden sm:inline">Verified</span>
+              <Badge variant="secondary" className="ml-1 bg-green-100 text-green-700">{counts.verified}</Badge>
+            </TabsTrigger>
+            <TabsTrigger value="rejected" className="flex items-center gap-2">
+              <XCircle className="h-4 w-4" />
+              <span className="hidden sm:inline">Rejected</span>
+              <Badge variant="secondary" className="ml-1 bg-red-100 text-red-700">{counts.rejected}</Badge>
+            </TabsTrigger>
+            <TabsTrigger value="all" className="flex items-center gap-2">
+              <Users className="h-4 w-4" />
+              <span className="hidden sm:inline">All</span>
+              <Badge variant="secondary" className="ml-1">{counts.all}</Badge>
+            </TabsTrigger>
           </TabsList>
 
           {loading ? (
             <div className="flex items-center justify-center py-12">
               <RefreshCw className="h-6 w-6 animate-spin text-muted-foreground" />
             </div>
-          ) : requests.length === 0 ? (
+          ) : profiles.length === 0 ? (
             <div className="text-center py-12 text-muted-foreground">
               <Clock className="h-12 w-12 mx-auto mb-4 opacity-50" />
-              <p>No {filter !== 'all' ? filter : ''} verification requests found</p>
+              <p>No {filter !== 'all' ? filter : ''} profiles found</p>
             </div>
           ) : (
             <ScrollArea className="h-[500px]">
               <div className="space-y-4">
-                {requests.map((request) => (
+                {profiles.map((profile) => (
                   <Card
-                    key={request.id}
+                    key={profile.id}
                     className="cursor-pointer hover:shadow-md transition-all"
                     onClick={() => {
-                      setSelectedRequest(request);
-                      setAdminNotes(request.admin_notes || '');
+                      setSelectedProfile(profile);
+                      setAdminNotes(profile.admin_notes || '');
                     }}
                   >
                     <CardContent className="p-4">
                       <div className="flex items-center gap-4">
                         <Avatar className="h-14 w-14">
-                          <AvatarImage src={request.profile.photo_url || ''} />
+                          <AvatarImage src={profile.photo_url || ''} />
                           <AvatarFallback className="bg-primary/10 text-primary">
-                            {getInitials(request.profile.name)}
+                            {getInitials(profile.name)}
                           </AvatarFallback>
                         </Avatar>
                         <div className="flex-1">
                           <div className="flex items-center gap-2">
-                            <h3 className="font-semibold">{request.profile.name}</h3>
-                            {getStatusBadge(request.status)}
+                            <h3 className="font-semibold">{profile.name}</h3>
+                            {getStatusBadge(profile.verification_status)}
                           </div>
                           <p className="text-sm text-muted-foreground">
-                            {request.profile.profile_id} • {request.profile.gender}
-                            {request.profile.date_of_birth && ` • ${calculateAge(request.profile.date_of_birth)} yrs`}
+                            {profile.profile_id} • {profile.gender}
+                            {profile.date_of_birth && ` • ${calculateAge(profile.date_of_birth)} yrs`}
                           </p>
                           <div className="flex items-center gap-4 mt-1 text-xs text-muted-foreground">
                             <span className="flex items-center gap-1">
                               <Phone className="h-3 w-3" />
-                              {request.profile.phone}
+                              {profile.phone}
                             </span>
                             <span className="flex items-center gap-1">
                               <Clock className="h-3 w-3" />
-                              {formatDate(request.requested_at)}
+                              {formatDate(profile.created_at)}
                             </span>
                           </div>
                         </div>
-                        {request.status === 'pending' && (
+                        {(!profile.verification_status || profile.verification_status === 'pending') && (
                           <div className="flex gap-2">
                             <Button
                               size="sm"
                               className="bg-green-600 hover:bg-green-700"
                               onClick={(e) => {
                                 e.stopPropagation();
-                                setSelectedRequest(request);
-                                handleVerification('verified');
+                                setSelectedProfile(profile);
+                                setAdminNotes('');
+                                setTimeout(() => handleVerification('verified'), 100);
                               }}
                             >
                               <CheckCircle className="h-4 w-4" />
@@ -293,7 +313,8 @@ const VerificationCenter = () => {
                               variant="destructive"
                               onClick={(e) => {
                                 e.stopPropagation();
-                                setSelectedRequest(request);
+                                setSelectedProfile(profile);
+                                setAdminNotes('');
                               }}
                             >
                               <XCircle className="h-4 w-4" />
@@ -311,28 +332,28 @@ const VerificationCenter = () => {
       </CardContent>
 
       {/* Profile Detail Dialog */}
-      <Dialog open={!!selectedRequest} onOpenChange={() => setSelectedRequest(null)}>
+      <Dialog open={!!selectedProfile} onOpenChange={() => setSelectedProfile(null)}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Verification Request Details</DialogTitle>
+            <DialogTitle>Profile Details</DialogTitle>
           </DialogHeader>
           
-          {selectedRequest && (
+          {selectedProfile && (
             <div className="space-y-6">
               {/* Profile Header */}
               <div className="flex items-center gap-4">
                 <Avatar className="h-20 w-20">
-                  <AvatarImage src={selectedRequest.profile.photo_url || ''} />
+                  <AvatarImage src={selectedProfile.photo_url || ''} />
                   <AvatarFallback className="bg-primary/10 text-primary text-xl">
-                    {getInitials(selectedRequest.profile.name)}
+                    {getInitials(selectedProfile.name)}
                   </AvatarFallback>
                 </Avatar>
                 <div>
-                  <h2 className="text-xl font-semibold">{selectedRequest.profile.name}</h2>
+                  <h2 className="text-xl font-semibold">{selectedProfile.name}</h2>
                   <p className="text-muted-foreground">
-                    {selectedRequest.profile.profile_id} • {selectedRequest.profile.gender}
+                    {selectedProfile.profile_id} • {selectedProfile.gender}
                   </p>
-                  {getStatusBadge(selectedRequest.status)}
+                  {getStatusBadge(selectedProfile.verification_status)}
                 </div>
               </div>
 
@@ -342,61 +363,58 @@ const VerificationCenter = () => {
               <div className="grid grid-cols-2 gap-4">
                 <div className="flex items-center gap-2">
                   <Phone className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-sm">{selectedRequest.profile.phone}</span>
+                  <span className="text-sm">{selectedProfile.phone}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Mail className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-sm">{selectedRequest.profile.email}</span>
+                  <span className="text-sm">{selectedProfile.email}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Calendar className="h-4 w-4 text-muted-foreground" />
                   <span className="text-sm">
-                    {calculateAge(selectedRequest.profile.date_of_birth)} years old
+                    {calculateAge(selectedProfile.date_of_birth)} years old
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
                   <MapPin className="h-4 w-4 text-muted-foreground" />
                   <span className="text-sm">
-                    {[selectedRequest.profile.city, selectedRequest.profile.state].filter(Boolean).join(', ') || '-'}
+                    {[selectedProfile.city, selectedProfile.state].filter(Boolean).join(', ') || '-'}
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
                   <GraduationCap className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-sm">{selectedRequest.profile.education || '-'}</span>
+                  <span className="text-sm">{selectedProfile.education || '-'}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Briefcase className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-sm">{selectedRequest.profile.occupation || '-'}</span>
+                  <span className="text-sm">{selectedProfile.occupation || '-'}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <User className="h-4 w-4 text-muted-foreground" />
                   <span className="text-sm">
-                    {[selectedRequest.profile.religion, selectedRequest.profile.caste].filter(Boolean).join(' - ') || '-'}
+                    {[selectedProfile.religion, selectedProfile.caste].filter(Boolean).join(' - ') || '-'}
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
                   <FileText className="h-4 w-4 text-muted-foreground" />
                   <span className="text-sm">
-                    {selectedRequest.profile.horoscope_url ? 'Horoscope Uploaded' : 'No Horoscope'}
+                    {selectedProfile.horoscope_url ? 'Horoscope Uploaded' : 'No Horoscope'}
                   </span>
                 </div>
               </div>
 
               <Separator />
 
-              {/* Request Details */}
+              {/* Registration Info */}
               <div>
-                <h3 className="font-medium mb-2">Request Info</h3>
+                <h3 className="font-medium mb-2">Registration Info</h3>
                 <div className="text-sm text-muted-foreground space-y-1">
-                  <p>Requested: {formatDate(selectedRequest.requested_at)}</p>
-                  {selectedRequest.processed_at && (
-                    <p>Processed: {formatDate(selectedRequest.processed_at)}</p>
-                  )}
+                  <p>Registered: {formatDate(selectedProfile.created_at)}</p>
                 </div>
               </div>
 
               {/* Admin Notes */}
-              {selectedRequest.status === 'pending' && (
+              {(!selectedProfile.verification_status || selectedProfile.verification_status === 'pending') && (
                 <div>
                   <h3 className="font-medium mb-2">Admin Notes</h3>
                   <Textarea
@@ -408,17 +426,17 @@ const VerificationCenter = () => {
                 </div>
               )}
 
-              {selectedRequest.admin_notes && selectedRequest.status !== 'pending' && (
+              {selectedProfile.admin_notes && selectedProfile.verification_status !== 'pending' && (
                 <div>
                   <h3 className="font-medium mb-2">Admin Notes</h3>
                   <p className="text-sm text-muted-foreground p-3 bg-muted rounded-lg">
-                    {selectedRequest.admin_notes}
+                    {selectedProfile.admin_notes}
                   </p>
                 </div>
               )}
 
               {/* Action Buttons */}
-              {selectedRequest.status === 'pending' && (
+              {(!selectedProfile.verification_status || selectedProfile.verification_status === 'pending') && (
                 <div className="flex gap-3 pt-4">
                   <Button
                     className="flex-1 bg-green-600 hover:bg-green-700"
