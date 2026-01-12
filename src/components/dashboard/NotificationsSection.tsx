@@ -1,11 +1,12 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Bell, Heart, MessageCircle, Check, CheckCheck, Loader2, Trash2 } from 'lucide-react';
+import { Bell, Heart, MessageCircle, Check, CheckCheck, Loader2, Eye, Crown, Star } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useNotificationSound } from '@/hooks/useNotificationSound';
 
 interface Notification {
   id: string;
@@ -30,6 +31,8 @@ const NotificationsSection = ({ userId }: NotificationsSectionProps) => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
+  const { playNotificationSound } = useNotificationSound();
+  const prevNotificationCountRef = useRef<number>(0);
 
   const fetchNotifications = async () => {
     setLoading(true);
@@ -113,7 +116,7 @@ const NotificationsSection = ({ userId }: NotificationsSectionProps) => {
     fetchNotifications();
   }, [userId]);
 
-  // Real-time subscription
+  // Real-time subscription with sound notification
   useEffect(() => {
     const channel = supabase
       .channel('notifications-channel')
@@ -126,6 +129,7 @@ const NotificationsSection = ({ userId }: NotificationsSectionProps) => {
           filter: `user_id=eq.${userId}`,
         },
         () => {
+          playNotificationSound();
           fetchNotifications();
         }
       )
@@ -134,7 +138,7 @@ const NotificationsSection = ({ userId }: NotificationsSectionProps) => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [userId]);
+  }, [userId, playNotificationSound]);
 
   const getIcon = (type: string) => {
     switch (type) {
@@ -144,6 +148,12 @@ const NotificationsSection = ({ userId }: NotificationsSectionProps) => {
         return <Check className="h-5 w-5 text-green-500" />;
       case 'message':
         return <MessageCircle className="h-5 w-5 text-blue-500" />;
+      case 'profile_view':
+        return <Eye className="h-5 w-5 text-purple-500" />;
+      case 'prime_upgrade':
+        return <Crown className="h-5 w-5 text-amber-500" />;
+      case 'verification':
+        return <Star className="h-5 w-5 text-green-500" />;
       default:
         return <Bell className="h-5 w-5 text-primary" />;
     }

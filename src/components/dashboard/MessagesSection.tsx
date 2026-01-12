@@ -8,6 +8,8 @@ import { Badge } from '@/components/ui/badge';
 import { MessageCircle, Send, ArrowLeft, Loader2, User } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useNotificationSound } from '@/hooks/useNotificationSound';
+import { useTypingIndicator } from '@/hooks/useTypingIndicator';
 
 interface Profile {
   id: string;
@@ -18,7 +20,7 @@ interface Profile {
 }
 
 interface Conversation {
-  userId: string;
+  odBCqt: string;
   profile: Profile;
   lastMessage: string;
   lastMessageTime: string;
@@ -35,8 +37,9 @@ interface Message {
 }
 
 interface MessagesSectionProps {
-  userId: string;
+  odBCqt: string;
   profileId: string;
+  userName?: string;
   initialRecipient?: {
     recipientUserId: string;
     recipientProfileId: string;
@@ -44,7 +47,7 @@ interface MessagesSectionProps {
   };
 }
 
-const MessagesSection = ({ userId, profileId, initialRecipient }: MessagesSectionProps) => {
+const MessagesSection = ({ odBCqt, profileId, userName = 'User', initialRecipient }: MessagesSectionProps) => {
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -53,6 +56,11 @@ const MessagesSection = ({ userId, profileId, initialRecipient }: MessagesSectio
   const [sendingMessage, setSendingMessage] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
+  const { playNotificationSound } = useNotificationSound();
+
+  // Typing indicator
+  const channelName = selectedConversation ? `chat-${[odBCqt, selectedConversation.odBCqt].sort().join('-')}` : '';
+  const { typingUsers, startTyping, stopTyping } = useTypingIndicator(channelName, odBCqt, userName);
 
   // Fetch accepted interests to get conversation partners
   const fetchConversations = async () => {
@@ -62,7 +70,7 @@ const MessagesSection = ({ userId, profileId, initialRecipient }: MessagesSectio
       const { data: sentInterests, error: sentError } = await supabase
         .from('interests')
         .select('to_profile_id')
-        .eq('from_user_id', userId)
+        .eq('from_user_id', odBCqt)
         .eq('status', 'accepted');
 
       const { data: receivedInterests, error: receivedError } = await supabase
@@ -113,7 +121,7 @@ const MessagesSection = ({ userId, profileId, initialRecipient }: MessagesSectio
         const { data: lastMessages } = await supabase
           .from('messages')
           .select('*')
-          .or(`and(from_user_id.eq.${userId},to_user_id.eq.${profile.user_id}),and(from_user_id.eq.${profile.user_id},to_user_id.eq.${userId})`)
+          .or(`and(from_user_id.eq.${odBCqt},to_user_id.eq.${profile.user_id}),and(from_user_id.eq.${profile.user_id},to_user_id.eq.${odBCqt})`)
           .order('created_at', { ascending: false })
           .limit(1);
 
@@ -122,11 +130,11 @@ const MessagesSection = ({ userId, profileId, initialRecipient }: MessagesSectio
           .from('messages')
           .select('*', { count: 'exact', head: true })
           .eq('from_user_id', profile.user_id)
-          .eq('to_user_id', userId)
+          .eq('to_user_id', odBCqt)
           .eq('is_read', false);
 
         conversationsData.push({
-          userId: profile.user_id,
+          odBCqt: profile.user_id,
           profile,
           lastMessage: lastMessages?.[0]?.content || 'Start a conversation',
           lastMessageTime: lastMessages?.[0]?.created_at || '',
@@ -160,7 +168,7 @@ const MessagesSection = ({ userId, profileId, initialRecipient }: MessagesSectio
       const { data, error } = await supabase
         .from('messages')
         .select('*')
-        .or(`and(from_user_id.eq.${userId},to_user_id.eq.${partnerUserId}),and(from_user_id.eq.${partnerUserId},to_user_id.eq.${userId})`)
+        .or(`and(from_user_id.eq.${odBCqt},to_user_id.eq.${partnerUserId}),and(from_user_id.eq.${partnerUserId},to_user_id.eq.${odBCqt})`)
         .order('created_at', { ascending: true });
 
       if (error) throw error;
@@ -171,7 +179,7 @@ const MessagesSection = ({ userId, profileId, initialRecipient }: MessagesSectio
         .from('messages')
         .update({ is_read: true })
         .eq('from_user_id', partnerUserId)
-        .eq('to_user_id', userId)
+        .eq('to_user_id', odBCqt)
         .eq('is_read', false);
 
     } catch (error) {
@@ -183,19 +191,20 @@ const MessagesSection = ({ userId, profileId, initialRecipient }: MessagesSectio
     if (!newMessage.trim() || !selectedConversation) return;
     
     setSendingMessage(true);
+    stopTyping();
     try {
       const { error } = await supabase
         .from('messages')
         .insert({
-          from_user_id: userId,
-          to_user_id: selectedConversation.userId,
+          from_user_id: odBCqt,
+          to_user_id: selectedConversation.odBCqt,
           content: newMessage.trim(),
         });
 
       if (error) throw error;
 
       setNewMessage('');
-      await fetchMessages(selectedConversation.userId);
+      await fetchMessages(selectedConversation.odBCqt);
     } catch (error) {
       toast({
         title: "Error",
@@ -207,20 +216,30 @@ const MessagesSection = ({ userId, profileId, initialRecipient }: MessagesSectio
     }
   };
 
+  // Handle typing
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setNewMessage(e.target.value);
+    if (e.target.value.trim()) {
+      startTyping();
+    } else {
+      stopTyping();
+    }
+  };
+
   useEffect(() => {
     fetchConversations();
-  }, [userId, profileId]);
+  }, [odBCqt, profileId]);
 
   // Handle initial recipient from interest section
   useEffect(() => {
     if (initialRecipient && conversations.length > 0) {
-      const existingConv = conversations.find(c => c.userId === initialRecipient.recipientUserId);
+      const existingConv = conversations.find(c => c.odBCqt === initialRecipient.recipientUserId);
       if (existingConv) {
         setSelectedConversation(existingConv);
       } else {
         // Create a temporary conversation entry for new chats
         const tempConversation: Conversation = {
-          userId: initialRecipient.recipientUserId,
+          odBCqt: initialRecipient.recipientUserId,
           profile: {
             id: initialRecipient.recipientProfileId,
             name: initialRecipient.recipientName,
@@ -239,7 +258,7 @@ const MessagesSection = ({ userId, profileId, initialRecipient }: MessagesSectio
 
   useEffect(() => {
     if (selectedConversation) {
-      fetchMessages(selectedConversation.userId);
+      fetchMessages(selectedConversation.odBCqt);
     }
   }, [selectedConversation]);
 
@@ -261,11 +280,16 @@ const MessagesSection = ({ userId, profileId, initialRecipient }: MessagesSectio
         (payload) => {
           const newMsg = payload.new as Message;
           // Only process messages relevant to this user
-          if (newMsg.to_user_id === userId || newMsg.from_user_id === userId) {
+          if (newMsg.to_user_id === odBCqt || newMsg.from_user_id === odBCqt) {
+            // Play notification sound for incoming messages
+            if (newMsg.to_user_id === odBCqt && newMsg.from_user_id !== odBCqt) {
+              playNotificationSound();
+            }
+            
             if (selectedConversation) {
               // Add message if it's from/to the selected conversation partner
-              if (newMsg.from_user_id === selectedConversation.userId || 
-                  newMsg.to_user_id === selectedConversation.userId) {
+              if (newMsg.from_user_id === selectedConversation.odBCqt || 
+                  newMsg.to_user_id === selectedConversation.odBCqt) {
                 setMessages(prev => {
                   // Avoid duplicates
                   if (prev.find(m => m.id === newMsg.id)) return prev;
@@ -283,7 +307,7 @@ const MessagesSection = ({ userId, profileId, initialRecipient }: MessagesSectio
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [userId, selectedConversation]);
+  }, [odBCqt, selectedConversation, playNotificationSound]);
 
   const getInitials = (name: string) => {
     return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
@@ -329,7 +353,13 @@ const MessagesSection = ({ userId, profileId, initialRecipient }: MessagesSectio
             </Avatar>
             <div>
               <h3 className="font-semibold">{selectedConversation.profile.name}</h3>
-              <p className="text-xs text-muted-foreground">{selectedConversation.profile.profile_id}</p>
+              <p className="text-xs text-muted-foreground">
+                {typingUsers.length > 0 ? (
+                  <span className="text-primary animate-pulse">Typing...</span>
+                ) : (
+                  selectedConversation.profile.profile_id
+                )}
+              </p>
             </div>
           </div>
         </CardHeader>
@@ -337,7 +367,7 @@ const MessagesSection = ({ userId, profileId, initialRecipient }: MessagesSectio
           <ScrollArea className="flex-1 p-4">
             <div className="space-y-3">
               {messages.map((message) => {
-                const isOwn = message.from_user_id === userId;
+                const isOwn = message.from_user_id === odBCqt;
                 return (
                   <div
                     key={message.id}
@@ -358,6 +388,18 @@ const MessagesSection = ({ userId, profileId, initialRecipient }: MessagesSectio
                   </div>
                 );
               })}
+              {/* Typing indicator in chat */}
+              {typingUsers.length > 0 && (
+                <div className="flex justify-start">
+                  <div className="bg-muted rounded-2xl rounded-bl-sm px-4 py-2">
+                    <div className="flex items-center gap-1">
+                      <span className="w-2 h-2 bg-muted-foreground/50 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                      <span className="w-2 h-2 bg-muted-foreground/50 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                      <span className="w-2 h-2 bg-muted-foreground/50 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                    </div>
+                  </div>
+                </div>
+              )}
               <div ref={messagesEndRef} />
             </div>
           </ScrollArea>
@@ -365,7 +407,8 @@ const MessagesSection = ({ userId, profileId, initialRecipient }: MessagesSectio
             <form onSubmit={(e) => { e.preventDefault(); sendMessage(); }} className="flex gap-2">
               <Input
                 value={newMessage}
-                onChange={(e) => setNewMessage(e.target.value)}
+                onChange={handleInputChange}
+                onBlur={stopTyping}
                 placeholder="Type a message..."
                 className="flex-1"
               />
@@ -407,7 +450,7 @@ const MessagesSection = ({ userId, profileId, initialRecipient }: MessagesSectio
           <div className="space-y-2">
             {conversations.map((conv) => (
               <button
-                key={conv.userId}
+                key={conv.odBCqt}
                 onClick={() => setSelectedConversation(conv)}
                 className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-muted/50 transition-colors text-left"
               >
