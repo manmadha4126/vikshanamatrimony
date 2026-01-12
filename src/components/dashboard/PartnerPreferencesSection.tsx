@@ -54,7 +54,8 @@ interface PartnerPreferences {
   education: string[];
   employed_in: string;
   occupation: string;
-  annual_income: string;
+  annual_income_from: string;
+  annual_income_to: string;
   country: string[];
   residing_state: string[];
   is_compulsory: boolean;
@@ -78,7 +79,8 @@ const defaultPreferences: PartnerPreferences = {
   education: [],
   employed_in: '',
   occupation: '',
-  annual_income: '',
+  annual_income_from: '',
+  annual_income_to: '',
   country: [],
   residing_state: [],
   is_compulsory: false,
@@ -235,7 +237,7 @@ const MultiSelectDropdown = ({
   );
 };
 
-type PreferenceStep = 'basic' | 'religious' | 'professional' | 'location';
+type PreferenceStep = 'basic' | 'religious' | 'professional_location';
 
 const PartnerPreferencesSection = ({ userId }: PartnerPreferencesSectionProps) => {
   const [formData, setFormData] = useState<PartnerPreferences>(defaultPreferences);
@@ -247,8 +249,7 @@ const PartnerPreferencesSection = ({ userId }: PartnerPreferencesSectionProps) =
   const steps: { id: PreferenceStep; label: string; icon: typeof User }[] = [
     { id: 'basic', label: 'Basic Details', icon: User },
     { id: 'religious', label: 'Religious', icon: Heart },
-    { id: 'professional', label: 'Professional', icon: GraduationCap },
-    { id: 'location', label: 'Location', icon: MapPin },
+    { id: 'professional_location', label: 'Professional & Location', icon: GraduationCap },
   ];
 
   useEffect(() => {
@@ -281,9 +282,11 @@ const PartnerPreferencesSection = ({ userId }: PartnerPreferencesSectionProps) =
           education: data.education || [],
           country: data.country || [],
           residing_state: data.residing_state || [],
+          annual_income_from: data.annual_income?.split(' - ')[0] || '',
+          annual_income_to: data.annual_income?.split(' - ')[1] || '',
         });
         // Mark all steps as completed if data exists
-        setCompletedSteps(['basic', 'religious', 'professional', 'location']);
+        setCompletedSteps(['basic', 'religious', 'professional_location']);
       }
     } catch (error: any) {
       console.error('Error fetching preferences:', error);
@@ -342,6 +345,11 @@ const PartnerPreferencesSection = ({ userId }: PartnerPreferencesSectionProps) =
   const saveCurrentStep = async () => {
     setIsSaving(true);
     try {
+      // Combine annual income range for storage
+      const annualIncomeRange = formData.annual_income_from && formData.annual_income_to 
+        ? `${formData.annual_income_from} - ${formData.annual_income_to}` 
+        : formData.annual_income_from || formData.annual_income_to || null;
+
       const { error } = await supabase
         .from('partner_preferences')
         .upsert({
@@ -363,7 +371,7 @@ const PartnerPreferencesSection = ({ userId }: PartnerPreferencesSectionProps) =
           education: formData.education,
           employed_in: formData.employed_in || null,
           occupation: formData.occupation || null,
-          annual_income: formData.annual_income || null,
+          annual_income: annualIncomeRange,
           country: formData.country,
           residing_state: formData.residing_state,
           is_compulsory: formData.is_compulsory,
@@ -642,79 +650,82 @@ const PartnerPreferencesSection = ({ userId }: PartnerPreferencesSectionProps) =
         </Card>
       )}
 
-      {/* Professional Preferences Section */}
-      {activeStep === 'professional' && (
+      {/* Professional & Location Preferences Section */}
+      {activeStep === 'professional_location' && (
         <Card className="shadow-card">
           <CardHeader className="pb-3">
             <CardTitle className="font-display text-lg flex items-center gap-2">
               <GraduationCap className="h-5 w-5 text-primary" />
-              Professional Preferences
+              Professional & Location Preferences
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <MultiSelectDropdown
-              label="Education"
-              options={educationOptions}
-              selectedValues={formData.education}
-              onToggle={(v) => toggleArrayItem('education', v)}
-              placeholder="Select education"
-            />
+          <CardContent className="space-y-6">
+            {/* Professional Section */}
+            <div className="space-y-4">
+              <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide border-b pb-2">
+                Professional Details
+              </h3>
+              
+              <MultiSelectDropdown
+                label="Education"
+                options={educationOptions}
+                selectedValues={formData.education}
+                onToggle={(v) => toggleArrayItem('education', v)}
+                placeholder="Select education"
+              />
 
-            <StyledSelect
-              label="Employed In"
-              value={formData.employed_in}
-              onValueChange={(v) => handleInputChange('employed_in', v)}
-              options={EMPLOYED_IN_OPTIONS}
-              placeholder="Select employment type"
-            />
+              <StyledSelect
+                label="Employed In"
+                value={formData.employed_in}
+                onValueChange={(v) => handleInputChange('employed_in', v)}
+                options={EMPLOYED_IN_OPTIONS}
+                placeholder="Select employment type"
+              />
 
-            <StyledSelect
-              label="Annual Income"
-              value={formData.annual_income}
-              onValueChange={(v) => handleInputChange('annual_income', v)}
-              options={['Any', ...incomeOptions]}
-              placeholder="Select income range"
-            />
-
-            <div className="flex justify-end pt-4">
-              <Button onClick={saveCurrentStep} disabled={isSaving} className="gap-2">
-                {isSaving ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <Save className="h-4 w-4" />
-                )}
-                Save & Continue
-              </Button>
+              <div className="space-y-2">
+                <Label className="text-xs font-medium text-foreground">Annual Income Range</Label>
+                <div className="grid grid-cols-2 gap-4">
+                  <StyledSelect
+                    label="From"
+                    value={formData.annual_income_from}
+                    onValueChange={(v) => handleInputChange('annual_income_from', v)}
+                    options={['Any', ...incomeOptions]}
+                    placeholder="Minimum income"
+                  />
+                  <StyledSelect
+                    label="To"
+                    value={formData.annual_income_to}
+                    onValueChange={(v) => handleInputChange('annual_income_to', v)}
+                    options={['Any', ...incomeOptions]}
+                    placeholder="Maximum income"
+                  />
+                </div>
+              </div>
             </div>
-          </CardContent>
-        </Card>
-      )}
 
-      {/* Location Preferences Section */}
-      {activeStep === 'location' && (
-        <Card className="shadow-card">
-          <CardHeader className="pb-3">
-            <CardTitle className="font-display text-lg flex items-center gap-2">
-              <MapPin className="h-5 w-5 text-primary" />
-              Location Preferences
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <MultiSelectDropdown
-              label="Country"
-              options={COUNTRIES}
-              selectedValues={formData.country}
-              onToggle={(v) => toggleArrayItem('country', v)}
-              placeholder="Select country"
-            />
+            {/* Location Section */}
+            <div className="space-y-4">
+              <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide border-b pb-2 flex items-center gap-2">
+                <MapPin className="h-4 w-4" />
+                Location Details
+              </h3>
 
-            <MultiSelectDropdown
-              label="Residing State"
-              options={stateOptions}
-              selectedValues={formData.residing_state}
-              onToggle={(v) => toggleArrayItem('residing_state', v)}
-              placeholder="Select state"
-            />
+              <MultiSelectDropdown
+                label="Country"
+                options={COUNTRIES}
+                selectedValues={formData.country}
+                onToggle={(v) => toggleArrayItem('country', v)}
+                placeholder="Select country"
+              />
+
+              <MultiSelectDropdown
+                label="Residing State"
+                options={stateOptions}
+                selectedValues={formData.residing_state}
+                onToggle={(v) => toggleArrayItem('residing_state', v)}
+                placeholder="Select state"
+              />
+            </div>
 
             <div className="flex justify-end pt-4">
               <Button onClick={saveCurrentStep} disabled={isSaving} className="gap-2">
