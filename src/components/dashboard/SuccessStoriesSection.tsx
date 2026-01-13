@@ -59,6 +59,7 @@ const defaultStories: SuccessStory[] = [
 const SuccessStoriesSection = ({ userId, userName }: SuccessStoriesSectionProps) => {
   const [stories, setStories] = useState<SuccessStory[]>(defaultStories);
   const [loading, setLoading] = useState(true);
+  const [isPaused, setIsPaused] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   const getInitials = (name: string) => {
@@ -79,9 +80,28 @@ const SuccessStoriesSection = ({ userId, userName }: SuccessStoriesSectionProps)
 
   const scrollRight = () => {
     if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollBy({ left: 320, behavior: "smooth" });
+      const container = scrollContainerRef.current;
+      const maxScroll = container.scrollWidth - container.clientWidth;
+      
+      // If at the end, scroll back to start
+      if (container.scrollLeft >= maxScroll - 10) {
+        container.scrollTo({ left: 0, behavior: "smooth" });
+      } else {
+        container.scrollBy({ left: 320, behavior: "smooth" });
+      }
     }
   };
+
+  // Auto-scroll effect
+  useEffect(() => {
+    if (loading || isPaused || stories.length <= 1) return;
+
+    const interval = setInterval(() => {
+      scrollRight();
+    }, 4000);
+
+    return () => clearInterval(interval);
+  }, [loading, isPaused, stories.length]);
 
   const fetchApprovedStories = async () => {
     try {
@@ -188,6 +208,10 @@ const SuccessStoriesSection = ({ userId, userName }: SuccessStoriesSectionProps)
                 ref={scrollContainerRef}
                 className="flex gap-4 overflow-x-auto pb-4 px-1 scroll-smooth scrollbar-hide md:px-10"
                 style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+                onMouseEnter={() => setIsPaused(true)}
+                onMouseLeave={() => setIsPaused(false)}
+                onTouchStart={() => setIsPaused(true)}
+                onTouchEnd={() => setIsPaused(false)}
               >
                 {stories.map((story) => (
                   <Card 
