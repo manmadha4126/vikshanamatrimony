@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Heart, Quote, Star, ChevronLeft, ChevronRight } from "lucide-react";
+import { Heart, Quote, Star, ChevronLeft, ChevronRight, Clock } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import ShareYourStoryForm from "./ShareYourStoryForm";
 import weddingHero1 from "@/assets/wedding-hero-1.jpg";
@@ -18,6 +18,8 @@ interface SuccessStory {
   story: string;
   imageUrl?: string;
   weddingImageUrl?: string;
+  status?: string;
+  isOwnStory?: boolean;
 }
 
 interface SuccessStoriesSectionProps {
@@ -105,25 +107,48 @@ const SuccessStoriesSection = ({ userId, userName }: SuccessStoriesSectionProps)
 
   const fetchApprovedStories = async () => {
     try {
-      const { data, error } = await supabase
+      // Fetch approved stories from all users
+      const { data: approvedData, error: approvedError } = await supabase
         .from("success_stories")
         .select("*")
         .eq("status", "approved")
         .order("approved_at", { ascending: false })
         .limit(10);
 
-      if (error) throw error;
+      if (approvedError) throw approvedError;
 
-      if (data && data.length > 0) {
+      // Fetch current user's own stories (including pending)
+      let userStories: typeof approvedData = [];
+      if (userId) {
+        const { data: userData, error: userError } = await supabase
+          .from("success_stories")
+          .select("*")
+          .eq("user_id", userId)
+          .order("created_at", { ascending: false });
+
+        if (!userError && userData) {
+          userStories = userData;
+        }
+      }
+
+      // Combine and deduplicate stories
+      const allStoriesData = [...(userStories || [])];
+      approvedData?.forEach(story => {
+        if (!allStoriesData.find(s => s.id === story.id)) {
+          allStoriesData.push(story);
+        }
+      });
+
+      if (allStoriesData.length > 0) {
         // Fetch user names for the stories
-        const userIds = data.map(s => s.user_id);
+        const userIds = allStoriesData.map(s => s.user_id);
         const { data: profilesData } = await supabase
           .from("profiles")
           .select("user_id, name")
           .in("user_id", userIds);
 
         const weddingImages = [weddingHero1, weddingHero2, weddingCarousel2];
-        const formattedStories: SuccessStory[] = data.map((s, index) => {
+        const formattedStories: SuccessStory[] = allStoriesData.map((s, index) => {
           const profile = profilesData?.find(p => p.user_id === s.user_id);
           return {
             id: s.id,
@@ -133,12 +158,19 @@ const SuccessStoriesSection = ({ userId, userName }: SuccessStoriesSectionProps)
             story: s.story,
             imageUrl: s.photo_url || undefined,
             weddingImageUrl: s.photo_url || weddingImages[index % weddingImages.length],
+            status: s.status,
+            isOwnStory: s.user_id === userId,
           };
         });
 
-        // Combine user stories with default stories
-        const allStories = [...formattedStories, ...defaultStories];
-        setStories(allStories);
+        // Put user's own stories first, then approved stories, then default stories
+        const sortedStories = formattedStories.sort((a, b) => {
+          if (a.isOwnStory && !b.isOwnStory) return -1;
+          if (!a.isOwnStory && b.isOwnStory) return 1;
+          return 0;
+        });
+
+        setStories([...sortedStories, ...defaultStories]);
       }
     } catch (error) {
       console.error("Error fetching stories:", error);
@@ -150,7 +182,7 @@ const SuccessStoriesSection = ({ userId, userName }: SuccessStoriesSectionProps)
 
   useEffect(() => {
     fetchApprovedStories();
-  }, []);
+  }, [userId]);
 
   return (
     <Card>
@@ -233,6 +265,24 @@ const SuccessStoriesSection = ({ userId, userName }: SuccessStoriesSectionProps)
                             {story.weddingDate} • {story.location}
                           </p>
                         </div>
+                      </div>
+                    )}
+                    
+                    {/* Status Badge for user's own pending stories */}
+                    {story.isOwnStory && story.status === "pending" && (
+                      <div className="absolute top-3 left-3 z-10">
+                        <Badge variant="secondary" className="bg-amber-500/90 text-white border-0 gap-1">
+                          <Clock className="h-3 w-3" />
+                          Pending Approval
+                        </Badge>
+                      </div>
+                    )}
+                    
+                    {story.isOwnStory && story.status === "approved" && (
+                      <div className="absolute top-3 left-3 z-10">
+                        <Badge variant="secondary" className="bg-green-500/90 text-white border-0">
+                          Your Story
+                        </Badge>
                       </div>
                     )}
                     
