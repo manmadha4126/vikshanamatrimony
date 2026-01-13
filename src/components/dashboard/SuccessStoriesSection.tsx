@@ -1,8 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Heart, Quote, Star } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Heart, Quote, Star, ChevronLeft, ChevronRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import ShareYourStoryForm from "./ShareYourStoryForm";
 import weddingHero1 from "@/assets/wedding-hero-1.jpg";
@@ -58,6 +59,7 @@ const defaultStories: SuccessStory[] = [
 const SuccessStoriesSection = ({ userId, userName }: SuccessStoriesSectionProps) => {
   const [stories, setStories] = useState<SuccessStory[]>(defaultStories);
   const [loading, setLoading] = useState(true);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   const getInitials = (name: string) => {
     const names = name.split(" & ");
@@ -69,6 +71,18 @@ const SuccessStoriesSection = ({ userId, userName }: SuccessStoriesSectionProps)
     return date.toLocaleDateString("en-US", { month: "long", year: "numeric" });
   };
 
+  const scrollLeft = () => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollBy({ left: -320, behavior: "smooth" });
+    }
+  };
+
+  const scrollRight = () => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollBy({ left: 320, behavior: "smooth" });
+    }
+  };
+
   const fetchApprovedStories = async () => {
     try {
       const { data, error } = await supabase
@@ -76,7 +90,7 @@ const SuccessStoriesSection = ({ userId, userName }: SuccessStoriesSectionProps)
         .select("*")
         .eq("status", "approved")
         .order("approved_at", { ascending: false })
-        .limit(6);
+        .limit(10);
 
       if (error) throw error;
 
@@ -102,7 +116,9 @@ const SuccessStoriesSection = ({ userId, userName }: SuccessStoriesSectionProps)
           };
         });
 
-        setStories(formattedStories.length > 0 ? formattedStories : defaultStories);
+        // Combine user stories with default stories
+        const allStories = [...formattedStories, ...defaultStories];
+        setStories(allStories);
       }
     } catch (error) {
       console.error("Error fetching stories:", error);
@@ -147,69 +163,98 @@ const SuccessStoriesSection = ({ userId, userName }: SuccessStoriesSectionProps)
           </div>
         ) : (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {stories.slice(0, 3).map((story) => (
-                <Card key={story.id} className="relative overflow-hidden group hover:shadow-lg transition-shadow">
-                  {/* Wedding Image */}
-                  {story.weddingImageUrl && (
-                    <div className="relative h-40 overflow-hidden">
-                      <img 
-                        src={story.weddingImageUrl} 
-                        alt={`${story.coupleName} wedding`}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                      <div className="absolute bottom-2 left-3 right-3">
-                        <h3 className="font-semibold text-white text-lg">{story.coupleName}</h3>
-                        <p className="text-xs text-white/80">
-                          {story.weddingDate} • {story.location}
-                        </p>
-                      </div>
-                    </div>
-                  )}
-                  
-                  <div className="absolute top-3 right-3 z-10">
-                    <Quote className="h-8 w-8 text-white/30" />
-                  </div>
-                  
-                  <CardContent className={story.weddingImageUrl ? "pt-4" : "pt-6"}>
-                    {!story.weddingImageUrl && (
-                      <div className="flex items-center gap-3 mb-4">
-                        <Avatar className="h-14 w-14 border-2 border-primary/20">
-                          <AvatarImage src={story.imageUrl} />
-                          <AvatarFallback className="bg-gradient-to-br from-primary/20 to-primary/10 text-primary font-semibold">
-                            {getInitials(story.coupleName)}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div>
-                          <h3 className="font-semibold text-foreground">{story.coupleName}</h3>
-                          <p className="text-xs text-muted-foreground">
+            <div className="relative">
+              {/* Navigation Buttons */}
+              <Button
+                variant="outline"
+                size="icon"
+                className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-background/90 backdrop-blur-sm shadow-md hidden md:flex"
+                onClick={scrollLeft}
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+              
+              <Button
+                variant="outline"
+                size="icon"
+                className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-background/90 backdrop-blur-sm shadow-md hidden md:flex"
+                onClick={scrollRight}
+              >
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+
+              {/* Scrollable Stories Container */}
+              <div
+                ref={scrollContainerRef}
+                className="flex gap-4 overflow-x-auto pb-4 px-1 scroll-smooth scrollbar-hide md:px-10"
+                style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+              >
+                {stories.map((story) => (
+                  <Card 
+                    key={story.id} 
+                    className="relative overflow-hidden group hover:shadow-lg transition-shadow flex-shrink-0 w-[300px]"
+                  >
+                    {/* Wedding Image */}
+                    {story.weddingImageUrl && (
+                      <div className="relative h-40 overflow-hidden">
+                        <img 
+                          src={story.weddingImageUrl} 
+                          alt={`${story.coupleName} wedding`}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                        <div className="absolute bottom-2 left-3 right-3">
+                          <h3 className="font-semibold text-white text-lg">{story.coupleName}</h3>
+                          <p className="text-xs text-white/80">
                             {story.weddingDate} • {story.location}
                           </p>
                         </div>
                       </div>
                     )}
                     
-                    <div className="relative">
-                      <p className="text-sm text-muted-foreground italic leading-relaxed line-clamp-3">
-                        &quot;{story.story}&quot;
-                      </p>
+                    <div className="absolute top-3 right-3 z-10">
+                      <Quote className="h-8 w-8 text-white/30" />
                     </div>
+                    
+                    <CardContent className={story.weddingImageUrl ? "pt-4" : "pt-6"}>
+                      {!story.weddingImageUrl && (
+                        <div className="flex items-center gap-3 mb-4">
+                          <Avatar className="h-14 w-14 border-2 border-primary/20">
+                            <AvatarImage src={story.imageUrl} />
+                            <AvatarFallback className="bg-gradient-to-br from-primary/20 to-primary/10 text-primary font-semibold">
+                              {getInitials(story.coupleName)}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div>
+                            <h3 className="font-semibold text-foreground">{story.coupleName}</h3>
+                            <p className="text-xs text-muted-foreground">
+                              {story.weddingDate} • {story.location}
+                            </p>
+                          </div>
+                        </div>
+                      )}
+                      
+                      <div className="relative">
+                        <p className="text-sm text-muted-foreground italic leading-relaxed line-clamp-3">
+                          &quot;{story.story}&quot;
+                        </p>
+                      </div>
 
-                    <div className="flex items-center gap-1 mt-4">
-                      {[1, 2, 3, 4, 5].map((star) => (
-                        <Star
-                          key={star}
-                          className="h-4 w-4 fill-amber-400 text-amber-400"
-                        />
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+                      <div className="flex items-center gap-1 mt-4">
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <Star
+                            key={star}
+                            className="h-4 w-4 fill-amber-400 text-amber-400"
+                          />
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
             </div>
 
-            <div className="mt-6 text-center">
+            <div className="mt-4 text-center">
               <p className="text-sm text-muted-foreground">
                 Join thousands of happy couples who found their soulmate with us
               </p>
