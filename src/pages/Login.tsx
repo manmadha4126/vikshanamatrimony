@@ -5,10 +5,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "@/hooks/use-toast";
-import { Lock, Mail, Phone, Eye, EyeOff } from "lucide-react";
+import { Lock, Mail, Phone, Eye, EyeOff, Heart, Sparkles } from "lucide-react";
 import { z } from "zod";
 
-// Import wedding images
+// Import logo and wedding images
+import vikshanaLogo from "@/assets/vikshana-logo.png";
 import weddingImg1 from "@/assets/wedding-carousel-1.jpg";
 import weddingImg2 from "@/assets/wedding-carousel-2.jpg";
 import weddingImg3 from "@/assets/wedding-carousel-3.jpg";
@@ -51,7 +52,6 @@ const Login = () => {
     setIsLoading(true);
 
     try {
-      // Determine if identifier is email or phone
       const isEmail = identifier.includes("@");
       
       const { error } = await supabase.auth.signInWithPassword({
@@ -112,48 +112,161 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center relative overflow-hidden">
-      {/* Background with diagonal split */}
-      <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900" />
-      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/5 to-primary/10" />
-      
-      {/* Decorative diagonal line */}
-      <div 
-        className="absolute inset-0 opacity-20"
-        style={{
-          background: "linear-gradient(135deg, transparent 40%, hsl(var(--primary) / 0.3) 50%, hsl(180, 70%, 40%) 60%, transparent 70%)",
-        }}
-      />
+    <div className="min-h-screen flex relative overflow-hidden">
+      {/* Left Side - Branding & Image Gallery */}
+      <div className="hidden lg:flex lg:w-1/2 relative bg-gradient-to-br from-rose-900 via-pink-800 to-rose-900">
+        {/* Decorative patterns */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-0 left-0 w-full h-full" style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+          }} />
+        </div>
 
-      {/* Floating decorative elements */}
-      <div className="absolute top-20 left-20 w-32 h-32 bg-primary/10 rounded-full blur-3xl animate-float" />
-      <div className="absolute bottom-20 right-20 w-48 h-48 bg-cyan-500/10 rounded-full blur-3xl animate-float" style={{ animationDelay: "2s" }} />
+        {/* Golden accent overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-amber-900/30 via-transparent to-rose-900/50" />
 
-      <div className="relative z-10 flex flex-col lg:flex-row w-full max-w-5xl mx-4 items-end lg:items-center gap-8">
-        {/* Login Form Card */}
-        <div className="flex-1 max-w-md mx-auto lg:mx-0 mb-8 lg:mb-0">
-          <div 
-            className="backdrop-blur-xl bg-slate-900/60 border border-slate-700/50 rounded-2xl p-8 shadow-2xl"
-            style={{ 
-              boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255,255,255,0.1)" 
-            }}
-          >
-            <h1 className="text-3xl font-display font-bold text-center mb-8 text-white">
-              Login
+        {/* Content */}
+        <div className="relative z-10 flex flex-col items-center justify-center w-full p-12">
+          {/* Logo & Brand */}
+          <div className="text-center mb-8">
+            <div className="flex items-center justify-center gap-3 mb-4">
+              <img 
+                src={vikshanaLogo} 
+                alt="Vikshana Matrimony" 
+                className="h-20 w-20 object-contain drop-shadow-2xl"
+              />
+            </div>
+            <h1 className="text-4xl font-display font-bold text-white mb-2 tracking-wide">
+              Vikshana
+              <span className="text-amber-300"> Matrimony</span>
             </h1>
+            <p className="text-rose-200 text-lg italic">
+              Where Hearts Find Home
+            </p>
+          </div>
 
-            <form onSubmit={handleLogin} className="space-y-6">
+          {/* Decorative hearts */}
+          <div className="flex items-center gap-2 mb-8">
+            <Heart className="h-4 w-4 text-amber-400 fill-amber-400 animate-pulse" />
+            <div className="w-24 h-px bg-gradient-to-r from-transparent via-amber-400 to-transparent" />
+            <Sparkles className="h-5 w-5 text-amber-300" />
+            <div className="w-24 h-px bg-gradient-to-r from-transparent via-amber-400 to-transparent" />
+            <Heart className="h-4 w-4 text-amber-400 fill-amber-400 animate-pulse" style={{ animationDelay: "0.5s" }} />
+          </div>
+
+          {/* Welcome text */}
+          <div className="text-center mb-8">
+            <h2 className="text-5xl font-display font-bold text-white mb-2" style={{
+              textShadow: "0 4px 20px rgba(0,0,0,0.4)"
+            }}>
+              Welcome Back!
+            </h2>
+            <p className="text-rose-100 text-lg max-w-md">
+              Continue your journey to find your perfect life partner
+            </p>
+          </div>
+
+          {/* Image Gallery */}
+          <div className="relative w-full overflow-hidden rounded-2xl" style={{ height: "280px" }}>
+            <div className="absolute left-0 top-0 bottom-0 w-16 bg-gradient-to-r from-rose-900 to-transparent z-10" />
+            <div className="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-rose-900 to-transparent z-10" />
+            
+            <div 
+              className="flex gap-4"
+              style={{
+                width: "fit-content",
+                animation: "scroll-left 30s linear infinite"
+              }}
+            >
+              {[...weddingImages, ...weddingImages].map((img, index) => (
+                <div
+                  key={index}
+                  className="flex-shrink-0 w-56 h-72 rounded-xl overflow-hidden shadow-2xl border-2 border-amber-400/30 transform transition-transform duration-500 hover:scale-105"
+                  style={{
+                    boxShadow: "0 20px 40px -12px rgba(0,0,0,0.5)"
+                  }}
+                >
+                  <img 
+                    src={img} 
+                    alt={`Wedding ${index + 1}`}
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-rose-900/40 via-transparent to-transparent" />
+                </div>
+              ))}
+            </div>
+
+            {/* Floating elements */}
+            <div className="absolute top-4 right-20 text-3xl animate-float z-20">💍</div>
+            <div className="absolute bottom-8 left-20 text-2xl animate-float z-20" style={{ animationDelay: "1.5s" }}>❤️</div>
+          </div>
+
+          {/* Stats */}
+          <div className="flex gap-8 mt-8">
+            <div className="text-center">
+              <p className="text-3xl font-bold text-amber-300">10K+</p>
+              <p className="text-rose-200 text-sm">Happy Couples</p>
+            </div>
+            <div className="w-px bg-amber-400/30" />
+            <div className="text-center">
+              <p className="text-3xl font-bold text-amber-300">50K+</p>
+              <p className="text-rose-200 text-sm">Verified Profiles</p>
+            </div>
+            <div className="w-px bg-amber-400/30" />
+            <div className="text-center">
+              <p className="text-3xl font-bold text-amber-300">98%</p>
+              <p className="text-rose-200 text-sm">Success Rate</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Right Side - Login Form */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center bg-gradient-to-br from-slate-50 via-rose-50 to-amber-50 p-6 lg:p-12">
+        <div className="w-full max-w-md">
+          {/* Mobile Logo */}
+          <div className="lg:hidden text-center mb-8">
+            <div className="flex items-center justify-center gap-3 mb-3">
+              <img 
+                src={vikshanaLogo} 
+                alt="Vikshana Matrimony" 
+                className="h-16 w-16 object-contain"
+              />
+            </div>
+            <h1 className="text-2xl font-display font-bold text-rose-900">
+              Vikshana <span className="text-amber-600">Matrimony</span>
+            </h1>
+            <p className="text-rose-600 text-sm italic">Where Hearts Find Home</p>
+          </div>
+
+          {/* Login Card */}
+          <div className="bg-white rounded-3xl shadow-2xl p-8 border border-rose-100" style={{
+            boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(244, 63, 94, 0.05)"
+          }}>
+            <div className="text-center mb-8">
+              <h2 className="text-3xl font-display font-bold text-slate-800 mb-2">
+                Sign In
+              </h2>
+              <p className="text-slate-500">
+                Enter your credentials to continue
+              </p>
+            </div>
+
+            <form onSubmit={handleLogin} className="space-y-5">
               {/* Phone/Email Field */}
-              <div className="relative group">
-                <div className="flex items-center border-b-2 border-slate-600 group-focus-within:border-cyan-400 transition-colors pb-2">
+              <div className="relative">
+                <label className="text-sm font-medium text-slate-600 mb-1.5 block">
+                  Phone Number or Email
+                </label>
+                <div className="relative">
                   <Input
                     type="text"
-                    placeholder="Phone Number or Email"
+                    placeholder="Enter your phone or email"
                     value={identifier}
                     onChange={(e) => setIdentifier(e.target.value)}
-                    className="flex-1 bg-transparent border-none text-white placeholder:text-slate-400 focus-visible:ring-0 focus-visible:ring-offset-0 text-base"
+                    className="h-12 pl-4 pr-12 bg-slate-50 border-slate-200 rounded-xl focus:border-rose-400 focus:ring-rose-400/20 text-slate-800 placeholder:text-slate-400"
                   />
-                  <div className="flex items-center gap-1 text-slate-400">
+                  <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-1 text-slate-400">
                     <Phone className="h-4 w-4" />
                     <span className="text-xs">/</span>
                     <Mail className="h-4 w-4" />
@@ -162,23 +275,28 @@ const Login = () => {
               </div>
 
               {/* Password Field */}
-              <div className="relative group">
-                <div className="flex items-center border-b-2 border-slate-600 group-focus-within:border-cyan-400 transition-colors pb-2">
+              <div className="relative">
+                <label className="text-sm font-medium text-slate-600 mb-1.5 block">
+                  Password
+                </label>
+                <div className="relative">
                   <Input
                     type={showPassword ? "text" : "password"}
-                    placeholder="Password"
+                    placeholder="Enter your password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="flex-1 bg-transparent border-none text-white placeholder:text-slate-400 focus-visible:ring-0 focus-visible:ring-offset-0 text-base"
+                    className="h-12 pl-4 pr-20 bg-slate-50 border-slate-200 rounded-xl focus:border-rose-400 focus:ring-rose-400/20 text-slate-800 placeholder:text-slate-400"
                   />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="text-slate-400 hover:text-white transition-colors mr-2"
-                  >
-                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                  </button>
-                  <Lock className="h-5 w-5 text-slate-400" />
+                  <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="text-slate-400 hover:text-rose-500 transition-colors"
+                    >
+                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </button>
+                    <Lock className="h-4 w-4 text-slate-400" />
+                  </div>
                 </div>
               </div>
 
@@ -189,18 +307,18 @@ const Login = () => {
                     id="stayLoggedIn"
                     checked={stayLoggedIn}
                     onCheckedChange={(checked) => setStayLoggedIn(checked as boolean)}
-                    className="border-slate-500 data-[state=checked]:bg-cyan-500 data-[state=checked]:border-cyan-500"
+                    className="border-slate-300 data-[state=checked]:bg-rose-500 data-[state=checked]:border-rose-500"
                   />
                   <label
                     htmlFor="stayLoggedIn"
-                    className="text-sm text-slate-300 cursor-pointer"
+                    className="text-sm text-slate-600 cursor-pointer"
                   >
                     Stay logged in
                   </label>
                 </div>
                 <Link
                   to="/forgot-password"
-                  className="text-sm text-cyan-400 hover:text-cyan-300 transition-colors"
+                  className="text-sm text-rose-500 hover:text-rose-600 font-medium transition-colors"
                 >
                   Forgot Password?
                 </Link>
@@ -210,18 +328,28 @@ const Login = () => {
               <Button
                 type="submit"
                 disabled={isLoading}
-                className="w-full py-6 text-lg font-semibold rounded-full bg-gradient-to-r from-cyan-500 to-teal-400 hover:from-cyan-400 hover:to-teal-300 text-slate-900 shadow-lg shadow-cyan-500/30 transition-all duration-300 hover:shadow-cyan-500/50 hover:scale-[1.02]"
+                className="w-full h-12 text-base font-semibold rounded-xl bg-gradient-to-r from-rose-500 via-pink-500 to-rose-600 hover:from-rose-600 hover:via-pink-600 hover:to-rose-700 text-white shadow-lg shadow-rose-500/30 transition-all duration-300 hover:shadow-rose-500/40 hover:scale-[1.02]"
               >
-                {isLoading ? "Logging in..." : "Login"}
+                {isLoading ? (
+                  <span className="flex items-center gap-2">
+                    <span className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    Signing in...
+                  </span>
+                ) : (
+                  <span className="flex items-center gap-2">
+                    Sign In
+                    <Heart className="h-4 w-4" />
+                  </span>
+                )}
               </Button>
 
               {/* Divider */}
               <div className="relative my-6">
                 <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-slate-600"></div>
+                  <div className="w-full border-t border-slate-200"></div>
                 </div>
                 <div className="relative flex justify-center text-sm">
-                  <span className="px-4 bg-slate-900/60 text-slate-400">or continue with</span>
+                  <span className="px-4 bg-white text-slate-400">or continue with</span>
                 </div>
               </div>
 
@@ -231,7 +359,7 @@ const Login = () => {
                 variant="outline"
                 disabled={isGoogleLoading}
                 onClick={handleGoogleSignIn}
-                className="w-full py-6 text-base font-semibold rounded-full bg-white hover:bg-slate-100 text-slate-900 border-none shadow-lg transition-all duration-300 hover:scale-[1.02] flex items-center justify-center gap-3"
+                className="w-full h-12 text-base font-semibold rounded-xl bg-white hover:bg-slate-50 text-slate-700 border-slate-200 shadow-sm transition-all duration-300 hover:shadow-md hover:scale-[1.01] flex items-center justify-center gap-3"
               >
                 <svg className="h-5 w-5" viewBox="0 0 24 24">
                   <path
@@ -257,13 +385,13 @@ const Login = () => {
 
             {/* Sign Up Link */}
             <div className="mt-8 text-center">
-              <p className="text-slate-400">
+              <p className="text-slate-500">
                 Don't have an account?{" "}
                 <Link
                   to="/#hero"
-                  className="text-cyan-400 hover:text-cyan-300 font-semibold transition-colors"
+                  className="text-rose-500 hover:text-rose-600 font-semibold transition-colors"
                 >
-                  Sign Up
+                  Register Now
                 </Link>
               </p>
             </div>
@@ -272,122 +400,39 @@ const Login = () => {
             <div className="mt-4 text-center">
               <Link
                 to="/"
-                className="text-sm text-slate-500 hover:text-slate-300 transition-colors"
+                className="text-sm text-slate-400 hover:text-slate-600 transition-colors inline-flex items-center gap-1"
               >
                 ← Back to Home
               </Link>
             </div>
           </div>
-        </div>
 
-        {/* Welcome Back Section - Desktop Only with Auto-Scrolling Images */}
-        <div className="hidden lg:flex flex-1 flex-col items-center justify-center pl-8 overflow-hidden">
-          {/* 3D Welcome Text */}
-          <div 
-            className="text-center mb-8 relative z-10"
-            style={{ perspective: "1000px" }}
-          >
-            <h2 
-              className="text-6xl font-display font-bold text-white leading-tight"
-              style={{ 
-                textShadow: "0 4px 12px rgba(0,0,0,0.5), 0 8px 24px rgba(0,0,0,0.3)",
-                transform: "rotateX(-5deg) translateZ(20px)"
-              }}
-            >
-              WELCOME
-            </h2>
-            <h2 
-              className="text-6xl font-display font-bold bg-gradient-to-r from-cyan-400 via-teal-300 to-cyan-400 bg-clip-text text-transparent leading-tight"
-              style={{ 
-                filter: "drop-shadow(0 4px 12px rgba(6,182,212,0.5))",
-                transform: "rotateX(-5deg) translateZ(30px)"
-              }}
-            >
-              BACK!
-            </h2>
-            <p className="mt-3 text-slate-400 text-lg">
-              Find your perfect match with{" "}
-              <span className="text-secondary font-semibold">Vikshana Matrimony</span>
-            </p>
-            <p className="mt-2 text-cyan-400/80 text-base italic animate-pulse">
-              Waiting for someone special...!
-            </p>
-          </div>
-
-          {/* Auto-Scrolling Image Gallery */}
-          <div 
-            className="relative w-full overflow-hidden rounded-2xl"
-            style={{ 
-              perspective: "1200px",
-              height: "320px"
-            }}
-          >
-            {/* Gradient overlays for smooth edges */}
-            <div className="absolute left-0 top-0 bottom-0 w-20 bg-gradient-to-r from-slate-900 to-transparent z-10" />
-            <div className="absolute right-0 top-0 bottom-0 w-20 bg-gradient-to-l from-slate-900 to-transparent z-10" />
-            
-            {/* Scrolling container */}
-            <div 
-              className="flex gap-4 animate-scroll-left"
-              style={{
-                width: "fit-content",
-                animation: "scroll-left 25s linear infinite"
-              }}
-            >
-              {/* First set of images */}
-              {weddingImages.map((img, index) => (
-                <div
-                  key={`first-${index}`}
-                  className="flex-shrink-0 w-64 h-80 rounded-xl overflow-hidden shadow-2xl border-2 border-white/10 transform transition-transform duration-500 hover:scale-105 hover:z-20"
-                  style={{
-                    boxShadow: "0 25px 50px -12px rgba(0,0,0,0.6), 0 0 30px rgba(6,182,212,0.15)"
-                  }}
-                >
-                  <img 
-                    src={img} 
-                    alt={`Hindu wedding ${index + 1}`}
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-transparent to-transparent" />
-                </div>
-              ))}
-              {/* Duplicate set for seamless loop */}
-              {weddingImages.map((img, index) => (
-                <div
-                  key={`second-${index}`}
-                  className="flex-shrink-0 w-64 h-80 rounded-xl overflow-hidden shadow-2xl border-2 border-white/10 transform transition-transform duration-500 hover:scale-105 hover:z-20"
-                  style={{
-                    boxShadow: "0 25px 50px -12px rgba(0,0,0,0.6), 0 0 30px rgba(6,182,212,0.15)"
-                  }}
-                >
-                  <img 
-                    src={img} 
-                    alt={`Hindu wedding ${index + 1}`}
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-transparent to-transparent" />
-                </div>
-              ))}
+          {/* Trust badges */}
+          <div className="mt-6 flex items-center justify-center gap-6 text-slate-400">
+            <div className="flex items-center gap-1.5 text-xs">
+              <Lock className="h-3.5 w-3.5" />
+              <span>Secure Login</span>
             </div>
-
-            {/* Floating decorative elements */}
-            <div className="absolute top-4 right-24 text-3xl animate-float z-20">💍</div>
-            <div className="absolute bottom-8 left-24 text-2xl animate-float z-20" style={{ animationDelay: "1.5s" }}>❤️</div>
+            <div className="w-1 h-1 rounded-full bg-slate-300" />
+            <div className="flex items-center gap-1.5 text-xs">
+              <Heart className="h-3.5 w-3.5" />
+              <span>100% Privacy</span>
+            </div>
           </div>
-
-          {/* CSS for scroll animation */}
-          <style>{`
-            @keyframes scroll-left {
-              0% {
-                transform: translateX(0);
-              }
-              100% {
-                transform: translateX(-50%);
-              }
-            }
-          `}</style>
         </div>
       </div>
+
+      {/* CSS for scroll animation */}
+      <style>{`
+        @keyframes scroll-left {
+          0% {
+            transform: translateX(0);
+          }
+          100% {
+            transform: translateX(-50%);
+          }
+        }
+      `}</style>
     </div>
   );
 };
