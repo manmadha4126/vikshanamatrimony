@@ -31,7 +31,7 @@ interface DailyRecommendationsProps {
   onViewAllClick?: () => void;
 }
 
-const MAX_DAILY_RECOMMENDATIONS = 10;
+const MAX_DAILY_RECOMMENDATIONS = 5;
 
 const DailyRecommendations = ({ userGender, userId, userAge, userReligion, onViewProfile, onViewAllClick }: DailyRecommendationsProps) => {
   const [profiles, setProfiles] = useState<Profile[]>([]);
@@ -250,10 +250,6 @@ const DailyRecommendations = ({ userGender, userId, userAge, userReligion, onVie
               <Button variant="outline" size="sm" onClick={fetchRecommendations} className="h-8 px-2 sm:px-3">
                 <RefreshCw className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" />
                 <span className="hidden sm:inline">Refresh</span>
-              </Button>
-              <Button variant="ghost" size="sm" onClick={onViewAllClick} className="h-8 px-2 sm:px-3">
-                <span className="hidden sm:inline">View All</span>
-                <ChevronRight className="h-3 w-3 sm:h-4 sm:w-4" />
               </Button>
             </div>
           </div>
