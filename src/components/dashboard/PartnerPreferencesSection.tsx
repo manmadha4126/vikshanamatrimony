@@ -34,6 +34,7 @@ import {
   stateOptions,
 } from '@/data/registrationOptions';
 import { castesByReligion } from '@/data/casteOptions';
+import { citiesByState } from '@/data/locationOptions';
 
 interface PartnerPreferences {
   id?: string;
@@ -58,6 +59,7 @@ interface PartnerPreferences {
   annual_income_to: string;
   country: string[];
   residing_state: string[];
+  residing_city: string[];
   is_compulsory: boolean;
 }
 
@@ -83,6 +85,7 @@ const defaultPreferences: PartnerPreferences = {
   annual_income_to: '',
   country: [],
   residing_state: [],
+  residing_city: [],
   is_compulsory: false,
 };
 
@@ -299,6 +302,7 @@ const PartnerPreferencesSection = ({ userId }: PartnerPreferencesSectionProps) =
           education: data.education || [],
           country: data.country || [],
           residing_state: data.residing_state || [],
+          residing_city: data.residing_city || [],
           annual_income_from: data.annual_income?.split(' - ')[0] || '',
           annual_income_to: data.annual_income?.split(' - ')[1] || '',
         });
@@ -391,6 +395,7 @@ const PartnerPreferencesSection = ({ userId }: PartnerPreferencesSectionProps) =
           annual_income: annualIncomeRange,
           country: formData.country,
           residing_state: formData.residing_state,
+          residing_city: formData.residing_city,
           is_compulsory: formData.is_compulsory,
         }, { onConflict: 'user_id' });
 
@@ -742,6 +747,16 @@ const PartnerPreferencesSection = ({ userId }: PartnerPreferencesSectionProps) =
                 onToggle={(v) => toggleArrayItem('residing_state', v)}
                 placeholder="Select state"
               />
+
+              {formData.residing_state.length > 0 && (
+                <MultiSelectDropdown
+                  label="City / District"
+                  options={[...new Set(formData.residing_state.flatMap(state => citiesByState[state] || []))]}
+                  selectedValues={formData.residing_city}
+                  onToggle={(v) => toggleArrayItem('residing_city', v)}
+                  placeholder="Select city or district"
+                />
+              )}
             </div>
 
             <div className="flex justify-end pt-4">

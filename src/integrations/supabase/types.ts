@@ -172,6 +172,7 @@ export type Database = {
           physical_status: string | null
           profile_id: string | null
           religion: string[] | null
+          residing_city: string[] | null
           residing_state: string[] | null
           smoking_habits: string | null
           star: string[] | null
@@ -200,6 +201,7 @@ export type Database = {
           physical_status?: string | null
           profile_id?: string | null
           religion?: string[] | null
+          residing_city?: string[] | null
           residing_state?: string[] | null
           smoking_habits?: string | null
           star?: string[] | null
@@ -228,6 +230,7 @@ export type Database = {
           physical_status?: string | null
           profile_id?: string | null
           religion?: string[] | null
+          residing_city?: string[] | null
           residing_state?: string[] | null
           smoking_habits?: string | null
           star?: string[] | null
