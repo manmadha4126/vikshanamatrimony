@@ -128,6 +128,62 @@ const InterestsSection = ({ userId, profileId, onMessageClick, onViewProfile }: 
     }
   }, [userId, profileId]);
 
+  // Real-time subscription for interests
+  useEffect(() => {
+    if (!userId || !profileId) return;
+
+    const channel = supabase
+      .channel('interests-realtime')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'interests',
+        },
+        (payload) => {
+          const newRecord = payload.new as any;
+          const oldRecord = payload.old as any;
+
+          // Check if this change is relevant to the current user
+          const isRelevant = 
+            newRecord?.to_profile_id === profileId || 
+            newRecord?.from_user_id === userId ||
+            oldRecord?.to_profile_id === profileId ||
+            oldRecord?.from_user_id === userId;
+
+          if (isRelevant) {
+            // Refetch to get updated data with profiles
+            fetchInterests();
+            
+            // Show toast for new received interests
+            if (payload.eventType === 'INSERT' && newRecord?.to_profile_id === profileId) {
+              toast({
+                title: "New Interest Received!",
+                description: "Someone has shown interest in your profile.",
+              });
+            }
+            
+            // Show toast when your sent interest is accepted
+            if (payload.eventType === 'UPDATE' && 
+                newRecord?.from_user_id === userId && 
+                newRecord?.status === 'accepted' &&
+                oldRecord?.status === 'pending') {
+              toast({
+                title: "Interest Accepted!",
+                description: "Your interest has been accepted. You can now start a conversation.",
+              });
+            }
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [userId, profileId, toast]);
+
   const handleAccept = async (interestId: string) => {
     setProcessingId(interestId);
     try {
