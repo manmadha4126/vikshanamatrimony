@@ -94,8 +94,21 @@ const PHYSICAL_STATUS_OPTIONS = ['Normal', 'Physically Challenged', "Doesn't mat
 const EMPLOYED_IN_OPTIONS = ['Government / PSU', 'Private', 'Business', 'Defence', 'Self Employed', 'Not Working', 'Any'];
 
 // Annual income options for partner preferences
-const ANNUAL_INCOME_FROM_OPTIONS = ['Below ₹1 Lakh', '₹1 Lakh - ₹1 Crore'];
-const ANNUAL_INCOME_TO_OPTIONS = ['₹1 Lakh - ₹1 Crore', 'Above ₹1 Crore'];
+const ANNUAL_INCOME_FROM_OPTIONS = [
+  'Below ₹1 Lakh',
+  '₹1 Lakh', '₹2 Lakh', '₹3 Lakh', '₹4 Lakh', '₹5 Lakh',
+  '₹6 Lakh', '₹7 Lakh', '₹8 Lakh', '₹9 Lakh', '₹10 Lakh',
+  '₹15 Lakh', '₹20 Lakh', '₹25 Lakh', '₹30 Lakh', '₹35 Lakh',
+  '₹40 Lakh', '₹45 Lakh', '₹50 Lakh', '₹60 Lakh', '₹70 Lakh',
+  '₹80 Lakh', '₹90 Lakh', '₹1 Crore'
+];
+const ANNUAL_INCOME_TO_OPTIONS = [
+  '₹1 Lakh', '₹2 Lakh', '₹3 Lakh', '₹4 Lakh', '₹5 Lakh',
+  '₹6 Lakh', '₹7 Lakh', '₹8 Lakh', '₹9 Lakh', '₹10 Lakh',
+  '₹15 Lakh', '₹20 Lakh', '₹25 Lakh', '₹30 Lakh', '₹35 Lakh',
+  '₹40 Lakh', '₹45 Lakh', '₹50 Lakh', '₹60 Lakh', '₹70 Lakh',
+  '₹80 Lakh', '₹90 Lakh', '₹1 Crore', 'Above ₹1 Crore'
+];
 
 interface PartnerPreferencesSectionProps {
   userId: string;
