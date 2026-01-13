@@ -343,6 +343,7 @@ const Dashboard = () => {
                   userAge={profile.date_of_birth ? Math.floor((new Date().getTime() - new Date(profile.date_of_birth).getTime()) / (365.25 * 24 * 60 * 60 * 1000)) : undefined}
                   userReligion={profile.religion || undefined}
                   onViewProfile={handleViewProfile}
+                  onViewAllClick={() => handleViewChange('matches')}
                 />
 
                 <MatchesPreview
