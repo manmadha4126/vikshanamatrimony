@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { AspectRatio } from '@/components/ui/aspect-ratio';
-import { Progress } from '@/components/ui/progress';
+import { Badge } from '@/components/ui/badge';
 import { Users, ArrowRight, MapPin, GraduationCap } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import placeholderMale from '@/assets/placeholder-male.png';
@@ -17,11 +17,30 @@ interface Profile {
   city: string | null;
   state: string | null;
   education: string | null;
+  height: string | null;
+  religion: string | null;
+  caste: string | null;
+  mother_tongue: string | null;
+  marital_status: string | null;
   gender?: string;
+}
+
+interface PartnerPreferences {
+  age_from: number | null;
+  age_to: number | null;
+  height_from: string | null;
+  height_to: string | null;
+  marital_status: string[] | null;
+  religion: string[] | null;
+  caste: string[] | null;
+  education: string[] | null;
+  mother_tongue: string[] | null;
+  residing_state: string[] | null;
 }
 
 interface MatchedProfile extends Profile {
   compatibilityScore: number;
+  matchedCriteria: string[];
 }
 
 interface MatchesPreviewProps {
@@ -46,28 +65,154 @@ const MatchesPreview = ({ userId, userGender, onViewAllClick }: MatchesPreviewPr
     return age;
   };
 
+  const parseHeight = (height: string | null): number | null => {
+    if (!height) return null;
+    const match = height.match(/(\d+)'(\d+)"/);
+    if (match) {
+      return parseInt(match[1]) * 12 + parseInt(match[2]);
+    }
+    return null;
+  };
+
+  const calculateCompatibility = (profile: Profile, prefs: PartnerPreferences): { score: number; matched: string[] } => {
+    const matched: string[] = [];
+    let totalCriteria = 0;
+    let matchedCriteria = 0;
+
+    // Age check
+    if (prefs.age_from || prefs.age_to) {
+      totalCriteria++;
+      const age = calculateAge(profile.date_of_birth);
+      if (age) {
+        const fromOk = !prefs.age_from || age >= prefs.age_from;
+        const toOk = !prefs.age_to || age <= prefs.age_to;
+        if (fromOk && toOk) {
+          matchedCriteria++;
+          matched.push('Age');
+        }
+      }
+    }
+
+    // Height check
+    if (prefs.height_from || prefs.height_to) {
+      totalCriteria++;
+      const profileHeight = parseHeight(profile.height);
+      const fromHeight = parseHeight(prefs.height_from);
+      const toHeight = parseHeight(prefs.height_to);
+      if (profileHeight) {
+        const fromOk = !fromHeight || profileHeight >= fromHeight;
+        const toOk = !toHeight || profileHeight <= toHeight;
+        if (fromOk && toOk) {
+          matchedCriteria++;
+          matched.push('Height');
+        }
+      }
+    }
+
+    // Religion check
+    if (prefs.religion && prefs.religion.length > 0 && !prefs.religion.includes('Any')) {
+      totalCriteria++;
+      if (profile.religion && prefs.religion.includes(profile.religion)) {
+        matchedCriteria++;
+        matched.push('Religion');
+      }
+    }
+
+    // Caste check
+    if (prefs.caste && prefs.caste.length > 0 && !prefs.caste.includes('Any')) {
+      totalCriteria++;
+      if (profile.caste && prefs.caste.includes(profile.caste)) {
+        matchedCriteria++;
+        matched.push('Caste');
+      }
+    }
+
+    // Marital status check
+    if (prefs.marital_status && prefs.marital_status.length > 0) {
+      totalCriteria++;
+      if (profile.marital_status && prefs.marital_status.includes(profile.marital_status)) {
+        matchedCriteria++;
+        matched.push('Marital Status');
+      }
+    }
+
+    // Mother tongue check
+    if (prefs.mother_tongue && prefs.mother_tongue.length > 0) {
+      totalCriteria++;
+      if (profile.mother_tongue && prefs.mother_tongue.includes(profile.mother_tongue)) {
+        matchedCriteria++;
+        matched.push('Mother Tongue');
+      }
+    }
+
+    // Education check
+    if (prefs.education && prefs.education.length > 0) {
+      totalCriteria++;
+      if (profile.education && prefs.education.includes(profile.education)) {
+        matchedCriteria++;
+        matched.push('Education');
+      }
+    }
+
+    // State check
+    if (prefs.residing_state && prefs.residing_state.length > 0) {
+      totalCriteria++;
+      if (profile.state && prefs.residing_state.includes(profile.state)) {
+        matchedCriteria++;
+        matched.push('Location');
+      }
+    }
+
+    const score = totalCriteria > 0 ? Math.round((matchedCriteria / totalCriteria) * 100) : 0;
+    return { score, matched };
+  };
+
   useEffect(() => {
     const fetchTopMatches = async () => {
       try {
         const targetGender = userGender === 'Male' ? 'Female' : 'Male';
         
+        // Fetch user's partner preferences
+        const { data: prefs, error: prefsError } = await supabase
+          .from('partner_preferences')
+          .select('*')
+          .eq('user_id', userId)
+          .maybeSingle();
+
+        if (prefsError) throw prefsError;
+
         const { data: profiles, error } = await supabase
           .from('profiles')
-          .select('id, name, photo_url, profile_id, date_of_birth, city, state, education, gender')
+          .select('id, name, photo_url, profile_id, date_of_birth, city, state, education, gender, height, religion, caste, mother_tongue, marital_status')
           .eq('is_complete', true)
           .eq('gender', targetGender)
           .neq('id', userId)
-          .limit(4);
+          .limit(20);
 
         if (error) throw error;
 
-        // Add mock compatibility scores for preview
-        const matchedProfiles = (profiles || []).map(profile => ({
-          ...profile,
-          compatibilityScore: Math.floor(Math.random() * 30) + 70 // 70-100%
-        }));
+        if (!prefs || !profiles) {
+          setMatches([]);
+          return;
+        }
 
-        setMatches(matchedProfiles.sort((a, b) => b.compatibilityScore - a.compatibilityScore));
+        // Calculate compatibility scores based on actual preferences
+        const matchedProfiles: MatchedProfile[] = profiles.map(profile => {
+          const { score, matched } = calculateCompatibility(profile, prefs);
+          return {
+            ...profile,
+            compatibilityScore: score,
+            matchedCriteria: matched,
+          };
+        });
+
+        // Sort by score and filter out 0% matches, take top 4
+        const sortedMatches = matchedProfiles
+          .filter(m => m.compatibilityScore > 0)
+          .sort((a, b) => b.compatibilityScore - a.compatibilityScore)
+          .slice(0, 4);
+
+        setMatches(sortedMatches);
       } catch (error) {
         console.error('Error fetching matches preview:', error);
       } finally {
@@ -83,9 +228,9 @@ const MatchesPreview = ({ userId, userGender, onViewAllClick }: MatchesPreviewPr
   };
 
   const getScoreColor = (score: number) => {
-    if (score >= 80) return 'text-green-600';
-    if (score >= 60) return 'text-yellow-600';
-    return 'text-orange-600';
+    if (score >= 80) return 'text-green-600 bg-green-50';
+    if (score >= 60) return 'text-yellow-600 bg-yellow-50';
+    return 'text-orange-600 bg-orange-50';
   };
 
   if (loading) {
