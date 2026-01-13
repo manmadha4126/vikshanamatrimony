@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Headphones, UserCheck, Star, ArrowRight, Phone, Mail, Clock, Users, MessageSquare, Calendar, X } from 'lucide-react';
 import assistedExpertImage from '@/assets/assisted-matrimony-expert.jpg';
+
 const AssistedServiceSection = () => {
   const [isKnowMoreOpen, setIsKnowMoreOpen] = useState(false);
   const [isContactOpen, setIsContactOpen] = useState(false);
@@ -50,17 +51,17 @@ const AssistedServiceSection = () => {
     description: 'Our Relationship Manager (RM) saves your time and effort following up with prospects and set up meetings.'
   }];
   const relationshipManagers = [{
-    name: 'Priya Sharma',
+    name: 'Priya',
     role: 'Senior Relationship Manager',
-    phone: '+91 98765 43210',
-    email: 'priya@vikshana.com',
-    experience: '5+ years experience'
+    phone: '+91 9491449044',
+    email: 'info@vikshanamatrimony.com',
+    experience: '10+ years experience'
   }, {
-    name: 'Rajesh Kumar',
+    name: 'Prasanth',
     role: 'Relationship Manager',
-    phone: '+91 98765 43211',
-    email: 'rajesh@vikshana.com',
-    experience: '3+ years experience'
+    phone: '+91 9100090883',
+    email: 'info@vikshanamatrimony.com',
+    experience: '4+ years experience'
   }];
   return <div className="container mx-auto px-4 py-6">
       <Card className="shadow-card overflow-hidden">
@@ -110,7 +111,11 @@ const AssistedServiceSection = () => {
               {/* Expert Image */}
               <div className="hidden md:flex justify-center items-center">
                 <div className="relative">
-                  <img src={assistedExpertImage} alt="Assisted Matrimony Expert" className="w-80 h-96 object-cover object-top rounded-2xl shadow-lg" />
+                  <img 
+                    src={assistedExpertImage} 
+                    alt="Assisted Matrimony Expert" 
+                    className="w-80 h-96 object-cover object-top rounded-2xl shadow-lg"
+                  />
                 </div>
               </div>
             </div>
@@ -218,7 +223,7 @@ const AssistedServiceSection = () => {
 
             <div className="flex items-center gap-2 text-sm text-muted-foreground bg-muted/50 rounded-lg p-3">
               <Clock className="h-4 w-4" />
-              <span className="text-amber-900 py-[4px] px-[2px] my-[2px] mx-[49px]">Available: Mon-Sat, 10 AM - 7 PM</span>
+              <span className="text-amber-900 mx-[2px] my-[4px] py-[4px] px-[2px]">Available: Mon-Sat, 9 AM - 8 PM</span>
             </div>
 
             <Button className="w-full gradient-primary">
