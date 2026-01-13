@@ -93,6 +93,10 @@ const SMOKING_OPTIONS = ['Never smokes', 'Smokes occasionally', 'Smokes regularl
 const PHYSICAL_STATUS_OPTIONS = ['Normal', 'Physically Challenged', "Doesn't matter"];
 const EMPLOYED_IN_OPTIONS = ['Government / PSU', 'Private', 'Business', 'Defence', 'Self Employed', 'Not Working', 'Any'];
 
+// Annual income options for partner preferences
+const ANNUAL_INCOME_FROM_OPTIONS = ['Below ₹1 Lakh', '₹1 Lakh - ₹1 Crore'];
+const ANNUAL_INCOME_TO_OPTIONS = ['₹1 Lakh - ₹1 Crore', 'Above ₹1 Crore'];
+
 interface PartnerPreferencesSectionProps {
   userId: string;
 }
@@ -689,14 +693,14 @@ const PartnerPreferencesSection = ({ userId }: PartnerPreferencesSectionProps) =
                     label="From"
                     value={formData.annual_income_from}
                     onValueChange={(v) => handleInputChange('annual_income_from', v)}
-                    options={['Any', ...incomeOptions]}
+                    options={['Any', ...ANNUAL_INCOME_FROM_OPTIONS]}
                     placeholder="Minimum income"
                   />
                   <StyledSelect
                     label="To"
                     value={formData.annual_income_to}
                     onValueChange={(v) => handleInputChange('annual_income_to', v)}
-                    options={['Any', ...incomeOptions]}
+                    options={['Any', ...ANNUAL_INCOME_TO_OPTIONS]}
                     placeholder="Maximum income"
                   />
                 </div>
