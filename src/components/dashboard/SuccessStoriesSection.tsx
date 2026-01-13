@@ -214,7 +214,7 @@ const SuccessStoriesSection = ({
               </Button>
 
               {/* Scrollable Stories Container */}
-              <div ref={scrollContainerRef} className="overflow-x-auto pb-4 px-1 scroll-smooth scrollbar-hide md:px-10 flex-row flex items-center justify-end gap-[16px] border-4 rounded-3xl shadow-2xl opacity-100 border-double" style={{
+              <div ref={scrollContainerRef} className="overflow-x-auto pb-4 px-1 scroll-smooth scrollbar-hide md:px-10 flex-row gap-[16px] border-4 rounded-3xl shadow-2xl opacity-100 border-double flex items-center justify-center" style={{
             scrollbarWidth: "none",
             msOverflowStyle: "none"
           }} onMouseEnter={() => setIsPaused(true)} onMouseLeave={() => setIsPaused(false)} onTouchStart={() => setIsPaused(true)} onTouchEnd={() => setIsPaused(false)}>
