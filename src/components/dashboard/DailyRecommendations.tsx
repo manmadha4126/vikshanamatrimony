@@ -5,7 +5,6 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import ProfileCard from './ProfileCard';
 import { ChevronRight, RefreshCw, Sparkles } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
 
 interface Profile {
   id: string;
@@ -29,12 +28,12 @@ interface DailyRecommendationsProps {
   userAge?: number;
   userReligion?: string;
   onViewProfile?: (profileId: string) => void;
+  onViewAllClick?: () => void;
 }
 
 const MAX_DAILY_RECOMMENDATIONS = 10;
 
-const DailyRecommendations = ({ userGender, userId, userAge, userReligion, onViewProfile }: DailyRecommendationsProps) => {
-  const navigate = useNavigate();
+const DailyRecommendations = ({ userGender, userId, userAge, userReligion, onViewProfile, onViewAllClick }: DailyRecommendationsProps) => {
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [loading, setLoading] = useState(true);
   const [shortlistedIds, setShortlistedIds] = useState<string[]>([]);
@@ -252,7 +251,7 @@ const DailyRecommendations = ({ userGender, userId, userAge, userReligion, onVie
                 <RefreshCw className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" />
                 <span className="hidden sm:inline">Refresh</span>
               </Button>
-              <Button variant="ghost" size="sm" onClick={() => navigate('/dashboard/matches')} className="h-8 px-2 sm:px-3">
+              <Button variant="ghost" size="sm" onClick={onViewAllClick} className="h-8 px-2 sm:px-3">
                 <span className="hidden sm:inline">View All</span>
                 <ChevronRight className="h-3 w-3 sm:h-4 sm:w-4" />
               </Button>
