@@ -22,7 +22,7 @@ const loginSchema = z.object({
   password: z.string().min(6, "Password must be at least 6 characters"),
 });
 
-// Heart particle component
+// Heart particle component for success animation
 const HeartParticle = ({ delay, left }: { delay: number; left: number }) => (
   <div
     className="absolute text-rose-500 animate-float-up pointer-events-none"
@@ -33,6 +33,16 @@ const HeartParticle = ({ delay, left }: { delay: number; left: number }) => (
     }}
   >
     ❤️
+  </div>
+);
+
+// Floating heart for background animation
+const FloatingHeart = ({ style }: { style: React.CSSProperties }) => (
+  <div
+    className="absolute pointer-events-none animate-floating-heart opacity-20"
+    style={style}
+  >
+    <Heart className="text-amber-300 fill-amber-300/50" style={{ width: style.fontSize, height: style.fontSize }} />
   </div>
 );
 
@@ -127,11 +137,23 @@ const Login = () => {
     }
   };
 
-  // Generate heart particles
+  // Generate heart particles for success animation
   const hearts = Array.from({ length: 20 }, (_, i) => ({
     id: i,
     delay: Math.random() * 2,
     left: Math.random() * 100,
+  }));
+
+  // Generate floating hearts for background
+  const floatingHearts = Array.from({ length: 15 }, (_, i) => ({
+    id: i,
+    style: {
+      left: `${Math.random() * 100}%`,
+      top: `${Math.random() * 100}%`,
+      fontSize: Math.random() * 20 + 10,
+      animationDelay: `${Math.random() * 8}s`,
+      animationDuration: `${Math.random() * 4 + 6}s`,
+    } as React.CSSProperties,
   }));
 
   return (
@@ -146,19 +168,26 @@ const Login = () => {
       )}
 
       {/* Left Side - Branding & Image Gallery */}
-      <div className="hidden lg:flex lg:w-[45%] relative bg-gradient-to-br from-rose-900 via-pink-800 to-rose-900">
+      <div className="hidden lg:flex lg:w-[45%] relative bg-gradient-to-br from-rose-900 via-pink-800 to-rose-900 overflow-hidden">
+        {/* Floating hearts background animation */}
+        <div className="absolute inset-0 z-0">
+          {floatingHearts.map((heart) => (
+            <FloatingHeart key={heart.id} style={heart.style} />
+          ))}
+        </div>
+
         {/* Decorative patterns */}
-        <div className="absolute inset-0 opacity-10">
+        <div className="absolute inset-0 opacity-10 z-[1]">
           <div className="absolute top-0 left-0 w-full h-full" style={{
             backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
           }} />
         </div>
 
         {/* Golden accent overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-amber-900/30 via-transparent to-rose-900/50" />
+        <div className="absolute inset-0 bg-gradient-to-t from-amber-900/30 via-transparent to-rose-900/50 z-[2]" />
 
         {/* Content */}
-        <div className="relative z-10 flex flex-col items-center justify-center w-full p-8">
+        <div className="relative z-10 flex flex-col items-center justify-center w-full p-8 z-[3]">
           {/* Logo & Brand */}
           <div className="text-center mb-4">
             <div className="flex items-center justify-center gap-2 mb-2">
@@ -436,6 +465,24 @@ const Login = () => {
         }
         .animate-float-up {
           animation: float-up 3s ease-out forwards;
+        }
+        
+        @keyframes floating-heart {
+          0%, 100% {
+            transform: translateY(0) translateX(0) scale(1) rotate(0deg);
+          }
+          25% {
+            transform: translateY(-20px) translateX(10px) scale(1.1) rotate(5deg);
+          }
+          50% {
+            transform: translateY(-10px) translateX(-5px) scale(0.95) rotate(-3deg);
+          }
+          75% {
+            transform: translateY(-25px) translateX(5px) scale(1.05) rotate(3deg);
+          }
+        }
+        .animate-floating-heart {
+          animation: floating-heart 8s ease-in-out infinite;
         }
       `}</style>
     </div>
