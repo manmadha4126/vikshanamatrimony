@@ -189,8 +189,8 @@ const DashboardHeader = ({
 
           {/* Right Section */}
           <div className="flex items-center gap-2">
-            {/* Notifications */}
-            <Button variant="ghost" size="icon" className="relative" onClick={onNotificationsClick}>
+            {/* Notifications - Hidden on mobile since it's in bottom nav */}
+            <Button variant="ghost" size="icon" className="relative hidden lg:flex" onClick={onNotificationsClick}>
               <Bell className="h-5 w-5" />
               {notificationCount > 0 && (
                 <Badge
