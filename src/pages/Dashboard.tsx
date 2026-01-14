@@ -713,7 +713,8 @@ const Dashboard = () => {
       {/* Mobile Bottom Navigation */}
       <MobileBottomNav 
         activeView={activeView} 
-        onNavigate={handleViewChange} 
+        onNavigate={handleViewChange}
+        notificationCount={0}
       />
 
       <div className="hidden lg:block">

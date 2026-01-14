@@ -1,19 +1,21 @@
-import { Home, Heart, Gem, MessageCircle, Search, User } from 'lucide-react';
+import { Home, Heart, Gem, MessageCircle, Bell } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 
 type DashboardView = 'home' | 'preferences' | 'search' | 'edit-profile' | 'view-profile' | 'interests' | 'messages' | 'notifications' | 'matches' | 'who-viewed-me';
 
 interface MobileBottomNavProps {
   activeView: DashboardView;
   onNavigate: (view: DashboardView) => void;
+  notificationCount?: number;
 }
 
-const MobileBottomNav = ({ activeView, onNavigate }: MobileBottomNavProps) => {
+const MobileBottomNav = ({ activeView, onNavigate, notificationCount = 0 }: MobileBottomNavProps) => {
   const navItems = [
-    { view: 'home' as DashboardView, icon: Home, label: 'Home' },
-    { view: 'interests' as DashboardView, icon: Heart, label: 'Interests' },
-    { view: 'matches' as DashboardView, icon: Gem, label: 'Matches' },
-    { view: 'messages' as DashboardView, icon: MessageCircle, label: 'Messages' },
-    { view: 'view-profile' as DashboardView, icon: User, label: 'Profile' },
+    { view: 'home' as DashboardView, icon: Home, label: 'Home', showBadge: false },
+    { view: 'interests' as DashboardView, icon: Heart, label: 'Interests', showBadge: false },
+    { view: 'matches' as DashboardView, icon: Gem, label: 'Matches', showBadge: false },
+    { view: 'messages' as DashboardView, icon: MessageCircle, label: 'Messages', showBadge: false },
+    { view: 'notifications' as DashboardView, icon: Bell, label: 'Alerts', showBadge: true },
   ];
 
   return (
@@ -33,10 +35,17 @@ const MobileBottomNav = ({ activeView, onNavigate }: MobileBottomNavProps) => {
                   : 'text-muted-foreground hover:text-foreground'
               }`}
             >
-              <div className={`p-1.5 rounded-xl transition-all duration-200 ${
+              <div className={`relative p-1.5 rounded-xl transition-all duration-200 ${
                 isActive ? 'bg-primary/10 scale-110' : ''
               }`}>
                 <item.icon className={`h-5 w-5 ${isActive ? 'stroke-[2.5]' : ''}`} />
+                {item.showBadge && notificationCount > 0 && (
+                  <Badge
+                    className="absolute -top-1 -right-1 h-4 w-4 flex items-center justify-center p-0 text-[9px] bg-destructive text-destructive-foreground"
+                  >
+                    {notificationCount > 9 ? '9+' : notificationCount}
+                  </Badge>
+                )}
               </div>
               <span className={`text-[10px] font-medium ${isActive ? 'font-semibold' : ''}`}>
                 {item.label}
