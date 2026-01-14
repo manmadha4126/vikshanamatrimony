@@ -4,9 +4,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Bot, Send, User, Sparkles, X, Minimize2, Maximize2 } from 'lucide-react';
+import { Bot, Send, User, X, Minimize2, Maximize2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
+import vikshanaLogo from '@/assets/vikshana-logo.png';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -187,10 +188,9 @@ const MatchAssistantChat = ({ userName }: MatchAssistantChatProps) => {
     return (
       <Button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-24 right-4 lg:bottom-6 lg:right-6 h-14 w-14 rounded-full shadow-lg bg-gradient-to-r from-primary to-amber-500 hover:from-primary/90 hover:to-amber-400 z-50"
-        size="icon"
+        className="fixed bottom-24 right-4 lg:bottom-6 lg:right-6 h-14 w-auto px-3 rounded-xl shadow-lg bg-gradient-to-r from-primary to-amber-500 hover:from-primary/90 hover:to-amber-400 z-50"
       >
-        <Sparkles className="h-6 w-6 text-white" />
+        <img src={vikshanaLogo} alt="Vikshana" className="h-8 w-8 object-contain" />
       </Button>
     );
   }
