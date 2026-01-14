@@ -246,14 +246,17 @@ const DashboardHeader = ({
               </DropdownMenuContent>
             </DropdownMenu>
 
-            {/* Mobile Menu Toggle */}
+            {/* Mobile Menu Toggle with Notification Indicator */}
             <Button
               variant="ghost"
               size="icon"
-              className="lg:hidden"
+              className="lg:hidden relative"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             >
               {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+              {notificationCount > 0 && !isMobileMenuOpen && (
+                <span className="absolute top-1 right-1 h-2 w-2 bg-destructive rounded-full animate-pulse" />
+              )}
             </Button>
           </div>
         </div>
