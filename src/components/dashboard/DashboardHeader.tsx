@@ -205,9 +205,9 @@ const DashboardHeader = ({
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="gap-2 px-2">
-                  <Avatar className="h-8 w-8">
-                    <AvatarImage src={profile?.photo_url || undefined} alt={profile?.name} />
-                    <AvatarFallback className="bg-primary text-primary-foreground text-xs">
+                  <Avatar className="h-8 w-8 ring-2 ring-primary/20">
+                    <AvatarImage src={profile?.photo_url || undefined} alt={profile?.name} className="object-cover" />
+                    <AvatarFallback className="bg-primary text-primary-foreground text-xs font-semibold">
                       {profile?.name ? getInitials(profile.name) : 'U'}
                     </AvatarFallback>
                   </Avatar>
