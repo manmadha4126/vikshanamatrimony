@@ -188,9 +188,9 @@ const MatchAssistantChat = ({ userName }: MatchAssistantChatProps) => {
     return (
       <Button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-24 right-4 lg:bottom-6 lg:right-6 h-14 w-auto px-3 rounded-xl shadow-lg bg-gradient-to-r from-primary to-amber-500 hover:from-primary/90 hover:to-amber-400 z-50"
+        className="fixed bottom-24 right-4 lg:bottom-6 lg:right-6 h-14 w-auto px-3 rounded-xl shadow-lg bg-black hover:bg-black/90 z-50"
       >
-        <img src={vikshanaLogo} alt="Vikshana" className="h-8 w-8 object-contain" />
+        <img src={vikshanaLogo} alt="Vikshana" className="h-8 w-8 object-contain drop-shadow-[0_0_8px_rgba(251,191,36,0.6)]" style={{ filter: 'sepia(1) saturate(3) hue-rotate(10deg) brightness(1.1)' }} />
       </Button>
     );
   }
