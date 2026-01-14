@@ -48,6 +48,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { EditProfileDialog } from "@/components/staff/EditProfileDialog";
 import VerificationCenter from "@/components/staff/VerificationCenter";
+import SuccessStoriesApproval from "@/components/staff/SuccessStoriesApproval";
 
 interface Profile {
   id: string;
@@ -105,7 +106,7 @@ const StaffDashboard = () => {
   const [genderCounts, setGenderCounts] = useState({ all: 0, male: 0, female: 0 });
   const [genderFilter, setGenderFilter] = useState<GenderFilter>("all");
   const [selectedProfile, setSelectedProfile] = useState<Profile | null>(null);
-  const [activeSection, setActiveSection] = useState<"profiles" | "add" | "verification">("profiles");
+  const [activeSection, setActiveSection] = useState<"profiles" | "add" | "verification" | "stories">("profiles");
   const [deleteProfile, setDeleteProfile] = useState<Profile | null>(null);
   const [deleting, setDeleting] = useState(false);
   const [verificationFilter, setVerificationFilter] = useState<VerificationFilter>("all");
@@ -606,7 +607,7 @@ const StaffDashboard = () => {
         </div>
 
         {/* Action Boxes */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           <Card 
             className={`cursor-pointer transition-all hover:shadow-md hover:scale-[1.02] ${activeSection === "profiles" ? "ring-2 ring-primary" : ""} bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-blue-950 dark:to-indigo-900 border-blue-200 dark:border-blue-800`}
             onClick={() => setActiveSection("profiles")}
@@ -693,11 +694,36 @@ const StaffDashboard = () => {
               </Button>
             </CardContent>
           </Card>
+
+          <Card 
+            className={`cursor-pointer transition-all hover:shadow-md hover:scale-[1.02] ${activeSection === "stories" ? "ring-2 ring-primary" : ""} bg-gradient-to-br from-pink-50 to-rose-100 dark:from-pink-950 dark:to-rose-900 border-pink-200 dark:border-pink-800`}
+            onClick={() => setActiveSection("stories")}
+          >
+            <CardHeader className="pb-2 pt-4 px-4">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-pink-500/20 dark:bg-pink-400/20 rounded-lg">
+                  <Heart className="w-5 h-5 text-pink-600 dark:text-pink-400" />
+                </div>
+                <div>
+                  <CardTitle className="text-base text-pink-900 dark:text-pink-100">Success Stories</CardTitle>
+                  <CardDescription className="text-xs text-pink-600/70 dark:text-pink-300/70">Approve user stories</CardDescription>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="pb-4 px-4">
+              <p className="text-sm text-pink-600/80 dark:text-pink-300/80">Review and publish success stories</p>
+            </CardContent>
+          </Card>
         </div>
 
         {/* Verification Center Section */}
         {activeSection === "verification" && (
           <VerificationCenter />
+        )}
+
+        {/* Success Stories Approval Section */}
+        {activeSection === "stories" && (
+          <SuccessStoriesApproval />
         )}
 
         {/* Profiles Table - Only show when activeSection is "profiles" */}
