@@ -158,12 +158,17 @@ const DashboardHeader = ({
           {/* Logo */}
           <Link to="/my-dashboard" className="flex items-center gap-2">
             <img src={vikshanaLogo} alt="Vikshana Logo" className="w-10 h-10 object-contain" />
-            <span className="font-display font-bold text-xl hidden sm:block">
-              <span className="bg-gradient-to-r from-primary via-primary/80 to-amber-500 bg-clip-text text-transparent">
-                Vikshana
+            <div className="flex flex-col">
+              <span className="font-display font-bold text-lg leading-tight">
+                <span className="bg-gradient-to-r from-primary via-primary/80 to-amber-500 bg-clip-text text-transparent">
+                  Vikshana
+                </span>
+                <span className="text-foreground ml-1">Matrimony</span>
               </span>
-              <span className="text-foreground ml-1">Matrimony</span>
-            </span>
+              <span className="text-[10px] text-muted-foreground font-medium tracking-wide hidden sm:block">
+                Where Hearts Find Home
+              </span>
+            </div>
           </Link>
 
           {/* Desktop Navigation */}
