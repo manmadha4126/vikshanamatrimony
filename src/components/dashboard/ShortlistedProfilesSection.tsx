@@ -31,6 +31,9 @@ interface ShortlistedProfilesSectionProps {
 const ShortlistedProfilesSection = ({ userId, onViewProfile }: ShortlistedProfilesSectionProps) => {
   const [shortlistedProfiles, setShortlistedProfiles] = useState<ShortlistedProfile[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showAll, setShowAll] = useState(false);
+  
+  const INITIAL_DISPLAY_COUNT = 6;
 
   const calculateAge = (dateOfBirth: string | null) => {
     if (!dateOfBirth) return null;
@@ -131,16 +134,32 @@ const ShortlistedProfilesSection = ({ userId, onViewProfile }: ShortlistedProfil
     );
   }
 
+  const displayedProfiles = showAll ? shortlistedProfiles : shortlistedProfiles.slice(0, INITIAL_DISPLAY_COUNT);
+  const hasMore = shortlistedProfiles.length > INITIAL_DISPLAY_COUNT;
+
   return (
     <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Heart className="h-5 w-5 text-primary fill-primary" />
-          Shortlisted Profiles
-          <span className="text-sm font-normal text-muted-foreground">
-            ({shortlistedProfiles.length})
-          </span>
-        </CardTitle>
+      <CardHeader className="pb-2">
+        <div className="flex items-center justify-between">
+          <CardTitle className="flex items-center gap-2 text-sm lg:text-base">
+            <Heart className="h-4 w-4 lg:h-5 lg:w-5 text-primary fill-primary" />
+            <span className="hidden sm:inline">Shortlisted Profiles</span>
+            <span className="sm:hidden">Shortlisted</span>
+            <span className="text-xs lg:text-sm font-normal text-muted-foreground">
+              ({shortlistedProfiles.length})
+            </span>
+          </CardTitle>
+          {hasMore && (
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="text-xs h-7 px-2"
+              onClick={() => setShowAll(!showAll)}
+            >
+              {showAll ? 'Show Less' : 'View All'}
+            </Button>
+          )}
+        </div>
       </CardHeader>
       <CardContent>
         {shortlistedProfiles.length === 0 ? (
@@ -150,15 +169,15 @@ const ShortlistedProfilesSection = ({ userId, onViewProfile }: ShortlistedProfil
             <p className="text-sm mt-1">Save profiles you're interested in for later review</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {shortlistedProfiles.map((item) => {
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2 lg:gap-4">
+            {displayedProfiles.map((item) => {
               const profile = item.profile;
               const age = calculateAge(profile.date_of_birth);
               
               return (
-                <Card key={item.id} className="overflow-hidden hover:shadow-lg transition-shadow">
+                <Card key={item.id} className="overflow-hidden hover:shadow-lg transition-shadow group cursor-pointer" onClick={() => onViewProfile?.(profile.id)}>
                   <div className="relative">
-                    <div className="aspect-[4/3] bg-muted">
+                    <div className="aspect-square bg-muted">
                       {profile.photo_url ? (
                         <img
                           src={profile.photo_url}
@@ -167,8 +186,8 @@ const ShortlistedProfilesSection = ({ userId, onViewProfile }: ShortlistedProfil
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center">
-                          <Avatar className="h-20 w-20">
-                            <AvatarFallback className="text-2xl">
+                          <Avatar className="h-12 w-12 lg:h-16 lg:w-16">
+                            <AvatarFallback className="text-lg lg:text-xl">
                               {getInitials(profile.name)}
                             </AvatarFallback>
                           </Avatar>
@@ -178,53 +197,20 @@ const ShortlistedProfilesSection = ({ userId, onViewProfile }: ShortlistedProfil
                     <Button
                       variant="destructive"
                       size="icon"
-                      className="absolute top-2 right-2 h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
-                      onClick={() => handleRemoveFromShortlist(item.id)}
+                      className="absolute top-1 right-1 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleRemoveFromShortlist(item.id);
+                      }}
                     >
-                      <Trash2 className="h-4 w-4" />
+                      <Trash2 className="h-3 w-3" />
                     </Button>
                   </div>
-                  <CardContent className="p-4">
-                    <h3 className="font-semibold text-lg truncate">{profile.name}</h3>
-                    <p className="text-sm text-muted-foreground mb-2">
-                      {age ? `${age} yrs` : ""} {profile.height ? `• ${profile.height}` : ""}
+                  <CardContent className="p-1.5 lg:p-2">
+                    <h3 className="font-medium text-[10px] lg:text-xs truncate">{profile.name.split(' ')[0]}</h3>
+                    <p className="text-[8px] lg:text-[10px] text-muted-foreground truncate">
+                      {age ? `${age} yrs` : ""}{profile.city ? `, ${profile.city}` : ""}
                     </p>
-                    
-                    {(profile.city || profile.state) && (
-                      <div className="flex items-center gap-1 text-sm text-muted-foreground mb-1">
-                        <MapPin className="h-3 w-3" />
-                        <span className="truncate">
-                          {[profile.city, profile.state].filter(Boolean).join(", ")}
-                        </span>
-                      </div>
-                    )}
-                    
-                    {profile.education && (
-                      <div className="flex items-center gap-1 text-sm text-muted-foreground mb-3">
-                        <GraduationCap className="h-3 w-3" />
-                        <span className="truncate">{profile.education}</span>
-                      </div>
-                    )}
-                    
-                    <div className="flex gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="flex-1"
-                        onClick={() => onViewProfile?.(profile.id)}
-                      >
-                        <Eye className="h-4 w-4 mr-1" />
-                        View
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleRemoveFromShortlist(item.id)}
-                        className="text-destructive hover:text-destructive"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
                   </CardContent>
                 </Card>
               );
