@@ -12,6 +12,7 @@ import ShortlistedProfilesSection from '@/components/dashboard/ShortlistedProfil
 import ProfileViewsSection from '@/components/dashboard/ProfileViewsSection';
 import WhoViewedMeSection from '@/components/dashboard/WhoViewedMeSection';
 import AssistedServiceSection from '@/components/dashboard/AssistedServiceSection';
+import SubscriptionStatusCard from '@/components/dashboard/SubscriptionStatusCard';
 import SuccessStoriesSection from '@/components/dashboard/SuccessStoriesSection';
 import PartnerPreferencesSection from '@/components/dashboard/PartnerPreferencesSection';
 import EditProfileSection from '@/components/dashboard/EditProfileSection';
@@ -319,6 +320,12 @@ const Dashboard = () => {
                   userId={user.id}
                   profileId={profile.id}
                   userName={profile.name}
+                />
+
+                <SubscriptionStatusCard
+                  userId={user.id}
+                  isPrime={profile.is_prime || false}
+                  primeExpiresAt={profile.prime_expires_at}
                 />
 
                 <ProfileCompletionSection
