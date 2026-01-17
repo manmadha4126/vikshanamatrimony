@@ -24,6 +24,7 @@ import {
   Lock,
   Crown,
   FileText,
+  Check,
 } from 'lucide-react';
 
 interface ProfileViewModalProps {
@@ -70,13 +71,51 @@ interface FullProfile {
 const ProfileViewModal = ({ profileId, isOpen, onClose, currentUserIsPrime = false }: ProfileViewModalProps) => {
   const [profile, setProfile] = useState<FullProfile | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [interestSent, setInterestSent] = useState(false);
+  const [isShortlisted, setIsShortlisted] = useState(false);
 
   useEffect(() => {
     if (profileId && isOpen) {
       fetchProfile();
       recordProfileView();
+      checkExistingInterestAndShortlist();
+    } else {
+      // Reset states when modal closes
+      setInterestSent(false);
+      setIsShortlisted(false);
     }
   }, [profileId, isOpen]);
+
+  const checkExistingInterestAndShortlist = async () => {
+    if (!profileId) return;
+    
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      // Check if interest already sent
+      const { data: interestData } = await supabase
+        .from('interests')
+        .select('id')
+        .eq('from_user_id', user.id)
+        .eq('to_profile_id', profileId)
+        .maybeSingle();
+      
+      setInterestSent(!!interestData);
+
+      // Check if already shortlisted
+      const { data: shortlistData } = await supabase
+        .from('shortlisted_profiles')
+        .select('id')
+        .eq('user_id', user.id)
+        .eq('profile_id', profileId)
+        .maybeSingle();
+      
+      setIsShortlisted(!!shortlistData);
+    } catch (error) {
+      console.log('Error checking interest/shortlist status:', error);
+    }
+  };
 
   // Record profile view when opening a profile
   const recordProfileView = async () => {
@@ -157,7 +196,7 @@ const ProfileViewModal = ({ profileId, isOpen, onClose, currentUserIsPrime = fal
   };
 
   const handleSendInterest = async () => {
-    if (!profile) return;
+    if (!profile || interestSent) return;
     
     try {
       const { data: { user } } = await supabase.auth.getUser();
@@ -180,6 +219,7 @@ const ProfileViewModal = ({ profileId, isOpen, onClose, currentUserIsPrime = fal
 
       if (error) {
         if (error.code === '23505') {
+          setInterestSent(true);
           toast({
             title: "Already sent",
             description: "You have already sent interest to this profile.",
@@ -188,6 +228,7 @@ const ProfileViewModal = ({ profileId, isOpen, onClose, currentUserIsPrime = fal
           throw error;
         }
       } else {
+        setInterestSent(true);
         toast({
           title: "Interest sent!",
           description: `Your interest has been sent to ${profile.name}.`,
@@ -203,7 +244,7 @@ const ProfileViewModal = ({ profileId, isOpen, onClose, currentUserIsPrime = fal
   };
 
   const handleShortlist = async () => {
-    if (!profile) return;
+    if (!profile || isShortlisted) return;
     
     try {
       const { data: { user } } = await supabase.auth.getUser();
@@ -225,6 +266,7 @@ const ProfileViewModal = ({ profileId, isOpen, onClose, currentUserIsPrime = fal
 
       if (error) {
         if (error.code === '23505') {
+          setIsShortlisted(true);
           toast({
             title: "Already shortlisted",
             description: "This profile is already in your shortlist.",
@@ -233,6 +275,7 @@ const ProfileViewModal = ({ profileId, isOpen, onClose, currentUserIsPrime = fal
           throw error;
         }
       } else {
+        setIsShortlisted(true);
         toast({
           title: "Profile shortlisted!",
           description: `${profile.name} has been added to your shortlist.`,
@@ -323,13 +366,40 @@ const ProfileViewModal = ({ profileId, isOpen, onClose, currentUserIsPrime = fal
 
             {/* Action Buttons */}
             <div className="flex gap-2 px-6 -mt-6 relative z-10">
-              <Button onClick={handleSendInterest} className="flex-1">
-                <Heart className="h-4 w-4 mr-2" />
-                Send Interest
+              <Button 
+                onClick={handleSendInterest} 
+                className={`flex-1 transition-all ${interestSent ? 'bg-green-500 hover:bg-green-500 text-white' : ''}`}
+                disabled={interestSent}
+              >
+                {interestSent ? (
+                  <>
+                    <Check className="h-4 w-4 mr-2" />
+                    Interest Sent
+                  </>
+                ) : (
+                  <>
+                    <Heart className="h-4 w-4 mr-2" />
+                    Send Interest
+                  </>
+                )}
               </Button>
-              <Button variant="outline" onClick={handleShortlist} className="flex-1">
-                <Star className="h-4 w-4 mr-2" />
-                Shortlist
+              <Button 
+                variant={isShortlisted ? "default" : "outline"} 
+                onClick={handleShortlist} 
+                className={`flex-1 transition-all ${isShortlisted ? 'bg-yellow-500 hover:bg-yellow-500 text-white border-yellow-500' : ''}`}
+                disabled={isShortlisted}
+              >
+                {isShortlisted ? (
+                  <>
+                    <Check className="h-4 w-4 mr-2" />
+                    Shortlisted
+                  </>
+                ) : (
+                  <>
+                    <Star className="h-4 w-4 mr-2" />
+                    Shortlist
+                  </>
+                )}
               </Button>
             </div>
 
