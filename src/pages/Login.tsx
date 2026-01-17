@@ -153,6 +153,16 @@ const Login = () => {
 
   return (
     <div className="h-screen flex overflow-hidden relative">
+      {/* Back Arrow - Top Left */}
+      <Link
+        to="/"
+        className="absolute top-4 left-4 z-50 flex items-center justify-center w-10 h-10 rounded-full bg-black/80 hover:bg-black text-white shadow-lg transition-all duration-300 hover:scale-105"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+        </svg>
+      </Link>
+
       {/* Hearts Animation Overlay */}
       {showHearts && (
         <div className="fixed inset-0 z-50 pointer-events-none overflow-hidden">
@@ -223,13 +233,13 @@ const Login = () => {
           </div>
 
           {/* Image Gallery - Horizontal Auto-Scrolling Carousel */}
-          <div className="w-full max-w-sm mb-4 overflow-hidden">
-            <div className="flex gap-3 animate-scroll-left">
+          <div className="w-full max-w-md mb-4 overflow-hidden">
+            <div className="flex gap-4 animate-scroll-left">
               {/* Duplicate images for seamless loop */}
               {[...weddingImages, ...weddingImages].map((img, index) => (
                 <div
                   key={index}
-                  className="relative h-32 w-40 flex-shrink-0 rounded-xl overflow-hidden shadow-xl border border-amber-400/20 transform transition-transform duration-500 hover:scale-105"
+                  className="relative h-44 w-52 flex-shrink-0 rounded-xl overflow-hidden shadow-xl border border-amber-400/20 transform transition-transform duration-500 hover:scale-105"
                 >
                   <img 
                     src={img} 
@@ -398,7 +408,7 @@ const Login = () => {
               </p>
               <Link
                 to="/"
-                className="text-xs text-slate-400 hover:text-slate-600 transition-colors inline-flex items-center gap-1"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-black hover:bg-slate-800 text-white text-xs font-medium transition-all duration-300 shadow-md hover:shadow-lg"
               >
                 ← Back to Home
               </Link>
