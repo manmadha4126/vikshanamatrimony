@@ -14,7 +14,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { RefreshCw, Users, CheckCircle, Clock, Search, ChevronLeft, ChevronRight, UserPlus, Edit, Trash2, Home, XCircle, Phone, Mail, MapPin, Briefcase, GraduationCap, User as UserIcon, Calendar, Heart, LogOut, Shield, Sun, Moon, KeyRound } from "lucide-react";
+import { RefreshCw, Users, CheckCircle, Clock, Search, ChevronLeft, ChevronRight, UserPlus, Edit, Trash2, Home, XCircle, Phone, Mail, MapPin, Briefcase, GraduationCap, User as UserIcon, Calendar, Heart, LogOut, Shield, Sun, Moon, KeyRound, CreditCard } from "lucide-react";
 import vikshanaLogo from "@/assets/vikshana-logo.png";
 import { Input } from "@/components/ui/input";
 import {
@@ -48,6 +48,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { EditProfileDialog } from "@/components/staff/EditProfileDialog";
 import VerificationCenter from "@/components/staff/VerificationCenter";
+import SubscriptionApproval from "@/components/staff/SubscriptionApproval";
 import SuccessStoriesApproval from "@/components/staff/SuccessStoriesApproval";
 
 interface Profile {
@@ -106,7 +107,7 @@ const StaffDashboard = () => {
   const [genderCounts, setGenderCounts] = useState({ all: 0, male: 0, female: 0 });
   const [genderFilter, setGenderFilter] = useState<GenderFilter>("all");
   const [selectedProfile, setSelectedProfile] = useState<Profile | null>(null);
-  const [activeSection, setActiveSection] = useState<"profiles" | "add" | "verification" | "stories">("profiles");
+  const [activeSection, setActiveSection] = useState<"profiles" | "add" | "verification" | "stories" | "subscriptions">("profiles");
   const [deleteProfile, setDeleteProfile] = useState<Profile | null>(null);
   const [deleting, setDeleting] = useState(false);
   const [verificationFilter, setVerificationFilter] = useState<VerificationFilter>("all");
@@ -607,7 +608,7 @@ const StaffDashboard = () => {
         </div>
 
         {/* Action Boxes */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
           <Card 
             className={`cursor-pointer transition-all hover:shadow-md hover:scale-[1.02] ${activeSection === "profiles" ? "ring-2 ring-primary" : ""} bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-blue-950 dark:to-indigo-900 border-blue-200 dark:border-blue-800`}
             onClick={() => setActiveSection("profiles")}
@@ -714,6 +715,26 @@ const StaffDashboard = () => {
               <p className="text-sm text-pink-600/80 dark:text-pink-300/80">Review and publish success stories</p>
             </CardContent>
           </Card>
+
+          <Card 
+            className={`cursor-pointer transition-all hover:shadow-md hover:scale-[1.02] ${activeSection === "subscriptions" ? "ring-2 ring-primary" : ""} bg-gradient-to-br from-purple-50 to-violet-100 dark:from-purple-950 dark:to-violet-900 border-purple-200 dark:border-purple-800`}
+            onClick={() => setActiveSection("subscriptions")}
+          >
+            <CardHeader className="pb-2 pt-4 px-4">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-purple-500/20 dark:bg-purple-400/20 rounded-lg">
+                  <CreditCard className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+                </div>
+                <div>
+                  <CardTitle className="text-base text-purple-900 dark:text-purple-100">Subscriptions</CardTitle>
+                  <CardDescription className="text-xs text-purple-600/70 dark:text-purple-300/70">Approve payments</CardDescription>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="pb-4 px-4">
+              <p className="text-sm text-purple-600/80 dark:text-purple-300/80">Review and approve subscription payments</p>
+            </CardContent>
+          </Card>
         </div>
 
         {/* Verification Center Section */}
@@ -724,6 +745,11 @@ const StaffDashboard = () => {
         {/* Success Stories Approval Section */}
         {activeSection === "stories" && (
           <SuccessStoriesApproval />
+        )}
+
+        {/* Subscription Approval Section */}
+        {activeSection === "subscriptions" && (
+          <SubscriptionApproval />
         )}
 
         {/* Profiles Table - Only show when activeSection is "profiles" */}
