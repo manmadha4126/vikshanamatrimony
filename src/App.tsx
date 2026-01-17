@@ -10,6 +10,7 @@ import StaffLogin from "./pages/StaffLogin";
 import StaffDashboard from "./pages/StaffDashboard";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
+import AssistedSubscription from "./pages/AssistedSubscription";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -28,6 +29,7 @@ const App = () => (
             <Route path="/staff-dashboard" element={<StaffDashboard />} />
             <Route path="/register" element={<Register />} />
             <Route path="/my-dashboard" element={<Dashboard />} />
+            <Route path="/assisted-subscription" element={<AssistedSubscription />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

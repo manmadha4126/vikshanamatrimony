@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -6,7 +7,7 @@ import { Headphones, UserCheck, Star, ArrowRight, Phone, Mail, Clock, Users, Mes
 import assistedExpertImage from '@/assets/assisted-matrimony-expert.jpg';
 
 const AssistedServiceSection = () => {
-  const [isKnowMoreOpen, setIsKnowMoreOpen] = useState(false);
+  const navigate = useNavigate();
   const [isContactOpen, setIsContactOpen] = useState(false);
   const features = [{
     icon: UserCheck,
@@ -98,7 +99,7 @@ const AssistedServiceSection = () => {
                 </div>
 
                 <div className="flex flex-wrap gap-3">
-                  <Button size="lg" className="gradient-primary" onClick={() => setIsKnowMoreOpen(true)}>
+                  <Button size="lg" className="gradient-primary" onClick={() => navigate('/assisted-subscription')}>
                     Know More
                     <ArrowRight className="h-4 w-4 ml-2" />
                   </Button>
@@ -122,66 +123,6 @@ const AssistedServiceSection = () => {
           </CardContent>
         </div>
       </Card>
-
-      {/* Know More Dialog */}
-      <Dialog open={isKnowMoreOpen} onOpenChange={setIsKnowMoreOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="text-xl font-display">How Assisted Service works?</DialogTitle>
-          </DialogHeader>
-          
-          <div className="space-y-8 py-4">
-            {/* Service Features */}
-            <div className="space-y-4">
-              <p className="text-muted-foreground text-sm">
-                Personalized matchmaking service through expert Relationship Manager
-              </p>
-              
-              {serviceFeatures.map((feature, index) => <Card key={index} className="border">
-                  <CardContent className="p-4 flex gap-4">
-                    <div className={`p-3 rounded-full ${feature.iconBg} shrink-0`}>
-                      <feature.icon className="h-5 w-5 text-foreground" />
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-sm">{feature.title}</h4>
-                      <p className="text-xs text-muted-foreground mt-1">{feature.description}</p>
-                    </div>
-                  </CardContent>
-                </Card>)}
-            </div>
-
-            {/* How It Works Steps */}
-            <div>
-              <h3 className="font-display font-semibold text-lg mb-6">How it works</h3>
-              <div className="space-y-0">
-                {howItWorks.map((item, index) => <div key={index} className="flex gap-4">
-                    <div className="flex flex-col items-center">
-                      <div className="w-10 h-10 rounded-full border-2 border-foreground flex items-center justify-center text-sm font-semibold">
-                        {item.step}
-                      </div>
-                      {index < howItWorks.length - 1 && <div className="w-px h-12 border-l-2 border-dashed border-muted-foreground/30" />}
-                    </div>
-                    <div className="pt-2 pb-6">
-                      <p className="text-sm">{item.title}</p>
-                    </div>
-                  </div>)}
-              </div>
-            </div>
-
-            {/* CTA */}
-            <div className="bg-amber-50 dark:bg-amber-950/30 rounded-lg p-4 flex items-center justify-between">
-              <span className="font-semibold text-sm">Interested to know more?</span>
-              <Button className="bg-orange-500 hover:bg-orange-600 text-white" onClick={() => {
-              setIsKnowMoreOpen(false);
-              setIsContactOpen(true);
-            }}>
-                <Phone className="h-4 w-4 mr-2" />
-                Request a callback
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
 
       {/* Contact Us Dialog */}
       <Dialog open={isContactOpen} onOpenChange={setIsContactOpen}>
