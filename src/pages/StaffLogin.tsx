@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
+import { ArrowLeft } from "lucide-react";
 import { z } from "zod";
 
 const loginSchema = z.object({
@@ -207,7 +208,15 @@ const StaffLogin = () => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center gradient-cream px-4">
+    <div className="min-h-screen flex items-center justify-center gradient-cream px-4 relative">
+      {/* Back Arrow - Top Left */}
+      <Link 
+        to="/" 
+        className="absolute top-4 left-4 p-2 rounded-full bg-black/80 hover:bg-black text-white transition-colors z-10"
+      >
+        <ArrowLeft className="w-5 h-5" />
+      </Link>
+      
       <div className="w-full max-w-md">
         <div className="bg-card rounded-2xl shadow-xl p-8 border border-accent/20">
           <div className="text-center mb-8">
@@ -320,12 +329,12 @@ const StaffLogin = () => {
           )}
 
           <div className="mt-6 text-center">
-            <a
-              href="/"
-              className="text-primary hover:text-primary/80 text-sm font-medium"
+            <Link
+              to="/"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-black hover:bg-black/90 text-white text-sm font-medium rounded-lg transition-colors"
             >
               ← Back to Home
-            </a>
+            </Link>
           </div>
         </div>
       </div>
