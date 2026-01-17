@@ -366,22 +366,28 @@ const MatchesSection = ({ userId, userGender, onViewProfile }: MatchesSectionPro
   }
 
   return (
-    <Card>
-      <CardHeader className="pb-3">
-        <div className="flex items-center justify-between flex-wrap gap-3">
-          <CardTitle className="flex items-center gap-2">
-            <Gem className="h-5 w-5 text-primary" />
-            Your Matches
-            {matches.length > 0 && (
-              <Badge variant="secondary" className="ml-2">
-                {filteredMatches.length} of {matches.length} profiles
-              </Badge>
-            )}
+    <Card className="lg:p-0">
+      <CardHeader className="pb-2 lg:pb-3 p-3 lg:p-6">
+        <div className="flex items-center justify-between gap-2">
+          <CardTitle className="flex items-center gap-1 lg:gap-2 text-sm lg:text-base">
+            <Gem className="h-4 w-4 lg:h-5 lg:w-5 text-primary" />
+            <span className="hidden sm:inline">Your Matches</span>
+            <span className="sm:hidden">Matches</span>
           </CardTitle>
           
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1 lg:gap-2">
+            {/* View All button - visible on mobile */}
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="lg:hidden text-xs h-7 px-2"
+              onClick={() => onViewProfile?.('all')}
+            >
+              View All
+            </Button>
+            
             <Select value={sortBy} onValueChange={(v: SortOption) => setSortBy(v)}>
-              <SelectTrigger className="w-[140px] h-9">
+              <SelectTrigger className="w-[100px] lg:w-[140px] h-7 lg:h-9 text-xs lg:text-sm">
                 <SelectValue placeholder="Sort by" />
               </SelectTrigger>
               <SelectContent>
@@ -396,12 +402,12 @@ const MatchesSection = ({ userId, userGender, onViewProfile }: MatchesSectionPro
                 <Button 
                   variant={hasActiveFilters ? "default" : "outline"} 
                   size="sm" 
-                  className="gap-2"
+                  className="gap-1 h-7 lg:h-9 px-2 lg:px-3 text-xs lg:text-sm"
                 >
-                  <SlidersHorizontal className="h-4 w-4" />
-                  Filters
+                  <SlidersHorizontal className="h-3 w-3 lg:h-4 lg:w-4" />
+                  <span className="hidden sm:inline">Filters</span>
                   {hasActiveFilters && (
-                    <Badge variant="secondary" className="ml-1 h-5 w-5 p-0 text-xs">
+                    <Badge variant="secondary" className="ml-1 h-4 w-4 lg:h-5 lg:w-5 p-0 text-[10px] lg:text-xs">
                       !
                     </Badge>
                   )}
@@ -499,7 +505,7 @@ const MatchesSection = ({ userId, userGender, onViewProfile }: MatchesSectionPro
           </div>
         </div>
       </CardHeader>
-      <CardContent>
+      <CardContent className="p-2 lg:p-6 pt-0 lg:pt-0">
         {filteredMatches.length === 0 ? (
           <div className="text-center py-12">
             <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mx-auto mb-4">
@@ -521,17 +527,17 @@ const MatchesSection = ({ userId, userGender, onViewProfile }: MatchesSectionPro
           </div>
         ) : (
           <>
-            {/* Mobile: Horizontal scroll - compact cards */}
-            <div className="lg:hidden overflow-x-auto pb-2 -mx-4 px-4 scrollbar-thin">
-              <div className="flex gap-2" style={{ width: 'max-content' }}>
+            {/* Mobile: Horizontal scroll - ultra compact cards */}
+            <div className="lg:hidden overflow-x-auto pb-1 -mx-2 px-2 scrollbar-thin">
+              <div className="flex gap-1.5" style={{ width: 'max-content' }}>
                 {filteredMatches.map((match) => {
                   const age = calculateAge(match.date_of_birth);
                   const hasSentInterest = sentInterests.includes(match.id);
                   
                   return (
-                    <Card key={match.id} className="overflow-hidden hover:shadow-md transition-shadow cursor-pointer w-28 flex-shrink-0" onClick={() => onViewProfile?.(match.id)}>
+                    <Card key={match.id} className="overflow-hidden hover:shadow-md transition-shadow cursor-pointer w-20 flex-shrink-0" onClick={() => onViewProfile?.(match.id)}>
                       {/* Profile Image */}
-                      <div className="relative group/photo">
+                      <div className="relative">
                         <AspectRatio ratio={1}>
                           <img
                             src={match.photo_url || getPlaceholderImage(match.gender)}
@@ -541,9 +547,9 @@ const MatchesSection = ({ userId, userGender, onViewProfile }: MatchesSectionPro
                         </AspectRatio>
                         
                         {/* Compatibility Badge */}
-                        <div className="absolute top-0.5 right-0.5">
+                        <div className="absolute top-0 right-0">
                           <Badge 
-                            className={`text-[8px] px-1 py-0 ${
+                            className={`text-[7px] px-0.5 py-0 rounded-none rounded-bl ${
                               match.compatibilityScore >= 80 ? 'bg-green-500' :
                               match.compatibilityScore >= 60 ? 'bg-blue-500' :
                               match.compatibilityScore >= 40 ? 'bg-yellow-500' :
@@ -556,35 +562,11 @@ const MatchesSection = ({ userId, userGender, onViewProfile }: MatchesSectionPro
                       </div>
 
                       <CardContent className="p-1">
-                        <div className="space-y-0.5">
-                          <div>
-                            <h3 className="font-medium text-[10px] text-foreground truncate">{match.name}</h3>
-                            {age && (
-                              <p className="text-[8px] text-muted-foreground truncate">{age} yrs{match.height ? `, ${match.height}` : ''}</p>
-                            )}
-                          </div>
-                          <Button
-                            size="sm"
-                            className={`w-full h-5 text-[8px] ${hasSentInterest ? 'bg-green-500 hover:bg-green-500' : ''}`}
-                            disabled={hasSentInterest || sendingInterest === match.id}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              if (!hasSentInterest) {
-                                sendInterest(match.id);
-                              }
-                            }}
-                          >
-                            {sendingInterest === match.id ? (
-                              <Loader2 className="h-2.5 w-2.5 animate-spin" />
-                            ) : hasSentInterest ? (
-                              '✓ Sent'
-                            ) : (
-                              <>
-                                <Heart className="h-2 w-2 mr-0.5" />
-                                Interest
-                              </>
-                            )}
-                          </Button>
+                        <div className="space-y-0">
+                          <h3 className="font-medium text-[9px] text-foreground truncate leading-tight">{match.name.split(' ')[0]}</h3>
+                          {age && (
+                            <p className="text-[7px] text-muted-foreground truncate leading-tight">{age} yrs</p>
+                          )}
                         </div>
                       </CardContent>
                     </Card>
