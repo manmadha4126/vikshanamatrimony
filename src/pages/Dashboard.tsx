@@ -13,6 +13,7 @@ import ProfileViewsSection from '@/components/dashboard/ProfileViewsSection';
 import WhoViewedMeSection from '@/components/dashboard/WhoViewedMeSection';
 import AssistedServiceSection from '@/components/dashboard/AssistedServiceSection';
 import SubscriptionStatusCard from '@/components/dashboard/SubscriptionStatusCard';
+import SubscriptionHistory from '@/components/dashboard/SubscriptionHistory';
 import SuccessStoriesSection from '@/components/dashboard/SuccessStoriesSection';
 import PartnerPreferencesSection from '@/components/dashboard/PartnerPreferencesSection';
 import EditProfileSection from '@/components/dashboard/EditProfileSection';
@@ -369,6 +370,8 @@ const Dashboard = () => {
                 </div>
 
                 <AssistedServiceSection />
+
+                <SubscriptionHistory userId={user.id} />
 
                 <SuccessStoriesSection userId={user.id} userName={profile.name} />
               </>

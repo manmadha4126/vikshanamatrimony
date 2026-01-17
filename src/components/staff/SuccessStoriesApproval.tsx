@@ -5,6 +5,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -12,7 +14,19 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
+  DialogFooter,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import {
   Table,
   TableBody,
@@ -31,6 +45,8 @@ import {
   RefreshCw,
   MapPin,
   Calendar,
+  Trash2,
+  Edit,
 } from "lucide-react";
 
 interface SuccessStory {
@@ -55,9 +71,19 @@ const SuccessStoriesApproval = () => {
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("pending");
   const [selectedStory, setSelectedStory] = useState<SuccessStory | null>(null);
-  const [adminNotes, setAdminNotes] = useState("");
+  const [editingStory, setEditingStory] = useState<SuccessStory | null>(null);
+  const [deletingStory, setDeletingStory] = useState<SuccessStory | null>(null);
   const [processing, setProcessing] = useState(false);
   const [statusCounts, setStatusCounts] = useState({ all: 0, pending: 0, approved: 0, rejected: 0 });
+  
+  // Edit form state
+  const [editForm, setEditForm] = useState({
+    partner_name: "",
+    wedding_date: "",
+    wedding_location: "",
+    story: "",
+  });
+  
   const { toast } = useToast();
 
   const fetchStories = async () => {
@@ -156,7 +182,6 @@ const SuccessStoriesApproval = () => {
       });
 
       setSelectedStory(null);
-      setAdminNotes("");
       fetchStories();
     } catch (error) {
       console.error("Error updating story:", error);
@@ -168,6 +193,82 @@ const SuccessStoriesApproval = () => {
     } finally {
       setProcessing(false);
     }
+  };
+
+  const handleDeleteStory = async () => {
+    if (!deletingStory) return;
+    setProcessing(true);
+    try {
+      const { error } = await supabase
+        .from("success_stories")
+        .delete()
+        .eq("id", deletingStory.id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Story Deleted",
+        description: "The success story has been permanently deleted.",
+      });
+
+      setDeletingStory(null);
+      fetchStories();
+    } catch (error) {
+      console.error("Error deleting story:", error);
+      toast({
+        title: "Error",
+        description: "Failed to delete story",
+        variant: "destructive",
+      });
+    } finally {
+      setProcessing(false);
+    }
+  };
+
+  const handleEditStory = async () => {
+    if (!editingStory) return;
+    setProcessing(true);
+    try {
+      const { error } = await supabase
+        .from("success_stories")
+        .update({
+          partner_name: editForm.partner_name,
+          wedding_date: editForm.wedding_date,
+          wedding_location: editForm.wedding_location,
+          story: editForm.story,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", editingStory.id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Story Updated",
+        description: "The success story has been updated successfully.",
+      });
+
+      setEditingStory(null);
+      fetchStories();
+    } catch (error) {
+      console.error("Error updating story:", error);
+      toast({
+        title: "Error",
+        description: "Failed to update story",
+        variant: "destructive",
+      });
+    } finally {
+      setProcessing(false);
+    }
+  };
+
+  const openEditDialog = (story: SuccessStory) => {
+    setEditForm({
+      partner_name: story.partner_name,
+      wedding_date: story.wedding_date,
+      wedding_location: story.wedding_location,
+      story: story.story,
+    });
+    setEditingStory(story);
   };
 
   const formatDate = (dateString: string) => {
@@ -199,7 +300,7 @@ const SuccessStoriesApproval = () => {
             </div>
             <div>
               <CardTitle className="text-lg">Success Stories Approval</CardTitle>
-              <CardDescription>Review and approve user success stories</CardDescription>
+              <CardDescription>Review, edit, and manage user success stories</CardDescription>
             </div>
           </div>
           <Button
@@ -300,8 +401,23 @@ const SuccessStoriesApproval = () => {
                           size="sm"
                           onClick={() => setSelectedStory(story)}
                         >
-                          <Eye className="w-4 h-4 mr-1" />
-                          View
+                          <Eye className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => openEditDialog(story)}
+                          className="text-blue-600 border-blue-300 hover:bg-blue-50"
+                        >
+                          <Edit className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setDeletingStory(story)}
+                          className="text-red-600 border-red-300 hover:bg-red-50"
+                        >
+                          <Trash2 className="w-4 h-4" />
                         </Button>
                         {story.status === "pending" && (
                           <>
@@ -419,9 +535,26 @@ const SuccessStoriesApproval = () => {
                 )}
 
                 {selectedStory.status !== "pending" && (
-                  <div className="flex justify-end pt-4 border-t">
-                    <Button variant="outline" onClick={() => setSelectedStory(null)}>
-                      Close
+                  <div className="flex justify-end gap-2 pt-4 border-t">
+                    <Button 
+                      variant="outline" 
+                      onClick={() => {
+                        setSelectedStory(null);
+                        openEditDialog(selectedStory);
+                      }}
+                    >
+                      <Edit className="w-4 h-4 mr-2" />
+                      Edit
+                    </Button>
+                    <Button 
+                      variant="destructive" 
+                      onClick={() => {
+                        setSelectedStory(null);
+                        setDeletingStory(selectedStory);
+                      }}
+                    >
+                      <Trash2 className="w-4 h-4 mr-2" />
+                      Delete
                     </Button>
                   </div>
                 )}
@@ -429,6 +562,98 @@ const SuccessStoriesApproval = () => {
             )}
           </DialogContent>
         </Dialog>
+
+        {/* Edit Story Dialog */}
+        <Dialog open={!!editingStory} onOpenChange={() => setEditingStory(null)}>
+          <DialogContent className="max-w-lg">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <Edit className="w-5 h-5 text-blue-600" />
+                Edit Success Story
+              </DialogTitle>
+              <DialogDescription>
+                Make changes to the success story details
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="partner_name">Partner Name</Label>
+                <Input
+                  id="partner_name"
+                  value={editForm.partner_name}
+                  onChange={(e) => setEditForm({ ...editForm, partner_name: e.target.value })}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="wedding_date">Wedding Date</Label>
+                <Input
+                  id="wedding_date"
+                  type="date"
+                  value={editForm.wedding_date}
+                  onChange={(e) => setEditForm({ ...editForm, wedding_date: e.target.value })}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="wedding_location">Wedding Location</Label>
+                <Input
+                  id="wedding_location"
+                  value={editForm.wedding_location}
+                  onChange={(e) => setEditForm({ ...editForm, wedding_location: e.target.value })}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="story">Story</Label>
+                <Textarea
+                  id="story"
+                  value={editForm.story}
+                  onChange={(e) => setEditForm({ ...editForm, story: e.target.value })}
+                  rows={5}
+                />
+              </div>
+            </div>
+
+            <DialogFooter className="gap-2">
+              <Button variant="outline" onClick={() => setEditingStory(null)}>
+                Cancel
+              </Button>
+              <Button onClick={handleEditStory} disabled={processing}>
+                {processing ? "Saving..." : "Save Changes"}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Delete Confirmation Dialog */}
+        <AlertDialog open={!!deletingStory} onOpenChange={() => setDeletingStory(null)}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Delete Success Story</AlertDialogTitle>
+              <AlertDialogDescription>
+                Are you sure you want to delete this success story? This action cannot be undone.
+                <div className="mt-3 p-3 bg-muted rounded-lg">
+                  <p className="font-medium">{deletingStory?.user_name} & {deletingStory?.partner_name}</p>
+                  <p className="text-sm text-muted-foreground">
+                    Wedding: {deletingStory && formatDate(deletingStory.wedding_date)} • {deletingStory?.wedding_location}
+                  </p>
+                </div>
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={handleDeleteStory}
+                className="bg-red-600 hover:bg-red-700"
+                disabled={processing}
+              >
+                {processing ? "Deleting..." : "Delete Story"}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </CardContent>
     </Card>
   );
