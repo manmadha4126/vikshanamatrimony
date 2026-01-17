@@ -521,15 +521,15 @@ const MatchesSection = ({ userId, userGender, onViewProfile }: MatchesSectionPro
           </div>
         ) : (
           <>
-            {/* Mobile: Horizontal scroll */}
-            <div className="lg:hidden overflow-x-auto pb-2 -mx-4 px-4">
-              <div className="flex gap-3" style={{ width: 'max-content' }}>
+            {/* Mobile: Horizontal scroll - compact cards */}
+            <div className="lg:hidden overflow-x-auto pb-2 -mx-4 px-4 scrollbar-thin">
+              <div className="flex gap-2" style={{ width: 'max-content' }}>
                 {filteredMatches.map((match) => {
                   const age = calculateAge(match.date_of_birth);
                   const hasSentInterest = sentInterests.includes(match.id);
                   
                   return (
-                    <Card key={match.id} className="overflow-hidden hover:shadow-md transition-shadow cursor-pointer w-36 flex-shrink-0" onClick={() => onViewProfile?.(match.id)}>
+                    <Card key={match.id} className="overflow-hidden hover:shadow-md transition-shadow cursor-pointer w-28 flex-shrink-0" onClick={() => onViewProfile?.(match.id)}>
                       {/* Profile Image */}
                       <div className="relative group/photo">
                         <AspectRatio ratio={1}>
@@ -540,24 +540,10 @@ const MatchesSection = ({ userId, userGender, onViewProfile }: MatchesSectionPro
                           />
                         </AspectRatio>
                         
-                        {/* Photo Zoom Button */}
-                        {match.photo_url && (
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setZoomedPhoto({ url: match.photo_url!, name: match.name });
-                            }}
-                            className="absolute bottom-1 left-1 p-1 rounded-full bg-black/50 text-white opacity-0 group-hover/photo:opacity-100 transition-opacity hover:bg-black/70"
-                            aria-label="Zoom photo"
-                          >
-                            <ZoomIn className="h-2.5 w-2.5" />
-                          </button>
-                        )}
-                        
                         {/* Compatibility Badge */}
-                        <div className="absolute top-1 right-1">
+                        <div className="absolute top-0.5 right-0.5">
                           <Badge 
-                            className={`text-[10px] px-1 py-0 ${
+                            className={`text-[8px] px-1 py-0 ${
                               match.compatibilityScore >= 80 ? 'bg-green-500' :
                               match.compatibilityScore >= 60 ? 'bg-blue-500' :
                               match.compatibilityScore >= 40 ? 'bg-yellow-500' :
@@ -569,29 +555,17 @@ const MatchesSection = ({ userId, userGender, onViewProfile }: MatchesSectionPro
                         </div>
                       </div>
 
-                      <CardContent className="p-1.5">
-                        <div className="space-y-1">
+                      <CardContent className="p-1">
+                        <div className="space-y-0.5">
                           <div>
-                            <h3 className="font-medium text-xs text-foreground truncate">{match.name}</h3>
-                            {match.profile_id && (
-                              <p className="text-[9px] text-muted-foreground">{match.profile_id}</p>
+                            <h3 className="font-medium text-[10px] text-foreground truncate">{match.name}</h3>
+                            {age && (
+                              <p className="text-[8px] text-muted-foreground truncate">{age} yrs{match.height ? `, ${match.height}` : ''}</p>
                             )}
                           </div>
-                          <div className="text-[10px] text-muted-foreground">
-                            {age && <p className="truncate">{age} yrs{match.height ? `, ${match.height}` : ''}</p>}
-                          </div>
-                          {match.matchedCriteria.length > 0 && (
-                            <div className="flex flex-wrap gap-0.5">
-                              {match.matchedCriteria.slice(0, 1).map((criteria) => (
-                                <Badge key={criteria} variant="secondary" className="text-[9px] px-1 py-0">
-                                  {criteria}
-                                </Badge>
-                              ))}
-                            </div>
-                          )}
                           <Button
                             size="sm"
-                            className="w-full h-6 text-[10px]"
+                            className={`w-full h-5 text-[8px] ${hasSentInterest ? 'bg-green-500 hover:bg-green-500' : ''}`}
                             disabled={hasSentInterest || sendingInterest === match.id}
                             onClick={(e) => {
                               e.stopPropagation();
@@ -601,12 +575,12 @@ const MatchesSection = ({ userId, userGender, onViewProfile }: MatchesSectionPro
                             }}
                           >
                             {sendingInterest === match.id ? (
-                              <Loader2 className="h-3 w-3 animate-spin" />
+                              <Loader2 className="h-2.5 w-2.5 animate-spin" />
                             ) : hasSentInterest ? (
-                              'Sent ✓'
+                              '✓ Sent'
                             ) : (
                               <>
-                                <Heart className="h-2.5 w-2.5 mr-1" />
+                                <Heart className="h-2 w-2 mr-0.5" />
                                 Interest
                               </>
                             )}
