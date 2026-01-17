@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -10,12 +10,12 @@ import { z } from "zod";
 
 // Import logo and wedding images
 import vikshanaLogo from "@/assets/vikshana-logo.png";
-import weddingImg1 from "@/assets/wedding-carousel-1.jpg";
-import weddingImg2 from "@/assets/wedding-carousel-2.jpg";
-import weddingImg3 from "@/assets/wedding-carousel-3.jpg";
-import weddingImg4 from "@/assets/wedding-carousel-4.jpg";
+import loginCarousel1 from "@/assets/login-carousel-1.jpg";
+import loginCarousel2 from "@/assets/login-carousel-2.jpg";
+import loginCarousel3 from "@/assets/login-carousel-3.jpg";
+import loginCarousel4 from "@/assets/login-carousel-4.jpg";
 
-const weddingImages = [weddingImg1, weddingImg2, weddingImg3, weddingImg4];
+const weddingImages = [loginCarousel1, loginCarousel2, loginCarousel3, loginCarousel4];
 
 const loginSchema = z.object({
   identifier: z.string().min(1, "Phone or Email is required"),
@@ -222,21 +222,24 @@ const Login = () => {
             </p>
           </div>
 
-          {/* Image Gallery - Compact Grid */}
-          <div className="grid grid-cols-2 gap-3 mb-4 w-full max-w-sm">
-            {weddingImages.map((img, index) => (
-              <div
-                key={index}
-                className="relative h-28 rounded-xl overflow-hidden shadow-xl border border-amber-400/20 transform transition-transform duration-500 hover:scale-105"
-              >
-                <img 
-                  src={img} 
-                  alt={`Wedding ${index + 1}`}
-                  className="w-full h-full object-cover"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-rose-900/40 via-transparent to-transparent" />
-              </div>
-            ))}
+          {/* Image Gallery - Horizontal Auto-Scrolling Carousel */}
+          <div className="w-full max-w-sm mb-4 overflow-hidden">
+            <div className="flex gap-3 animate-scroll-left">
+              {/* Duplicate images for seamless loop */}
+              {[...weddingImages, ...weddingImages].map((img, index) => (
+                <div
+                  key={index}
+                  className="relative h-32 w-40 flex-shrink-0 rounded-xl overflow-hidden shadow-xl border border-amber-400/20 transform transition-transform duration-500 hover:scale-105"
+                >
+                  <img 
+                    src={img} 
+                    alt={`Wedding ${(index % 4) + 1}`}
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-rose-900/40 via-transparent to-transparent" />
+                </div>
+              ))}
+            </div>
           </div>
 
           {/* Stats */}
@@ -452,6 +455,21 @@ const Login = () => {
         }
         .animate-floating-heart {
           animation: floating-heart 8s ease-in-out infinite;
+        }
+        
+        @keyframes scroll-left {
+          0% {
+            transform: translateX(0);
+          }
+          100% {
+            transform: translateX(-50%);
+          }
+        }
+        .animate-scroll-left {
+          animation: scroll-left 20s linear infinite;
+        }
+        .animate-scroll-left:hover {
+          animation-play-state: paused;
         }
       `}</style>
     </div>
