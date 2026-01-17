@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { QrCode, Building2, Upload, Shield, Lock, CheckCircle2, Phone, AlertCircle, Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import upiQrCode from '@/assets/upi-qr-code.png';
 
 interface PlanSelection {
   planType: string;
@@ -222,13 +223,11 @@ const PaymentModal = ({ isOpen, onClose, plan }: PaymentModalProps) => {
                 <Card>
                   <CardContent className="p-4 text-center">
                     <div className="bg-white rounded-lg p-4 inline-block mb-4">
-                      <div className="w-48 h-48 bg-gray-100 rounded-lg flex items-center justify-center border-2 border-dashed border-gray-300">
-                        <div className="text-center">
-                          <QrCode className="h-12 w-12 mx-auto text-gray-400 mb-2" />
-                          <p className="text-sm text-gray-500">PhonePe / UPI QR</p>
-                          <p className="text-xs text-gray-400">Scan to pay</p>
-                        </div>
-                      </div>
+                      <img 
+                        src={upiQrCode} 
+                        alt="UPI QR Code - Scan to Pay" 
+                        className="w-48 h-48 object-contain rounded-lg"
+                      />
                     </div>
                     <p className="text-sm font-medium">Scan & Pay – 100% Secure</p>
                     <div className="flex items-center justify-center gap-2 mt-2 text-xs text-muted-foreground">
