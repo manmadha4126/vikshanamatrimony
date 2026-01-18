@@ -14,6 +14,59 @@ export type Database = {
   }
   public: {
     Tables: {
+      callback_requests: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          notes: string | null
+          phone: string
+          preferred_time: string
+          processed_at: string | null
+          processed_by: string | null
+          profile_id: string | null
+          status: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          notes?: string | null
+          phone: string
+          preferred_time: string
+          processed_at?: string | null
+          processed_by?: string | null
+          profile_id?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          notes?: string | null
+          phone?: string
+          preferred_time?: string
+          processed_at?: string | null
+          processed_by?: string | null
+          profile_id?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "callback_requests_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       daily_recommendations: {
         Row: {
           created_at: string
