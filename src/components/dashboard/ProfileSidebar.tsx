@@ -7,9 +7,7 @@ import { Camera, Edit, Settings, Crown, LogOut, BadgeCheck, Home, Eye, Heart, Me
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import PrimeSubscriptionModal from './PrimeSubscriptionModal';
-
 type DashboardView = 'home' | 'preferences' | 'search' | 'edit-profile' | 'view-profile' | 'interests' | 'messages' | 'notifications' | 'matches' | 'who-viewed-me';
-
 interface ProfileSidebarProps {
   profile: {
     id?: string;
@@ -33,44 +31,36 @@ interface ProfileSidebarProps {
   onProfilePhotoUpdated?: () => void;
   activeView?: DashboardView;
 }
-
-const ProfileSidebar = ({ 
-  profile, 
+const ProfileSidebar = ({
+  profile,
   userId,
-  onSignOut, 
-  onPreferencesClick, 
-  onEditProfileClick, 
-  onViewProfileClick, 
-  onHomeClick, 
-  onInterestsClick, 
-  onMessagesClick, 
-  onNotificationsClick, 
-  onMatchesClick, 
+  onSignOut,
+  onPreferencesClick,
+  onEditProfileClick,
+  onViewProfileClick,
+  onHomeClick,
+  onInterestsClick,
+  onMessagesClick,
+  onNotificationsClick,
+  onMatchesClick,
   onWhoViewedMeClick,
   onProfilePhotoUpdated,
-  activeView = 'home' 
+  activeView = 'home'
 }: ProfileSidebarProps) => {
   const [uploading, setUploading] = useState(false);
   const [isPrimeModalOpen, setIsPrimeModalOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const { toast } = useToast();
-
+  const {
+    toast
+  } = useToast();
   const getInitials = (name: string) => {
-    return name
-      .split(' ')
-      .map((n) => n[0])
-      .join('')
-      .toUpperCase()
-      .slice(0, 2);
+    return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
   };
-
   const isVerified = profile.verification_status === 'verified';
   const hasPhoto = !!profile.photo_url;
-
   const handlePhotoClick = () => {
     fileInputRef.current?.click();
   };
-
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file || !profile.id) return;
@@ -80,7 +70,7 @@ const ProfileSidebar = ({
       toast({
         title: "Invalid file type",
         description: "Please select an image file.",
-        variant: "destructive",
+        variant: "destructive"
       });
       return;
     }
@@ -90,11 +80,10 @@ const ProfileSidebar = ({
       toast({
         title: "File too large",
         description: "Please select an image under 5MB.",
-        variant: "destructive",
+        variant: "destructive"
       });
       return;
     }
-
     setUploading(true);
     try {
       // Generate unique file name
@@ -103,30 +92,29 @@ const ProfileSidebar = ({
       const filePath = `${fileName}`;
 
       // Upload to Supabase storage
-      const { error: uploadError } = await supabase.storage
-        .from('profile-photos')
-        .upload(filePath, file, { upsert: true });
-
+      const {
+        error: uploadError
+      } = await supabase.storage.from('profile-photos').upload(filePath, file, {
+        upsert: true
+      });
       if (uploadError) throw uploadError;
 
       // Get public URL
-      const { data: urlData } = supabase.storage
-        .from('profile-photos')
-        .getPublicUrl(filePath);
-
+      const {
+        data: urlData
+      } = supabase.storage.from('profile-photos').getPublicUrl(filePath);
       const photoUrl = urlData.publicUrl;
 
       // Update profile with new photo URL
-      const { error: updateError } = await supabase
-        .from('profiles')
-        .update({ photo_url: photoUrl })
-        .eq('id', profile.id);
-
+      const {
+        error: updateError
+      } = await supabase.from('profiles').update({
+        photo_url: photoUrl
+      }).eq('id', profile.id);
       if (updateError) throw updateError;
-
       toast({
         title: "Photo uploaded",
-        description: "Your profile photo has been updated successfully.",
+        description: "Your profile photo has been updated successfully."
       });
 
       // Trigger profile refresh
@@ -136,7 +124,7 @@ const ProfileSidebar = ({
       toast({
         title: "Upload failed",
         description: error.message || "Failed to upload photo. Please try again.",
-        variant: "destructive",
+        variant: "destructive"
       });
     } finally {
       setUploading(false);
@@ -146,12 +134,10 @@ const ProfileSidebar = ({
       }
     }
   };
-
-  return (
-    <aside className="w-72 bg-card rounded-2xl shadow-lg border border-border h-[calc(100vh-6rem)] sticky top-20 flex flex-col">
+  return <aside className="w-72 bg-card rounded-2xl shadow-lg border border-border h-[calc(100vh-6rem)] sticky top-20 flex flex-col">
       <ScrollArea className="flex-1 p-6">
         {/* Profile Photo Section */}
-        <div className="flex flex-col items-center text-center">
+        <div className="items-center text-center flex flex-col">
           <div className="relative">
             <Avatar className="h-24 w-24 border-4 border-primary/20">
               <AvatarImage src={profile.photo_url || undefined} alt={profile.name} />
@@ -161,40 +147,18 @@ const ProfileSidebar = ({
             </Avatar>
             
             {/* Hidden file input */}
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              onChange={handleFileChange}
-              className="hidden"
-            />
+            <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFileChange} className="hidden" />
             
             {/* Show camera button only if no photo is set */}
-            {!hasPhoto && (
-              <Button
-                size="icon"
-                variant="secondary"
-                className="absolute -bottom-1 -right-1 h-8 w-8 rounded-full shadow-md"
-                onClick={handlePhotoClick}
-                disabled={uploading}
-              >
-                {uploading ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <Camera className="h-4 w-4" />
-                )}
-              </Button>
-            )}
+            {!hasPhoto && <Button size="icon" variant="secondary" className="absolute -bottom-1 -right-1 h-8 w-8 rounded-full shadow-md" onClick={handlePhotoClick} disabled={uploading}>
+                {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Camera className="h-4 w-4" />}
+              </Button>}
           </div>
 
           {/* User Name with Verification Badge */}
           <div className="mt-4 flex items-center gap-1.5">
-            <h3 className="text-xl font-semibold text-foreground">{profile.name}</h3>
-            {isVerified ? (
-              <BadgeCheck className="h-5 w-5 text-green-600 fill-green-100" />
-            ) : (
-              <BadgeCheck className="h-5 w-5 text-red-500 fill-red-100" />
-            )}
+            <h3 className="text-xl text-foreground mx-0 py-0 px-[9px] font-bold text-justify">{profile.name}</h3>
+            {isVerified ? <BadgeCheck className="h-5 w-5 text-green-600 fill-green-100" /> : <BadgeCheck className="h-5 w-5 text-red-500 fill-red-100" />}
           </div>
 
           {/* Brand Badge */}
@@ -214,150 +178,94 @@ const ProfileSidebar = ({
           </Badge>
 
           {/* Add/Change Photo Button - only show if no photo */}
-          {!hasPhoto && (
-            <Button
-              variant="outline"
-              size="sm"
-              className="mt-3 gap-2"
-              onClick={handlePhotoClick}
-              disabled={uploading}
-            >
-              {uploading ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <Camera className="h-4 w-4" />
-              )}
+          {!hasPhoto && <Button variant="outline" size="sm" className="mt-3 gap-2" onClick={handlePhotoClick} disabled={uploading}>
+              {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Camera className="h-4 w-4" />}
               Add Profile Photo
-            </Button>
-          )}
+            </Button>}
         </div>
 
         {/* Upgrade Section (for non-prime users) */}
-        {!profile.is_prime && (
-          <div className="mt-6 p-4 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950/30 dark:to-orange-950/30 rounded-xl border border-amber-200/50 dark:border-amber-800/50">
+        {!profile.is_prime && <div className="mt-6 p-4 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950/30 dark:to-orange-950/30 rounded-xl border border-amber-200/50 dark:border-amber-800/50">
             <div className="flex items-start gap-3">
               <div className="flex-1">
                 <p className="text-sm font-medium text-foreground">
                   Upgrade membership to call or message with matches
                 </p>
-                <Button
-                  size="sm"
-                  className="mt-3 bg-orange-500 hover:bg-orange-600 text-white"
-                  onClick={() => setIsPrimeModalOpen(true)}
-                >
+                <Button size="sm" className="mt-3 bg-orange-500 hover:bg-orange-600 text-white" onClick={() => setIsPrimeModalOpen(true)}>
                   <Crown className="mr-1.5 h-4 w-4" />
                   Upgrade now
                 </Button>
               </div>
               <Crown className="h-10 w-10 text-amber-500 opacity-50" />
             </div>
-          </div>
-        )}
+          </div>}
 
         {/* Divider */}
         <div className="my-6 border-t border-border" />
 
         {/* Dashboard Home */}
-        <button 
-          onClick={onHomeClick}
-          className={`w-full flex items-center gap-3 py-3 px-2 hover:bg-muted/50 rounded-lg transition-colors ${activeView === 'home' ? 'bg-muted' : ''}`}
-        >
+        <button onClick={onHomeClick} className={`w-full flex items-center gap-3 py-3 px-2 hover:bg-muted/50 rounded-lg transition-colors ${activeView === 'home' ? 'bg-muted' : ''}`}>
           <Home className="h-5 w-5 text-muted-foreground" />
           <span className="text-sm font-medium text-foreground">Dashboard</span>
         </button>
 
         {/* View Profile */}
-        <button 
-          onClick={onViewProfileClick}
-          className={`w-full flex items-center gap-3 py-3 px-2 hover:bg-muted/50 rounded-lg transition-colors ${activeView === 'view-profile' ? 'bg-muted' : ''}`}
-        >
+        <button onClick={onViewProfileClick} className={`w-full flex items-center gap-3 py-3 px-2 hover:bg-muted/50 rounded-lg transition-colors ${activeView === 'view-profile' ? 'bg-muted' : ''}`}>
           <Eye className="h-5 w-5 text-muted-foreground" />
           <span className="text-sm font-medium text-foreground">View profile</span>
         </button>
 
         {/* Edit Profile */}
-        <button 
-          onClick={onEditProfileClick}
-          className={`w-full flex items-center gap-3 py-3 px-2 hover:bg-muted/50 rounded-lg transition-colors ${activeView === 'edit-profile' ? 'bg-muted' : ''}`}
-        >
+        <button onClick={onEditProfileClick} className={`w-full flex items-center gap-3 py-3 px-2 hover:bg-muted/50 rounded-lg transition-colors ${activeView === 'edit-profile' ? 'bg-muted' : ''}`}>
           <Edit className="h-5 w-5 text-muted-foreground" />
           <span className="text-sm font-medium text-foreground">Edit profile</span>
         </button>
 
         {/* Edit Preferences */}
-        <button 
-          onClick={onPreferencesClick}
-          className={`w-full flex items-center gap-3 py-3 px-2 hover:bg-muted/50 rounded-lg transition-colors ${activeView === 'preferences' ? 'bg-muted' : ''}`}
-        >
+        <button onClick={onPreferencesClick} className={`w-full flex items-center gap-3 py-3 px-2 hover:bg-muted/50 rounded-lg transition-colors ${activeView === 'preferences' ? 'bg-muted' : ''}`}>
           <Settings className="h-5 w-5 text-muted-foreground" />
           <span className="text-sm font-medium text-foreground">Edit preferences</span>
         </button>
 
         {/* Interests */}
-        <button 
-          onClick={onInterestsClick}
-          className={`w-full flex items-center gap-3 py-3 px-2 hover:bg-muted/50 rounded-lg transition-colors ${activeView === 'interests' ? 'bg-muted' : ''}`}
-        >
+        <button onClick={onInterestsClick} className={`w-full flex items-center gap-3 py-3 px-2 hover:bg-muted/50 rounded-lg transition-colors ${activeView === 'interests' ? 'bg-muted' : ''}`}>
           <Heart className="h-5 w-5 text-muted-foreground" />
           <span className="text-sm font-medium text-foreground">Interests</span>
         </button>
 
         {/* Matches */}
-        <button 
-          onClick={onMatchesClick}
-          className={`w-full flex items-center gap-3 py-3 px-2 hover:bg-muted/50 rounded-lg transition-colors ${activeView === 'matches' ? 'bg-muted' : ''}`}
-        >
+        <button onClick={onMatchesClick} className={`w-full flex items-center gap-3 py-3 px-2 hover:bg-muted/50 rounded-lg transition-colors ${activeView === 'matches' ? 'bg-muted' : ''}`}>
           <Gem className="h-5 w-5 text-muted-foreground" />
           <span className="text-sm font-medium text-foreground">Matches</span>
         </button>
 
         {/* Messages */}
-        <button 
-          onClick={onMessagesClick}
-          className={`w-full flex items-center gap-3 py-3 px-2 hover:bg-muted/50 rounded-lg transition-colors ${activeView === 'messages' ? 'bg-muted' : ''}`}
-        >
+        <button onClick={onMessagesClick} className={`w-full flex items-center gap-3 py-3 px-2 hover:bg-muted/50 rounded-lg transition-colors ${activeView === 'messages' ? 'bg-muted' : ''}`}>
           <MessageCircle className="h-5 w-5 text-muted-foreground" />
           <span className="text-sm font-medium text-foreground">Messages</span>
         </button>
 
         {/* Who Viewed Me */}
-        <button 
-          onClick={onWhoViewedMeClick}
-          className={`w-full flex items-center gap-3 py-3 px-2 hover:bg-muted/50 rounded-lg transition-colors ${activeView === 'who-viewed-me' ? 'bg-muted' : ''}`}
-        >
+        <button onClick={onWhoViewedMeClick} className={`w-full flex items-center gap-3 py-3 px-2 hover:bg-muted/50 rounded-lg transition-colors ${activeView === 'who-viewed-me' ? 'bg-muted' : ''}`}>
           <Users className="h-5 w-5 text-muted-foreground" />
           <span className="text-sm font-medium text-foreground">Who Viewed Me</span>
         </button>
 
         {/* Notifications */}
-        <button 
-          onClick={onNotificationsClick}
-          className={`w-full flex items-center gap-3 py-3 px-2 hover:bg-muted/50 rounded-lg transition-colors ${activeView === 'notifications' ? 'bg-muted' : ''}`}
-        >
+        <button onClick={onNotificationsClick} className={`w-full flex items-center gap-3 py-3 px-2 hover:bg-muted/50 rounded-lg transition-colors ${activeView === 'notifications' ? 'bg-muted' : ''}`}>
           <Bell className="h-5 w-5 text-muted-foreground" />
           <span className="text-sm font-medium text-foreground">Notifications</span>
         </button>
 
         {/* Log Out */}
-        <button
-          onClick={onSignOut}
-          className="w-full flex items-center gap-3 py-3 px-2 hover:bg-destructive/10 rounded-lg transition-colors text-destructive"
-        >
+        <button onClick={onSignOut} className="w-full flex items-center gap-3 py-3 px-2 hover:bg-destructive/10 rounded-lg transition-colors text-destructive">
           <LogOut className="h-5 w-5" />
           <span className="text-sm font-medium">Log out</span>
         </button>
       </ScrollArea>
 
       {/* Prime Subscription Modal */}
-      <PrimeSubscriptionModal
-        isOpen={isPrimeModalOpen}
-        onClose={() => setIsPrimeModalOpen(false)}
-        userId={userId || ''}
-        profileId={profile.id || ''}
-        userName={profile.name}
-      />
-    </aside>
-  );
+      <PrimeSubscriptionModal isOpen={isPrimeModalOpen} onClose={() => setIsPrimeModalOpen(false)} userId={userId || ''} profileId={profile.id || ''} userName={profile.name} />
+    </aside>;
 };
-
 export default ProfileSidebar;
