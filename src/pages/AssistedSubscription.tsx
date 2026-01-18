@@ -11,6 +11,7 @@ import { ArrowLeft, Shield, Lock, Phone, Mail, Crown, Star, Gem, Check, Sparkles
 import PaymentModal from '@/components/subscription/PaymentModal';
 import assistedExpertImg from '@/assets/assisted-matrimony-expert.jpg';
 import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
 
 type PlanType = 'gold' | 'prime_gold' | 'combo' | 'prime_combo' | 'assisted_gold' | 'assisted_prime' | 'assisted_supreme';
 type Duration = '1_month' | '3_months' | '6_months' | '1_year';
@@ -126,13 +127,44 @@ const AssistedSubscription = () => {
 
     setIsSubmitting(true);
     
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    toast.success('Callback request submitted successfully! Our relationship manager will call you soon.');
-    setIsCallbackModalOpen(false);
-    setCallbackForm({ name: '', phone: '', preferredTime: '' });
-    setIsSubmitting(false);
+    try {
+      // Get current user if logged in
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      // Get profile id if user is logged in
+      let profileId = null;
+      if (user) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('id')
+          .eq('user_id', user.id)
+          .single();
+        profileId = profile?.id;
+      }
+
+      // Insert callback request
+      const { error } = await supabase
+        .from('callback_requests')
+        .insert({
+          name: callbackForm.name.trim(),
+          phone: callbackForm.phone.replace(/\s/g, ''),
+          preferred_time: callbackForm.preferredTime,
+          user_id: user?.id || null,
+          profile_id: profileId,
+          status: 'pending'
+        });
+
+      if (error) throw error;
+
+      toast.success('Callback request submitted successfully! Our relationship manager will call you soon.');
+      setIsCallbackModalOpen(false);
+      setCallbackForm({ name: '', phone: '', preferredTime: '' });
+    } catch (error) {
+      console.error('Error submitting callback request:', error);
+      toast.error('Failed to submit callback request. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const benefits = [
