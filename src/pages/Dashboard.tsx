@@ -220,6 +220,7 @@ const Dashboard = () => {
       setMessageRecipient(null);
     }
     setActiveView(view);
+    window.scrollTo(0, 0);
   };
 
   const handleMessageClick = (recipientUserId: string, recipientProfileId: string, recipientName: string) => {
@@ -229,6 +230,7 @@ const Dashboard = () => {
 
   const handleViewProfile = (profileId: string) => {
     setViewingProfileId(profileId);
+    window.scrollTo(0, 0);
   };
 
   if (loading) {
