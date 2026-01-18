@@ -3,9 +3,14 @@ import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Shield, Lock, Phone, Mail, Crown, Star, Gem, Check, Sparkles, Users, MessageSquare, Clock, ThumbsUp, UserCheck, Calendar, Target, Heart, Award, Zap } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { ArrowLeft, Shield, Lock, Phone, Mail, Crown, Star, Gem, Check, Sparkles, Users, MessageSquare, Clock, ThumbsUp, UserCheck, Calendar, Target, Heart, Award, Zap, User } from 'lucide-react';
 import PaymentModal from '@/components/subscription/PaymentModal';
 import assistedExpertImg from '@/assets/assisted-matrimony-expert.jpg';
+import { toast } from 'sonner';
 
 type PlanType = 'gold' | 'prime_gold' | 'combo' | 'prime_combo' | 'assisted_gold' | 'assisted_prime' | 'assisted_supreme';
 type Duration = '1_month' | '3_months' | '6_months' | '1_year';
@@ -19,10 +24,23 @@ interface PlanSelection {
   category: string;
 }
 
+interface CallbackFormData {
+  name: string;
+  phone: string;
+  preferredTime: string;
+}
+
 const AssistedSubscription = () => {
   const navigate = useNavigate();
   const [selectedPlan, setSelectedPlan] = useState<PlanSelection | null>(null);
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+  const [isCallbackModalOpen, setIsCallbackModalOpen] = useState(false);
+  const [callbackForm, setCallbackForm] = useState<CallbackFormData>({
+    name: '',
+    phone: '',
+    preferredTime: ''
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const basicPlans: Record<string, { name: string; icon: typeof Crown; color: string; badge?: string }> = {
     gold: { name: 'Gold', icon: Crown, color: 'from-yellow-400 to-yellow-600' },
@@ -89,6 +107,32 @@ const AssistedSubscription = () => {
       currency: 'INR',
       maximumFractionDigits: 0
     }).format(price);
+  };
+
+  const handleCallbackSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!callbackForm.name.trim() || !callbackForm.phone.trim() || !callbackForm.preferredTime) {
+      toast.error('Please fill in all fields');
+      return;
+    }
+
+    // Validate phone number
+    const phoneRegex = /^[6-9]\d{9}$/;
+    if (!phoneRegex.test(callbackForm.phone.replace(/\s/g, ''))) {
+      toast.error('Please enter a valid 10-digit phone number');
+      return;
+    }
+
+    setIsSubmitting(true);
+    
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    
+    toast.success('Callback request submitted successfully! Our relationship manager will call you soon.');
+    setIsCallbackModalOpen(false);
+    setCallbackForm({ name: '', phone: '', preferredTime: '' });
+    setIsSubmitting(false);
   };
 
   const benefits = [
@@ -538,7 +582,10 @@ const AssistedSubscription = () => {
       <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-card border-t shadow-lg p-4 z-50">
         <div className="container mx-auto flex items-center justify-between gap-4">
           <p className="font-semibold text-sm md:text-base">Interested to know more?</p>
-          <Button className="bg-primary hover:bg-primary/90 gap-2">
+          <Button 
+            className="bg-primary hover:bg-primary/90 gap-2"
+            onClick={() => setIsCallbackModalOpen(true)}
+          >
             <Phone className="h-4 w-4" />
             Request a callback
           </Button>
@@ -554,6 +601,92 @@ const AssistedSubscription = () => {
         onClose={() => setIsPaymentModalOpen(false)}
         plan={selectedPlan}
       />
+
+      {/* Callback Request Modal */}
+      <Dialog open={isCallbackModalOpen} onOpenChange={setIsCallbackModalOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Phone className="h-5 w-5 text-primary" />
+              Request a Callback
+            </DialogTitle>
+            <DialogDescription>
+              Fill in your details and our relationship manager will call you back at your preferred time.
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleCallbackSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="callback-name">Full Name *</Label>
+              <div className="relative">
+                <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="callback-name"
+                  placeholder="Enter your full name"
+                  value={callbackForm.name}
+                  onChange={(e) => setCallbackForm(prev => ({ ...prev, name: e.target.value }))}
+                  className="pl-10"
+                  required
+                />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="callback-phone">Phone Number *</Label>
+              <div className="relative">
+                <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="callback-phone"
+                  type="tel"
+                  placeholder="Enter your phone number"
+                  value={callbackForm.phone}
+                  onChange={(e) => setCallbackForm(prev => ({ ...prev, phone: e.target.value }))}
+                  className="pl-10"
+                  required
+                />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="callback-time">Preferred Time for Callback *</Label>
+              <Select 
+                value={callbackForm.preferredTime} 
+                onValueChange={(value) => setCallbackForm(prev => ({ ...prev, preferredTime: value }))}
+                required
+              >
+                <SelectTrigger id="callback-time" className="w-full">
+                  <Clock className="h-4 w-4 mr-2 text-muted-foreground" />
+                  <SelectValue placeholder="Select preferred time" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="morning">Morning (9 AM - 12 PM)</SelectItem>
+                  <SelectItem value="afternoon">Afternoon (12 PM - 3 PM)</SelectItem>
+                  <SelectItem value="evening">Evening (3 PM - 6 PM)</SelectItem>
+                  <SelectItem value="late_evening">Late Evening (6 PM - 9 PM)</SelectItem>
+                  <SelectItem value="anytime">Anytime</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex gap-3 pt-4">
+              <Button 
+                type="button" 
+                variant="outline" 
+                className="flex-1"
+                onClick={() => setIsCallbackModalOpen(false)}
+              >
+                Cancel
+              </Button>
+              <Button 
+                type="submit" 
+                className="flex-1 gradient-primary"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? 'Submitting...' : 'Submit Request'}
+              </Button>
+            </div>
+          </form>
+          <p className="text-xs text-muted-foreground text-center">
+            By submitting, you agree to be contacted by our relationship manager.
+          </p>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
