@@ -315,8 +315,10 @@ const AssistedSubscription = () => {
                           </Button>)}
                       </div>
                       <div className="text-center py-4">
-                        <span className="text-2xl md:text-3xl font-bold text-foreground mx-[260px] my-[30px]">{formatPrice(pricing[duration])}</span>
-                        <span className="text-muted-foreground ml-2 text-sm">/ {durations.find(d => d.key === duration)?.label}</span>
+                        <div className="flex flex-col items-center gap-1">
+                          <span className="text-3xl md:text-4xl font-bold text-foreground">{formatPrice(pricing[duration])}</span>
+                          <span className="text-muted-foreground text-sm">/ {durations.find(d => d.key === duration)?.label}</span>
+                        </div>
                       </div>
                       <ul className="space-y-2 text-sm">
                         <li className="flex items-center gap-2">
