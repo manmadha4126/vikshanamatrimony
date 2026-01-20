@@ -189,6 +189,38 @@ const SubscriptionApproval = () => {
     fetchSubscriptions();
   }, [currentPage, statusFilter, searchQuery]);
 
+  const sendNotificationEmail = async (
+    email: string,
+    name: string,
+    planName: string,
+    amount: number,
+    validityMonths: number,
+    status: "approved" | "rejected",
+    expiresAt?: string
+  ) => {
+    try {
+      const { error } = await supabase.functions.invoke("send-subscription-notification", {
+        body: {
+          email,
+          name,
+          planName,
+          amount,
+          validityMonths,
+          status,
+          expiresAt,
+        },
+      });
+
+      if (error) {
+        console.error("Failed to send notification email:", error);
+      } else {
+        console.log("Notification email sent successfully");
+      }
+    } catch (error) {
+      console.error("Error sending notification email:", error);
+    }
+  };
+
   const handleApproveSubscription = async () => {
     if (!selectedSubscription) return;
     setProcessing(true);
@@ -229,9 +261,22 @@ const SubscriptionApproval = () => {
           .eq("user_id", selectedSubscription.user_id);
       }
 
+      // Send approval notification email
+      if (selectedSubscription.profile?.email && selectedSubscription.profile?.name) {
+        await sendNotificationEmail(
+          selectedSubscription.profile.email,
+          selectedSubscription.profile.name,
+          selectedSubscription.plan_name,
+          selectedSubscription.amount,
+          selectedSubscription.validity_months || 3,
+          "approved",
+          expiresAt.toISOString()
+        );
+      }
+
       toast({
         title: "Subscription Approved",
-        description: `${selectedSubscription.plan_name} subscription has been activated.`,
+        description: `${selectedSubscription.plan_name} subscription has been activated. Email notification sent.`,
       });
 
       setSelectedSubscription(null);
@@ -260,9 +305,21 @@ const SubscriptionApproval = () => {
 
       if (error) throw error;
 
+      // Send rejection notification email
+      if (selectedSubscription.profile?.email && selectedSubscription.profile?.name) {
+        await sendNotificationEmail(
+          selectedSubscription.profile.email,
+          selectedSubscription.profile.name,
+          selectedSubscription.plan_name,
+          selectedSubscription.amount,
+          selectedSubscription.validity_months || 3,
+          "rejected"
+        );
+      }
+
       toast({
         title: "Subscription Rejected",
-        description: `${selectedSubscription.plan_name} subscription has been rejected.`,
+        description: `${selectedSubscription.plan_name} subscription has been rejected. Email notification sent.`,
       });
 
       setSelectedSubscription(null);
