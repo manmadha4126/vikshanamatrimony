@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -6,10 +6,11 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { QrCode, Building2, Upload, Shield, Lock, CheckCircle2, Phone, AlertCircle, Loader2 } from 'lucide-react';
+import { QrCode, Building2, Upload, Shield, Lock, CheckCircle2, Phone, AlertCircle, Loader2, IndianRupee } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import upiQrCode from '@/assets/phonepe-qr-code.png';
+import { QRCodeSVG } from 'qrcode.react';
+import phonePeLogo from '@/assets/phonepe-qr-code.png';
 
 interface PlanSelection {
   planType: string;
@@ -33,6 +34,16 @@ const PaymentModal = ({ isOpen, onClose, plan }: PaymentModalProps) => {
   const [screenshotFile, setScreenshotFile] = useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+
+  // UPI payment details
+  const upiId = 'prasanthtirupathi@ybl';
+  const merchantName = 'PRASANTH TIRUPATI';
+  
+  // Generate UPI deep link URL with amount
+  const upiUrl = useMemo(() => {
+    if (!plan) return '';
+    return `upi://pay?pa=${upiId}&pn=${encodeURIComponent(merchantName)}&am=${plan.price}&cu=INR&tn=${encodeURIComponent(`Vikshana Matrimony - ${plan.planName}`)}`;
+  }, [plan]);
 
   const bankDetails = {
     bankName: 'Canara Bank',
@@ -222,15 +233,28 @@ const PaymentModal = ({ isOpen, onClose, plan }: PaymentModalProps) => {
               <TabsContent value="upi" className="space-y-4">
                 <Card>
                   <CardContent className="p-4 text-center">
-                    <div className="bg-white rounded-lg p-4 inline-block mb-4">
-                      <img 
-                        src={upiQrCode} 
-                        alt="UPI QR Code - Scan to Pay" 
-                        className="w-48 h-48 object-contain rounded-lg"
+                    <div className="bg-white rounded-lg p-4 inline-block mb-4 shadow-sm border">
+                      <QRCodeSVG 
+                        value={upiUrl}
+                        size={192}
+                        level="H"
+                        includeMargin={true}
+                        imageSettings={{
+                          src: phonePeLogo,
+                          x: undefined,
+                          y: undefined,
+                          height: 40,
+                          width: 40,
+                          excavate: true,
+                        }}
                       />
                     </div>
-                    <p className="text-sm font-medium">Scan & Pay – 100% Secure</p>
-                    <p className="text-sm text-primary font-mono mt-1">UPI ID: prasanthtirupathi@ybl</p>
+                    <div className="flex items-center justify-center gap-2 mb-2">
+                      <IndianRupee className="h-5 w-5 text-primary" />
+                      <span className="text-xl font-bold text-primary">{formatPrice(plan.price)}</span>
+                    </div>
+                    <p className="text-sm font-medium text-muted-foreground">Amount auto-filled when you scan</p>
+                    <p className="text-sm text-primary font-mono mt-2">UPI ID: {upiId}</p>
                     <div className="flex items-center justify-center gap-2 mt-2 text-xs text-muted-foreground">
                       <Phone className="h-3 w-3" />
                       <span>PhonePe • Google Pay • Paytm • Any UPI App</span>
