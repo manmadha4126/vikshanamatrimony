@@ -255,7 +255,7 @@ const AssistedSubscription = () => {
       <div className="sticky top-0 z-50 bg-white/80 dark:bg-background/80 backdrop-blur-lg border-b">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center gap-4">
-            <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
+            <Button variant="ghost" size="icon" onClick={() => navigate('/my-dashboard')}>
               <ArrowLeft className="h-5 w-5" />
             </Button>
             <div>
