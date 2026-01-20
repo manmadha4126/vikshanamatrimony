@@ -1,32 +1,42 @@
 import { Heart, Shield, Users, Eye, Award, Handshake } from "lucide-react";
 import AssistedServiceSection from "@/components/dashboard/AssistedServiceSection";
-const coreValues = [{
-  icon: Heart,
-  title: "Trust & Tradition",
-  description: "We honor the sacred institution of marriage and traditional values that have united families for generations."
-}, {
-  icon: Shield,
-  title: "Safety & Security",
-  description: "Your privacy is our priority. We employ advanced security measures to protect your personal information."
-}, {
-  icon: Users,
-  title: "Family First",
-  description: "We believe in the importance of family involvement and support in the matchmaking process."
-}, {
-  icon: Eye,
-  title: "Transparency",
-  description: "We maintain complete transparency in our processes, ensuring honest and authentic connections."
-}, {
-  icon: Award,
-  title: "Quality Matches",
-  description: "Our expert team carefully curates matches based on compatibility, values, and life goals."
-}, {
-  icon: Handshake,
-  title: "Commitment",
-  description: "We are committed to helping you find not just a match, but a lifelong partner."
-}];
+
+const coreValues = [
+  {
+    icon: Heart,
+    title: "Trust & Tradition",
+    description: "We honor the sacred institution of marriage and traditional values that have united families for generations.",
+  },
+  {
+    icon: Shield,
+    title: "Safety & Security",
+    description: "Your privacy is our priority. We employ advanced security measures to protect your personal information.",
+  },
+  {
+    icon: Users,
+    title: "Family First",
+    description: "We believe in the importance of family involvement and support in the matchmaking process.",
+  },
+  {
+    icon: Eye,
+    title: "Transparency",
+    description: "We maintain complete transparency in our processes, ensuring honest and authentic connections.",
+  },
+  {
+    icon: Award,
+    title: "Quality Matches",
+    description: "Our expert team carefully curates matches based on compatibility, values, and life goals.",
+  },
+  {
+    icon: Handshake,
+    title: "Commitment",
+    description: "We are committed to helping you find not just a match, but a lifelong partner.",
+  },
+];
+
 const AboutFullSection = () => {
-  return <>
+  return (
+    <>
       {/* About Hero Section */}
       <section id="about" className="py-20 gradient-hero">
         <div className="container">
@@ -74,24 +84,22 @@ const AboutFullSection = () => {
             </div>
             
             <div className="grid grid-cols-2 gap-4">
-              {[{
-              number: "10,000+",
-              label: "Happy Marriages"
-            }, {
-              number: "50,000+",
-              label: "Verified Profiles"
-            }, {
-              number: "15+",
-              label: "Years Experience"
-            }, {
-              number: "98%",
-              label: "Satisfaction Rate"
-            }].map((stat, index) => <div key={index} className="p-6 bg-card rounded-xl border border-border/50 shadow-soft text-center">
+              {[
+                { number: "10,000+", label: "Happy Marriages" },
+                { number: "50,000+", label: "Verified Profiles" },
+                { number: "15+", label: "Years Experience" },
+                { number: "98%", label: "Satisfaction Rate" },
+              ].map((stat, index) => (
+                <div
+                  key={index}
+                  className="p-6 bg-card rounded-xl border border-border/50 shadow-soft text-center"
+                >
                   <div className="font-display text-3xl font-bold text-primary mb-2">
                     {stat.number}
                   </div>
                   <div className="text-sm text-muted-foreground">{stat.label}</div>
-                </div>)}
+                </div>
+              ))}
             </div>
           </div>
         </div>
@@ -110,7 +118,11 @@ const AboutFullSection = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {coreValues.map((value, index) => <div key={index} className="group bg-card p-8 rounded-xl border border-border/50 shadow-soft hover:shadow-card transition-all duration-300">
+            {coreValues.map((value, index) => (
+              <div
+                key={index}
+                className="group bg-card p-8 rounded-xl border border-border/50 shadow-soft hover:shadow-card transition-all duration-300"
+              >
                 <div className="w-12 h-12 rounded-lg gradient-primary flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
                   <value.icon className="w-6 h-6 text-primary-foreground" />
                 </div>
@@ -120,7 +132,8 @@ const AboutFullSection = () => {
                 <p className="text-muted-foreground text-sm leading-relaxed">
                   {value.description}
                 </p>
-              </div>)}
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -131,7 +144,7 @@ const AboutFullSection = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 bg-neutral-600">
+      <section className="py-16 bg-primary">
         <div className="container text-center">
           <h3 className="font-display text-3xl font-bold text-primary-foreground mb-4">
             Ready to Find Your Perfect Match?
@@ -140,11 +153,16 @@ const AboutFullSection = () => {
             Join thousands of families who have trusted Vikshana Matrimony to find their 
             life partner. Your beautiful journey begins here.
           </p>
-          <a href="#register" className="inline-flex items-center justify-center h-13 px-8 bg-secondary text-secondary-foreground font-semibold rounded-lg shadow-gold hover:bg-secondary/90 transition-colors">
+          <a
+            href="#register"
+            className="inline-flex items-center justify-center h-13 px-8 bg-secondary text-secondary-foreground font-semibold rounded-lg shadow-gold hover:bg-secondary/90 transition-colors"
+          >
             Register Now - It's Free
           </a>
         </div>
       </section>
-    </>;
+    </>
+  );
 };
+
 export default AboutFullSection;
