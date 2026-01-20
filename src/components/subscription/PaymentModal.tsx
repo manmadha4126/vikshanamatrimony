@@ -9,7 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { QrCode, Building2, Upload, Shield, Lock, CheckCircle2, Phone, AlertCircle, Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import upiQrCode from '@/assets/upi-qr-code.png';
+import upiQrCode from '@/assets/phonepe-qr-code.jpeg';
 
 interface PlanSelection {
   planType: string;
@@ -230,6 +230,7 @@ const PaymentModal = ({ isOpen, onClose, plan }: PaymentModalProps) => {
                       />
                     </div>
                     <p className="text-sm font-medium">Scan & Pay – 100% Secure</p>
+                    <p className="text-sm text-primary font-mono mt-1">UPI ID: prasanthtirupathi@ybl</p>
                     <div className="flex items-center justify-center gap-2 mt-2 text-xs text-muted-foreground">
                       <Phone className="h-3 w-3" />
                       <span>PhonePe • Google Pay • Paytm • Any UPI App</span>
