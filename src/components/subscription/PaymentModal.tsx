@@ -9,7 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { QrCode, Building2, Upload, Shield, Lock, CheckCircle2, Phone, AlertCircle, Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import upiQrCode from '@/assets/phonepe-qr-code.jpeg';
+import upiQrCode from '@/assets/phonepe-qr-code.png';
 
 interface PlanSelection {
   planType: string;
