@@ -220,17 +220,18 @@ const Dashboard = () => {
       setMessageRecipient(null);
     }
     setActiveView(view);
-    window.scrollTo(0, 0);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleMessageClick = (recipientUserId: string, recipientProfileId: string, recipientName: string) => {
     setMessageRecipient({ recipientUserId, recipientProfileId, recipientName });
     setActiveView('messages');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleViewProfile = (profileId: string) => {
     setViewingProfileId(profileId);
-    window.scrollTo(0, 0);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   if (loading) {
