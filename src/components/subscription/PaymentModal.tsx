@@ -6,7 +6,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { QrCode, Building2, Upload, Shield, Lock, CheckCircle2, Phone, AlertCircle, Loader2, IndianRupee } from 'lucide-react';
+import { QrCode, Building2, Upload, Shield, Lock, CheckCircle2, Phone, AlertCircle, Loader2, IndianRupee, Smartphone } from 'lucide-react';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { QRCodeSVG } from 'qrcode.react';
@@ -29,11 +30,18 @@ interface PaymentModalProps {
 
 const PaymentModal = ({ isOpen, onClose, plan }: PaymentModalProps) => {
   const { toast } = useToast();
+  const isMobile = useIsMobile();
   const [paymentMethod, setPaymentMethod] = useState<'upi' | 'bank'>('upi');
   const [utrId, setUtrId] = useState('');
   const [screenshotFile, setScreenshotFile] = useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+
+  const handleOpenUpiApp = () => {
+    if (upiUrl) {
+      window.location.href = upiUrl;
+    }
+  };
 
   // UPI payment details
   const upiId = 'prasanthtirupathi@ybl';
@@ -259,6 +267,18 @@ const PaymentModal = ({ isOpen, onClose, plan }: PaymentModalProps) => {
                       <Phone className="h-3 w-3" />
                       <span>PhonePe • Google Pay • Paytm • Any UPI App</span>
                     </div>
+                    
+                    {/* Pay via UPI App Button */}
+                    <Button
+                      onClick={handleOpenUpiApp}
+                      className="w-full mt-4 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white gap-2"
+                    >
+                      <Smartphone className="h-4 w-4" />
+                      Pay via UPI App
+                    </Button>
+                    <p className="text-xs text-muted-foreground mt-2">
+                      {isMobile ? 'Opens your default UPI app with amount pre-filled' : 'Works best on mobile devices'}
+                    </p>
                   </CardContent>
                 </Card>
               </TabsContent>
