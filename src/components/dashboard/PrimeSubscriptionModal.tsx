@@ -6,7 +6,8 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Crown, Phone, MessageCircle, Check, ArrowLeft, QrCode, Building2, Upload, Shield, Lock, CheckCircle2, AlertCircle, Loader2, IndianRupee } from 'lucide-react';
+import { Crown, Phone, MessageCircle, Check, ArrowLeft, QrCode, Building2, Upload, Shield, Lock, CheckCircle2, AlertCircle, Loader2, IndianRupee, Smartphone } from 'lucide-react';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { QRCodeSVG } from 'qrcode.react';
@@ -106,6 +107,7 @@ const bankDetails = {
 };
 
 const PrimeSubscriptionModal = ({ isOpen, onClose, userId, profileId, userName }: PrimeSubscriptionModalProps) => {
+  const isMobile = useIsMobile();
   const [selectedPlan, setSelectedPlan] = useState<SubscriptionPlan | null>(null);
   const [showPayment, setShowPayment] = useState(false);
   const [isLogging, setIsLogging] = useState(false);
@@ -113,6 +115,12 @@ const PrimeSubscriptionModal = ({ isOpen, onClose, userId, profileId, userName }
   const [screenshotFile, setScreenshotFile] = useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+
+  const handleOpenUpiApp = () => {
+    if (upiUrl) {
+      window.location.href = upiUrl;
+    }
+  };
 
   // UPI payment details
   const upiId = 'prasanthtirupathi@ybl';
@@ -330,6 +338,18 @@ const PrimeSubscriptionModal = ({ isOpen, onClose, userId, profileId, userName }
                           <Phone className="h-3 w-3" />
                           <span>PhonePe • Google Pay • Paytm • Any UPI App</span>
                         </div>
+                        
+                        {/* Pay via UPI App Button */}
+                        <Button
+                          onClick={handleOpenUpiApp}
+                          className="w-full mt-4 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white gap-2"
+                        >
+                          <Smartphone className="h-4 w-4" />
+                          Pay via UPI App
+                        </Button>
+                        <p className="text-xs text-muted-foreground mt-2">
+                          {isMobile ? 'Opens your default UPI app with amount pre-filled' : 'Works best on mobile devices'}
+                        </p>
                       </CardContent>
                     </Card>
                   </TabsContent>

@@ -14,7 +14,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { RefreshCw, Users, CheckCircle, Clock, Search, ChevronLeft, ChevronRight, UserPlus, Edit, Trash2, Home, XCircle, Phone, Mail, MapPin, Briefcase, GraduationCap, User as UserIcon, Calendar, Heart, LogOut, Shield, Sun, Moon, KeyRound, CreditCard, PhoneCall } from "lucide-react";
+import { RefreshCw, Users, CheckCircle, Clock, Search, ChevronLeft, ChevronRight, UserPlus, Edit, Trash2, Home, XCircle, Phone, Mail, MapPin, Briefcase, GraduationCap, User as UserIcon, Calendar, Heart, LogOut, Shield, Sun, Moon, KeyRound, CreditCard, PhoneCall, History } from "lucide-react";
 import vikshanaLogo from "@/assets/vikshana-logo.png";
 import { Input } from "@/components/ui/input";
 import {
@@ -51,6 +51,7 @@ import VerificationCenter from "@/components/staff/VerificationCenter";
 import SubscriptionApproval from "@/components/staff/SubscriptionApproval";
 import SuccessStoriesApproval from "@/components/staff/SuccessStoriesApproval";
 import CallbackRequestsSection from "@/components/staff/CallbackRequestsSection";
+import PaymentHistorySection from "@/components/staff/PaymentHistorySection";
 interface Profile {
   id: string;
   profile_id: string | null;
@@ -107,7 +108,7 @@ const StaffDashboard = () => {
   const [genderCounts, setGenderCounts] = useState({ all: 0, male: 0, female: 0 });
   const [genderFilter, setGenderFilter] = useState<GenderFilter>("all");
   const [selectedProfile, setSelectedProfile] = useState<Profile | null>(null);
-  const [activeSection, setActiveSection] = useState<"profiles" | "add" | "verification" | "stories" | "subscriptions" | "callbacks">("profiles");
+  const [activeSection, setActiveSection] = useState<"profiles" | "add" | "verification" | "stories" | "subscriptions" | "callbacks" | "payment-history">("profiles");
   const [deleteProfile, setDeleteProfile] = useState<Profile | null>(null);
   const [deleting, setDeleting] = useState(false);
   const [verificationFilter, setVerificationFilter] = useState<VerificationFilter>("all");
@@ -608,7 +609,7 @@ const StaffDashboard = () => {
         </div>
 
         {/* Action Boxes */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-7 gap-4 mb-8">
           <Card 
             className={`cursor-pointer transition-all hover:shadow-md hover:scale-[1.02] ${activeSection === "profiles" ? "ring-2 ring-primary" : ""} bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-blue-950 dark:to-indigo-900 border-blue-200 dark:border-blue-800`}
             onClick={() => setActiveSection("profiles")}
@@ -755,6 +756,26 @@ const StaffDashboard = () => {
               <p className="text-sm text-cyan-600/80 dark:text-cyan-300/80">View and manage callback requests</p>
             </CardContent>
           </Card>
+
+          <Card 
+            className={`cursor-pointer transition-all hover:shadow-md hover:scale-[1.02] ${activeSection === "payment-history" ? "ring-2 ring-primary" : ""} bg-gradient-to-br from-slate-50 to-gray-100 dark:from-slate-950 dark:to-gray-900 border-slate-200 dark:border-slate-800`}
+            onClick={() => setActiveSection("payment-history")}
+          >
+            <CardHeader className="pb-2 pt-4 px-4">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-slate-500/20 dark:bg-slate-400/20 rounded-lg">
+                  <History className="w-5 h-5 text-slate-600 dark:text-slate-400" />
+                </div>
+                <div>
+                  <CardTitle className="text-base text-slate-900 dark:text-slate-100">Payment History</CardTitle>
+                  <CardDescription className="text-xs text-slate-600/70 dark:text-slate-300/70">All transactions</CardDescription>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="pb-4 px-4">
+              <p className="text-sm text-slate-600/80 dark:text-slate-300/80">View all online payment transactions</p>
+            </CardContent>
+          </Card>
         </div>
 
         {/* Callback Requests Section */}
@@ -775,6 +796,11 @@ const StaffDashboard = () => {
         {/* Subscription Approval Section */}
         {activeSection === "subscriptions" && (
           <SubscriptionApproval />
+        )}
+
+        {/* Payment History Section */}
+        {activeSection === "payment-history" && (
+          <PaymentHistorySection />
         )}
 
         {/* Profiles Table - Only show when activeSection is "profiles" */}
