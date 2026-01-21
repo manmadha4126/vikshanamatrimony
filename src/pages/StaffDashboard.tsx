@@ -609,24 +609,24 @@ const StaffDashboard = () => {
         </div>
 
         {/* Action Boxes */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-7 gap-4 mb-8">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-3 mb-8">
           <Card 
             className={`cursor-pointer transition-all hover:shadow-md hover:scale-[1.02] ${activeSection === "profiles" ? "ring-2 ring-primary" : ""} bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-blue-950 dark:to-indigo-900 border-blue-200 dark:border-blue-800`}
             onClick={() => setActiveSection("profiles")}
           >
-            <CardHeader className="pb-2 pt-4 px-4">
-              <div className="flex items-center gap-3">
+            <CardHeader className="pb-2 pt-3 px-3">
+              <div className="flex flex-col items-center text-center gap-2">
                 <div className="p-2 bg-blue-500/20 dark:bg-blue-400/20 rounded-lg">
                   <Users className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                 </div>
                 <div>
-                  <CardTitle className="text-base text-blue-900 dark:text-blue-100">Registered Profiles</CardTitle>
-                  <CardDescription className="text-xs text-blue-600/70 dark:text-blue-300/70">View and manage profiles</CardDescription>
+                  <CardTitle className="text-sm text-blue-900 dark:text-blue-100 leading-tight">Profiles</CardTitle>
+                  <CardDescription className="text-[10px] text-blue-600/70 dark:text-blue-300/70 hidden sm:block">View & manage</CardDescription>
                 </div>
               </div>
             </CardHeader>
-            <CardContent className="pb-4 px-4">
-              <p className="text-2xl font-bold text-blue-700 dark:text-blue-300">{totalRegistrations} Profiles</p>
+            <CardContent className="pb-3 px-3 pt-0">
+              <p className="text-xl font-bold text-blue-700 dark:text-blue-300 text-center">{totalRegistrations}</p>
             </CardContent>
           </Card>
 
@@ -634,34 +634,26 @@ const StaffDashboard = () => {
             className={`cursor-pointer transition-all hover:shadow-md hover:scale-[1.02] ${activeSection === "verification" ? "ring-2 ring-primary" : ""} bg-gradient-to-br from-amber-50 to-orange-100 dark:from-amber-950 dark:to-orange-900 border-amber-200 dark:border-amber-800`}
             onClick={() => setActiveSection("verification")}
           >
-            <CardHeader className="pb-2 pt-4 px-4">
-              <div className="flex items-center gap-3">
+            <CardHeader className="pb-2 pt-3 px-3">
+              <div className="flex flex-col items-center text-center gap-2">
                 <div className="p-2 bg-amber-500/20 dark:bg-amber-400/20 rounded-lg">
                   <CheckCircle className="w-5 h-5 text-amber-600 dark:text-amber-400" />
                 </div>
                 <div>
-                  <CardTitle className="text-base text-amber-900 dark:text-amber-100">Verification Center</CardTitle>
-                  <CardDescription className="text-xs text-amber-600/70 dark:text-amber-300/70">Review profiles</CardDescription>
+                  <CardTitle className="text-sm text-amber-900 dark:text-amber-100 leading-tight">Verification</CardTitle>
+                  <CardDescription className="text-[10px] text-amber-600/70 dark:text-amber-300/70 hidden sm:block">Review profiles</CardDescription>
                 </div>
               </div>
             </CardHeader>
-            <CardContent className="pb-4 px-4">
-              <div className="grid grid-cols-4 gap-2">
-                <div className="bg-blue-100/80 dark:bg-blue-800/50 rounded-md p-2 text-center">
-                  <p className="text-lg font-bold text-blue-600 dark:text-blue-300">{totalRegistrations}</p>
-                  <p className="text-[10px] text-blue-600/80 dark:text-blue-300/80">All</p>
+            <CardContent className="pb-3 px-3 pt-0">
+              <div className="flex justify-center gap-1">
+                <div className="bg-yellow-100/80 dark:bg-yellow-800/50 rounded px-2 py-1 text-center">
+                  <p className="text-sm font-bold text-yellow-600 dark:text-yellow-300">{pendingVerification}</p>
+                  <p className="text-[8px] text-yellow-600/80 dark:text-yellow-300/80">Pending</p>
                 </div>
-                <div className="bg-yellow-100/80 dark:bg-yellow-800/50 rounded-md p-2 text-center">
-                  <p className="text-lg font-bold text-yellow-600 dark:text-yellow-300">{pendingVerification}</p>
-                  <p className="text-[10px] text-yellow-600/80 dark:text-yellow-300/80">Pending</p>
-                </div>
-                <div className="bg-green-100/80 dark:bg-green-800/50 rounded-md p-2 text-center">
-                  <p className="text-lg font-bold text-green-600 dark:text-green-300">{verifiedProfiles}</p>
-                  <p className="text-[10px] text-green-600/80 dark:text-green-300/80">Verified</p>
-                </div>
-                <div className="bg-red-100/80 dark:bg-red-800/50 rounded-md p-2 text-center">
-                  <p className="text-lg font-bold text-red-600 dark:text-red-300">{rejectedProfiles}</p>
-                  <p className="text-[10px] text-red-600/80 dark:text-red-300/80">Rejected</p>
+                <div className="bg-green-100/80 dark:bg-green-800/50 rounded px-2 py-1 text-center">
+                  <p className="text-sm font-bold text-green-600 dark:text-green-300">{verifiedProfiles}</p>
+                  <p className="text-[8px] text-green-600/80 dark:text-green-300/80">Done</p>
                 </div>
               </div>
             </CardContent>
@@ -671,28 +663,28 @@ const StaffDashboard = () => {
             className={`cursor-pointer transition-all hover:shadow-md hover:scale-[1.02] ${activeSection === "add" ? "ring-2 ring-primary" : ""} bg-gradient-to-br from-emerald-50 to-teal-100 dark:from-emerald-950 dark:to-teal-900 border-emerald-200 dark:border-emerald-800`}
             onClick={() => setActiveSection("add")}
           >
-            <CardHeader className="pb-2 pt-4 px-4">
-              <div className="flex items-center gap-3">
+            <CardHeader className="pb-2 pt-3 px-3">
+              <div className="flex flex-col items-center text-center gap-2">
                 <div className="p-2 bg-emerald-500/20 dark:bg-emerald-400/20 rounded-lg">
                   <UserPlus className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
                 </div>
                 <div>
-                  <CardTitle className="text-base text-emerald-900 dark:text-emerald-100">Add New Profile</CardTitle>
-                  <CardDescription className="text-xs text-emerald-600/70 dark:text-emerald-300/70">Create manually</CardDescription>
+                  <CardTitle className="text-sm text-emerald-900 dark:text-emerald-100 leading-tight">Add Profile</CardTitle>
+                  <CardDescription className="text-[10px] text-emerald-600/70 dark:text-emerald-300/70 hidden sm:block">Create new</CardDescription>
                 </div>
               </div>
             </CardHeader>
-            <CardContent className="pb-4 px-4">
+            <CardContent className="pb-3 px-3 pt-0">
               <Button 
                 size="sm"
-                className="w-full bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-500 dark:hover:bg-emerald-600 text-white"
+                className="w-full bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-500 dark:hover:bg-emerald-600 text-white text-xs h-8"
                 onClick={(e) => {
                   e.stopPropagation();
                   navigate("/register?from=staff");
                 }}
               >
                 <UserPlus className="w-3 h-3 mr-1" />
-                Create New Profile
+                Create
               </Button>
             </CardContent>
           </Card>
@@ -701,19 +693,19 @@ const StaffDashboard = () => {
             className={`cursor-pointer transition-all hover:shadow-md hover:scale-[1.02] ${activeSection === "stories" ? "ring-2 ring-primary" : ""} bg-gradient-to-br from-pink-50 to-rose-100 dark:from-pink-950 dark:to-rose-900 border-pink-200 dark:border-pink-800`}
             onClick={() => setActiveSection("stories")}
           >
-            <CardHeader className="pb-2 pt-4 px-4">
-              <div className="flex items-center gap-3">
+            <CardHeader className="pb-2 pt-3 px-3">
+              <div className="flex flex-col items-center text-center gap-2">
                 <div className="p-2 bg-pink-500/20 dark:bg-pink-400/20 rounded-lg">
                   <Heart className="w-5 h-5 text-pink-600 dark:text-pink-400" />
                 </div>
                 <div>
-                  <CardTitle className="text-base text-pink-900 dark:text-pink-100">Success Stories</CardTitle>
-                  <CardDescription className="text-xs text-pink-600/70 dark:text-pink-300/70">Approve user stories</CardDescription>
+                  <CardTitle className="text-sm text-pink-900 dark:text-pink-100 leading-tight">Stories</CardTitle>
+                  <CardDescription className="text-[10px] text-pink-600/70 dark:text-pink-300/70 hidden sm:block">Success stories</CardDescription>
                 </div>
               </div>
             </CardHeader>
-            <CardContent className="pb-4 px-4">
-              <p className="text-sm text-pink-600/80 dark:text-pink-300/80">Review and publish success stories</p>
+            <CardContent className="pb-3 px-3 pt-0">
+              <p className="text-xs text-pink-600/80 dark:text-pink-300/80 text-center">Review & publish</p>
             </CardContent>
           </Card>
 
@@ -721,19 +713,19 @@ const StaffDashboard = () => {
             className={`cursor-pointer transition-all hover:shadow-md hover:scale-[1.02] ${activeSection === "subscriptions" ? "ring-2 ring-primary" : ""} bg-gradient-to-br from-purple-50 to-violet-100 dark:from-purple-950 dark:to-violet-900 border-purple-200 dark:border-purple-800`}
             onClick={() => setActiveSection("subscriptions")}
           >
-            <CardHeader className="pb-2 pt-4 px-4">
-              <div className="flex items-center gap-3">
+            <CardHeader className="pb-2 pt-3 px-3">
+              <div className="flex flex-col items-center text-center gap-2">
                 <div className="p-2 bg-purple-500/20 dark:bg-purple-400/20 rounded-lg">
                   <CreditCard className="w-5 h-5 text-purple-600 dark:text-purple-400" />
                 </div>
                 <div>
-                  <CardTitle className="text-base text-purple-900 dark:text-purple-100">Subscriptions</CardTitle>
-                  <CardDescription className="text-xs text-purple-600/70 dark:text-purple-300/70">Approve payments</CardDescription>
+                  <CardTitle className="text-sm text-purple-900 dark:text-purple-100 leading-tight">Subscriptions</CardTitle>
+                  <CardDescription className="text-[10px] text-purple-600/70 dark:text-purple-300/70 hidden sm:block">Approve payments</CardDescription>
                 </div>
               </div>
             </CardHeader>
-            <CardContent className="pb-4 px-4">
-              <p className="text-sm text-purple-600/80 dark:text-purple-300/80">Review and approve subscription payments</p>
+            <CardContent className="pb-3 px-3 pt-0">
+              <p className="text-xs text-purple-600/80 dark:text-purple-300/80 text-center">Review & approve</p>
             </CardContent>
           </Card>
 
@@ -741,19 +733,19 @@ const StaffDashboard = () => {
             className={`cursor-pointer transition-all hover:shadow-md hover:scale-[1.02] ${activeSection === "callbacks" ? "ring-2 ring-primary" : ""} bg-gradient-to-br from-cyan-50 to-sky-100 dark:from-cyan-950 dark:to-sky-900 border-cyan-200 dark:border-cyan-800`}
             onClick={() => setActiveSection("callbacks")}
           >
-            <CardHeader className="pb-2 pt-4 px-4">
-              <div className="flex items-center gap-3">
+            <CardHeader className="pb-2 pt-3 px-3">
+              <div className="flex flex-col items-center text-center gap-2">
                 <div className="p-2 bg-cyan-500/20 dark:bg-cyan-400/20 rounded-lg">
                   <PhoneCall className="w-5 h-5 text-cyan-600 dark:text-cyan-400" />
                 </div>
                 <div>
-                  <CardTitle className="text-base text-cyan-900 dark:text-cyan-100">Callback Requests</CardTitle>
-                  <CardDescription className="text-xs text-cyan-600/70 dark:text-cyan-300/70">Manage callbacks</CardDescription>
+                  <CardTitle className="text-sm text-cyan-900 dark:text-cyan-100 leading-tight">Callbacks</CardTitle>
+                  <CardDescription className="text-[10px] text-cyan-600/70 dark:text-cyan-300/70 hidden sm:block">Manage requests</CardDescription>
                 </div>
               </div>
             </CardHeader>
-            <CardContent className="pb-4 px-4">
-              <p className="text-sm text-cyan-600/80 dark:text-cyan-300/80">View and manage callback requests</p>
+            <CardContent className="pb-3 px-3 pt-0">
+              <p className="text-xs text-cyan-600/80 dark:text-cyan-300/80 text-center">View & manage</p>
             </CardContent>
           </Card>
 
@@ -761,19 +753,19 @@ const StaffDashboard = () => {
             className={`cursor-pointer transition-all hover:shadow-md hover:scale-[1.02] ${activeSection === "payment-history" ? "ring-2 ring-primary" : ""} bg-gradient-to-br from-slate-50 to-gray-100 dark:from-slate-950 dark:to-gray-900 border-slate-200 dark:border-slate-800`}
             onClick={() => setActiveSection("payment-history")}
           >
-            <CardHeader className="pb-2 pt-4 px-4">
-              <div className="flex items-center gap-3">
+            <CardHeader className="pb-2 pt-3 px-3">
+              <div className="flex flex-col items-center text-center gap-2">
                 <div className="p-2 bg-slate-500/20 dark:bg-slate-400/20 rounded-lg">
                   <History className="w-5 h-5 text-slate-600 dark:text-slate-400" />
                 </div>
                 <div>
-                  <CardTitle className="text-base text-slate-900 dark:text-slate-100">Payment History</CardTitle>
-                  <CardDescription className="text-xs text-slate-600/70 dark:text-slate-300/70">All transactions</CardDescription>
+                  <CardTitle className="text-sm text-slate-900 dark:text-slate-100 leading-tight">History</CardTitle>
+                  <CardDescription className="text-[10px] text-slate-600/70 dark:text-slate-300/70 hidden sm:block">All transactions</CardDescription>
                 </div>
               </div>
             </CardHeader>
-            <CardContent className="pb-4 px-4">
-              <p className="text-sm text-slate-600/80 dark:text-slate-300/80">View all online payment transactions</p>
+            <CardContent className="pb-3 px-3 pt-0">
+              <p className="text-xs text-slate-600/80 dark:text-slate-300/80 text-center">Payment logs</p>
             </CardContent>
           </Card>
         </div>
