@@ -61,6 +61,12 @@ interface FullProfile {
   city: string | null;
   family_status: string | null;
   family_type: string | null;
+  father_name: string | null;
+  father_occupation: string | null;
+  mother_name: string | null;
+  mother_occupation: string | null;
+  siblings: string | null;
+  siblings_details: string | null;
   about_me: string | null;
   hobbies: string[] | null;
   is_prime: boolean | null;
@@ -519,6 +525,12 @@ const ProfileViewModal = ({ profileId, isOpen, onClose, currentUserIsPrime = fal
                   <InfoRow icon={MapPin} label="City" value={profile.city} />
                   <InfoRow icon={User} label="Family Status" value={profile.family_status} />
                   <InfoRow icon={User} label="Family Type" value={profile.family_type} />
+                  <InfoRow icon={User} label="Father's Name" value={profile.father_name} />
+                  <InfoRow icon={Briefcase} label="Father's Occupation" value={profile.father_occupation} />
+                  <InfoRow icon={User} label="Mother's Name" value={profile.mother_name} />
+                  <InfoRow icon={Briefcase} label="Mother's Occupation" value={profile.mother_occupation} />
+                  <InfoRow icon={User} label="Siblings" value={profile.siblings} />
+                  <InfoRow icon={User} label="Siblings Details" value={profile.siblings_details} />
                 </div>
               </div>
             </ScrollArea>

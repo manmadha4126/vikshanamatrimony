@@ -4,6 +4,7 @@ import { StepIndicator } from "@/components/register/StepIndicator";
 import { BasicDetailsStep } from "@/components/register/BasicDetailsStep";
 import { PasswordStep } from "@/components/register/PasswordStep";
 import { PersonalDetailsStep } from "@/components/register/PersonalDetailsStep";
+import { FamilyDetailsStep } from "@/components/register/FamilyDetailsStep";
 import { PhotoUploadStep } from "@/components/register/PhotoUploadStep";
 import { ProfileSummary } from "@/components/register/ProfileSummary";
 import Header from "@/components/Header";
@@ -11,9 +12,10 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 
 const stepLabels = [
-  "Basic Details",
+  "Basic",
   "Password",
-  "Personal Details",
+  "Personal",
+  "Family",
   "Photo",
   "Summary"
 ];
@@ -34,6 +36,7 @@ const Register = () => {
     submitBasicDetails,
     submitPassword,
     submitPersonalDetails,
+    submitFamilyDetails,
     uploadPhoto,
     completeRegistration,
   } = useRegistration();
@@ -71,6 +74,16 @@ const Register = () => {
         );
       case 4:
         return (
+          <FamilyDetailsStep
+            formData={formData}
+            updateFormData={updateFormData}
+            onSubmit={submitFamilyDetails}
+            onBack={prevStep}
+            isLoading={isLoading}
+          />
+        );
+      case 5:
+        return (
           <PhotoUploadStep
             onUpload={uploadPhoto}
             onBack={prevStep}
@@ -78,7 +91,7 @@ const Register = () => {
             isLoading={isLoading}
           />
         );
-      case 5:
+      case 6:
         return (
           <ProfileSummary
             formData={formData}
@@ -96,33 +109,35 @@ const Register = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <main className="container max-w-2xl mx-auto px-4 py-8">
-        <div className="flex gap-2 mb-6">
+      <main className="container max-w-2xl mx-auto px-3 sm:px-4 py-4 sm:py-8">
+        <div className="flex flex-wrap gap-2 mb-4 sm:mb-6">
           <Button
             variant="ghost"
-            className="text-muted-foreground hover:text-foreground"
+            size="sm"
+            className="text-muted-foreground hover:text-foreground text-xs sm:text-sm h-8 sm:h-9"
             onClick={() => navigate("/")}
           >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Home
+            <ArrowLeft className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+            Home
           </Button>
           {fromStaff && (
             <Button
               variant="ghost"
-              className="text-muted-foreground hover:text-foreground"
+              size="sm"
+              className="text-muted-foreground hover:text-foreground text-xs sm:text-sm h-8 sm:h-9"
               onClick={() => navigate("/staff-dashboard")}
             >
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Staff Dashboard
+              <ArrowLeft className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+              Staff Dashboard
             </Button>
           )}
         </div>
         <StepIndicator
           currentStep={currentStep}
-          totalSteps={5}
+          totalSteps={6}
           stepLabels={stepLabels}
         />
-        <div className="bg-card rounded-lg border shadow-sm p-6">
+        <div className="bg-card rounded-lg border shadow-sm p-4 sm:p-6">
           {renderStep()}
         </div>
       </main>

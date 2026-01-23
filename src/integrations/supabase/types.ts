@@ -481,6 +481,8 @@ export type Database = {
           employment_type: string | null
           family_status: string | null
           family_type: string | null
+          father_name: string | null
+          father_occupation: string | null
           gender: string
           gothram: string | null
           height: string | null
@@ -490,6 +492,8 @@ export type Database = {
           is_complete: boolean | null
           is_prime: boolean | null
           marital_status: string | null
+          mother_name: string | null
+          mother_occupation: string | null
           mother_tongue: string | null
           name: string
           occupation: string | null
@@ -504,6 +508,8 @@ export type Database = {
           profile_id: string | null
           registration_step: number | null
           religion: string | null
+          siblings: string | null
+          siblings_details: string | null
           star: string | null
           state: string | null
           sub_caste: string | null
@@ -530,6 +536,8 @@ export type Database = {
           employment_type?: string | null
           family_status?: string | null
           family_type?: string | null
+          father_name?: string | null
+          father_occupation?: string | null
           gender: string
           gothram?: string | null
           height?: string | null
@@ -539,6 +547,8 @@ export type Database = {
           is_complete?: boolean | null
           is_prime?: boolean | null
           marital_status?: string | null
+          mother_name?: string | null
+          mother_occupation?: string | null
           mother_tongue?: string | null
           name: string
           occupation?: string | null
@@ -553,6 +563,8 @@ export type Database = {
           profile_id?: string | null
           registration_step?: number | null
           religion?: string | null
+          siblings?: string | null
+          siblings_details?: string | null
           star?: string | null
           state?: string | null
           sub_caste?: string | null
@@ -579,6 +591,8 @@ export type Database = {
           employment_type?: string | null
           family_status?: string | null
           family_type?: string | null
+          father_name?: string | null
+          father_occupation?: string | null
           gender?: string
           gothram?: string | null
           height?: string | null
@@ -588,6 +602,8 @@ export type Database = {
           is_complete?: boolean | null
           is_prime?: boolean | null
           marital_status?: string | null
+          mother_name?: string | null
+          mother_occupation?: string | null
           mother_tongue?: string | null
           name?: string
           occupation?: string | null
@@ -602,6 +618,8 @@ export type Database = {
           profile_id?: string | null
           registration_step?: number | null
           religion?: string | null
+          siblings?: string | null
+          siblings_details?: string | null
           star?: string | null
           state?: string | null
           sub_caste?: string | null
