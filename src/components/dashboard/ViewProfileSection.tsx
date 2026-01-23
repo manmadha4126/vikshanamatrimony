@@ -51,6 +51,12 @@ interface ViewProfileSectionProps {
     city: string | null;
     family_status: string | null;
     family_type: string | null;
+    father_name: string | null;
+    father_occupation: string | null;
+    mother_name: string | null;
+    mother_occupation: string | null;
+    siblings: string | null;
+    siblings_details: string | null;
     about_me: string | null;
     hobbies: string[] | null;
     horoscope_url: string | null;
@@ -333,6 +339,12 @@ const ViewProfileSection = ({ profile, currentUserIsPrime = false, onUpgradeToPr
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8">
               <InfoRow label="Family Status" value={profile.family_status} />
               <InfoRow label="Family Type" value={profile.family_type} />
+              <InfoRow label="Father's Name" value={profile.father_name} />
+              <InfoRow label="Father's Occupation" value={profile.father_occupation} />
+              <InfoRow label="Mother's Name" value={profile.mother_name} />
+              <InfoRow label="Mother's Occupation" value={profile.mother_occupation} />
+              <InfoRow label="Siblings" value={profile.siblings} />
+              <InfoRow label="Siblings Details" value={profile.siblings_details} />
             </div>
           </CardContent>
         </Card>

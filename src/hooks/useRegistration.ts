@@ -40,6 +40,14 @@ export interface RegistrationData {
   companyName: string;
   annualIncome: string;
   
+  // Family Details
+  fatherName: string;
+  fatherOccupation: string;
+  motherName: string;
+  motherOccupation: string;
+  siblings: string;
+  siblingsDetails: string;
+  
   // Photo
   photoUrl: string;
 }
@@ -72,6 +80,12 @@ const initialData: RegistrationData = {
   occupation: "",
   companyName: "",
   annualIncome: "",
+  fatherName: "",
+  fatherOccupation: "",
+  motherName: "",
+  motherOccupation: "",
+  siblings: "",
+  siblingsDetails: "",
   photoUrl: "",
 };
 
@@ -86,7 +100,7 @@ export const useRegistration = () => {
   };
 
   const nextStep = () => {
-    if (currentStep < 5) {
+    if (currentStep < 6) {
       setCurrentStep((prev) => prev + 1);
     }
   };
@@ -206,6 +220,33 @@ export const useRegistration = () => {
     }
   };
 
+  const submitFamilyDetails = async () => {
+    setIsLoading(true);
+    try {
+      const { error } = await supabase
+        .from("profiles")
+        .update({
+          father_name: formData.fatherName,
+          father_occupation: formData.fatherOccupation,
+          mother_name: formData.motherName,
+          mother_occupation: formData.motherOccupation,
+          siblings: formData.siblings,
+          siblings_details: formData.siblingsDetails,
+          registration_step: 4,
+        })
+        .eq("profile_id", profileId);
+
+      if (error) throw error;
+      
+      toast.success("Family details saved!");
+      nextStep();
+    } catch (error: any) {
+      toast.error(error.message || "Failed to save family details");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const uploadPhoto = async (file: File) => {
     setIsLoading(true);
     try {
@@ -229,7 +270,7 @@ export const useRegistration = () => {
         .from("profiles")
         .update({ 
           photo_url: photoUrl,
-          registration_step: 4 
+          registration_step: 5 
         })
         .eq("profile_id", profileId);
 
@@ -252,7 +293,7 @@ export const useRegistration = () => {
         .from("profiles")
         .update({ 
           is_complete: true,
-          registration_step: 5 
+          registration_step: 6 
         })
         .eq("profile_id", profileId);
 
@@ -277,6 +318,7 @@ export const useRegistration = () => {
     submitBasicDetails,
     submitPassword,
     submitPersonalDetails,
+    submitFamilyDetails,
     uploadPhoto,
     completeRegistration,
     setCurrentStep,
