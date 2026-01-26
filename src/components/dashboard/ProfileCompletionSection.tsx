@@ -11,11 +11,9 @@ import { supabase } from '@/integrations/supabase/client';
 import PrimeSubscriptionModal from './PrimeSubscriptionModal';
 import {
   Phone,
-  FileText,
   Sparkles,
   User,
   Check,
-  Upload,
   X,
 } from 'lucide-react';
 
@@ -43,7 +41,6 @@ const SUGGESTED_HOBBIES = [
 
 const ProfileCompletionSection = ({ profile, userId, userName, onProfileUpdate }: ProfileCompletionSectionProps) => {
   const [isVerifyOpen, setIsVerifyOpen] = useState(false);
-  const [isHoroscopeOpen, setIsHoroscopeOpen] = useState(false);
   const [isHobbiesOpen, setIsHobbiesOpen] = useState(false);
   const [isAboutOpen, setIsAboutOpen] = useState(false);
   const [isPrimeModalOpen, setIsPrimeModalOpen] = useState(false);
@@ -51,7 +48,6 @@ const ProfileCompletionSection = ({ profile, userId, userName, onProfileUpdate }
   const [aboutMe, setAboutMe] = useState(profile.about_me || '');
   const [selectedHobbies, setSelectedHobbies] = useState<string[]>(profile.hobbies || []);
   const [customHobby, setCustomHobby] = useState('');
-  const [isUploading, setIsUploading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
   const [verificationRequested, setVerificationRequested] = useState(false);
@@ -134,69 +130,6 @@ const ProfileCompletionSection = ({ profile, userId, userName, onProfileUpdate }
       });
     }
     setIsVerifyOpen(false);
-  };
-
-  const handleHoroscopeUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    if (file.type !== 'application/pdf') {
-      toast({
-        title: "Invalid File Type",
-        description: "Please upload a PDF file only.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (file.size > 5 * 1024 * 1024) {
-      toast({
-        title: "File Too Large",
-        description: "Please upload a file smaller than 5MB.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setIsUploading(true);
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('Not authenticated');
-
-      const fileName = `${user.id}/horoscope-${Date.now()}.pdf`;
-      
-      const { error: uploadError } = await supabase.storage
-        .from('horoscopes')
-        .upload(fileName, file);
-
-      if (uploadError) throw uploadError;
-
-      const { data: { publicUrl } } = supabase.storage
-        .from('horoscopes')
-        .getPublicUrl(fileName);
-
-      const { error: updateError } = await supabase
-        .from('profiles')
-        .update({ horoscope_url: publicUrl })
-        .eq('id', profile.id);
-
-      if (updateError) throw updateError;
-
-      toast({
-        title: "Horoscope Uploaded",
-        description: "Your horoscope has been saved successfully.",
-      });
-      setIsHoroscopeOpen(false);
-      onProfileUpdate();
-    } catch (error: any) {
-      toast({
-        title: "Upload Failed",
-        description: error.message,
-        variant: "destructive",
-      });
-    } finally {
-      setIsUploading(false);
-    }
   };
 
   const toggleHobby = (hobby: string) => {
@@ -282,16 +215,6 @@ const ProfileCompletionSection = ({ profile, userId, userName, onProfileUpdate }
       iconColor: 'text-green-600',
     },
     {
-      icon: FileText,
-      title: 'Add Horoscope',
-      description: 'Upload your horoscope',
-      action: profile.horoscope_url ? 'View/Update' : 'Upload',
-      isComplete: !!profile.horoscope_url,
-      onClick: () => setIsHoroscopeOpen(true),
-      iconBg: 'bg-purple-100',
-      iconColor: 'text-purple-600',
-    },
-    {
       icon: Sparkles,
       title: 'Add Hobbies',
       description: profile.hobbies?.length ? `${profile.hobbies.length} hobbies` : 'Share interests',
@@ -327,7 +250,7 @@ const ProfileCompletionSection = ({ profile, userId, userName, onProfileUpdate }
           <Progress value={completionPercentage} className="h-1.5 mt-1" />
         </CardHeader>
         <CardContent className="py-2 px-3">
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+          <div className="grid grid-cols-3 sm:grid-cols-3 gap-2">
             {completionCards.map((card, index) => (
               <div
                 key={index}
@@ -372,35 +295,6 @@ const ProfileCompletionSection = ({ profile, userId, userName, onProfileUpdate }
         </DialogContent>
       </Dialog>
 
-      {/* Horoscope Upload Dialog */}
-      <Dialog open={isHoroscopeOpen} onOpenChange={setIsHoroscopeOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Upload Horoscope</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div className="border-2 border-dashed border-border rounded-lg p-8 text-center">
-              <Upload className="h-10 w-10 mx-auto text-muted-foreground mb-4" />
-              <p className="text-sm font-medium mb-2">Upload your horoscope</p>
-              <p className="text-xs text-muted-foreground mb-4">PDF format only, max 5MB</p>
-              <Input
-                type="file"
-                accept="application/pdf"
-                onChange={handleHoroscopeUpload}
-                disabled={isUploading}
-                className="max-w-xs mx-auto"
-              />
-            </div>
-            {profile.horoscope_url && (
-              <div className="flex items-center gap-2 p-3 bg-primary/5 rounded-lg">
-                <FileText className="h-5 w-5 text-primary" />
-                <span className="text-sm flex-1">Current horoscope uploaded</span>
-                <Check className="h-4 w-4 text-primary" />
-              </div>
-            )}
-          </div>
-        </DialogContent>
-      </Dialog>
 
       {/* Hobbies Dialog */}
       <Dialog open={isHobbiesOpen} onOpenChange={setIsHobbiesOpen}>
