@@ -60,6 +60,12 @@ interface ViewProfileSectionProps {
     about_me: string | null;
     hobbies: string[] | null;
     horoscope_url: string | null;
+    time_of_birth: string | null;
+    birth_country: string | null;
+    birth_state: string | null;
+    birth_city: string | null;
+    chart_style: string | null;
+    horoscope_language: string | null;
     is_prime: boolean | null;
     phone_verified: boolean | null;
     email_verified: boolean | null;
@@ -253,26 +259,31 @@ const ViewProfileSection = ({ profile, currentUserIsPrime = false, onUpgradeToPr
           <CardHeader className="pb-2">
             <CardTitle className="font-display text-lg flex items-center gap-2">
               <FileText className="h-5 w-5 text-primary" />
-              Horoscope
+              Horoscope Details
             </CardTitle>
           </CardHeader>
           <CardContent>
+            <InfoRow label="Time of Birth" value={profile.time_of_birth} />
+            <InfoRow label="Birth Country" value={profile.birth_country} />
+            <InfoRow label="Birth State" value={profile.birth_state} />
+            <InfoRow label="Birth City" value={profile.birth_city} />
+            <InfoRow label="Chart Style" value={profile.chart_style} />
+            <InfoRow label="Language" value={profile.horoscope_language} />
             {profile.horoscope_url ? (
               currentUserIsPrime ? (
-                <div className="space-y-2">
-                  <p className="text-sm text-muted-foreground">Horoscope document is available</p>
+                <div className="mt-3 pt-3 border-t">
                   <Button size="sm" variant="outline" asChild>
                     <a href={profile.horoscope_url} target="_blank" rel="noopener noreferrer">
                       <FileText className="h-4 w-4 mr-2" />
-                      View Horoscope
+                      View Horoscope Document
                     </a>
                   </Button>
                 </div>
               ) : (
-                <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+                <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg mt-3">
                   <div className="flex items-center gap-2">
                     <Lock className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-sm text-muted-foreground">Horoscope available</span>
+                    <span className="text-sm text-muted-foreground">Horoscope document available</span>
                   </div>
                   <Button 
                     size="sm" 
@@ -286,7 +297,9 @@ const ViewProfileSection = ({ profile, currentUserIsPrime = false, onUpgradeToPr
                 </div>
               )
             ) : (
-              <p className="text-sm text-muted-foreground">No horoscope uploaded</p>
+              <div className="mt-3 pt-3 border-t">
+                <p className="text-sm text-muted-foreground">No horoscope document uploaded</p>
+              </div>
             )}
           </CardContent>
         </Card>

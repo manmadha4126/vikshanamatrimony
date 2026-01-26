@@ -466,7 +466,11 @@ export type Database = {
           about_me: string | null
           admin_notes: string | null
           annual_income: string | null
+          birth_city: string | null
+          birth_country: string | null
+          birth_state: string | null
           caste: string | null
+          chart_style: string | null
           city: string | null
           company_name: string | null
           country: string | null
@@ -487,6 +491,7 @@ export type Database = {
           gothram: string | null
           height: string | null
           hobbies: string[] | null
+          horoscope_language: string | null
           horoscope_url: string | null
           id: string
           is_complete: boolean | null
@@ -513,6 +518,7 @@ export type Database = {
           star: string | null
           state: string | null
           sub_caste: string | null
+          time_of_birth: string | null
           updated_at: string
           user_id: string | null
           verification_status: string | null
@@ -521,7 +527,11 @@ export type Database = {
           about_me?: string | null
           admin_notes?: string | null
           annual_income?: string | null
+          birth_city?: string | null
+          birth_country?: string | null
+          birth_state?: string | null
           caste?: string | null
+          chart_style?: string | null
           city?: string | null
           company_name?: string | null
           country?: string | null
@@ -542,6 +552,7 @@ export type Database = {
           gothram?: string | null
           height?: string | null
           hobbies?: string[] | null
+          horoscope_language?: string | null
           horoscope_url?: string | null
           id?: string
           is_complete?: boolean | null
@@ -568,6 +579,7 @@ export type Database = {
           star?: string | null
           state?: string | null
           sub_caste?: string | null
+          time_of_birth?: string | null
           updated_at?: string
           user_id?: string | null
           verification_status?: string | null
@@ -576,7 +588,11 @@ export type Database = {
           about_me?: string | null
           admin_notes?: string | null
           annual_income?: string | null
+          birth_city?: string | null
+          birth_country?: string | null
+          birth_state?: string | null
           caste?: string | null
+          chart_style?: string | null
           city?: string | null
           company_name?: string | null
           country?: string | null
@@ -597,6 +613,7 @@ export type Database = {
           gothram?: string | null
           height?: string | null
           hobbies?: string[] | null
+          horoscope_language?: string | null
           horoscope_url?: string | null
           id?: string
           is_complete?: boolean | null
@@ -623,6 +640,7 @@ export type Database = {
           star?: string | null
           state?: string | null
           sub_caste?: string | null
+          time_of_birth?: string | null
           updated_at?: string
           user_id?: string | null
           verification_status?: string | null

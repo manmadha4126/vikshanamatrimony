@@ -5,6 +5,7 @@ import { BasicDetailsStep } from "@/components/register/BasicDetailsStep";
 import { PasswordStep } from "@/components/register/PasswordStep";
 import { PersonalDetailsStep } from "@/components/register/PersonalDetailsStep";
 import { FamilyDetailsStep } from "@/components/register/FamilyDetailsStep";
+import { HoroscopeDetailsStep } from "@/components/register/HoroscopeDetailsStep";
 import { PhotoUploadStep } from "@/components/register/PhotoUploadStep";
 import { ProfileSummary } from "@/components/register/ProfileSummary";
 import Header from "@/components/Header";
@@ -16,6 +17,7 @@ const stepLabels = [
   "Password",
   "Personal",
   "Family",
+  "Horoscope",
   "Photo",
   "Summary"
 ];
@@ -37,6 +39,7 @@ const Register = () => {
     submitPassword,
     submitPersonalDetails,
     submitFamilyDetails,
+    submitHoroscopeDetails,
     uploadPhoto,
     completeRegistration,
   } = useRegistration();
@@ -84,6 +87,17 @@ const Register = () => {
         );
       case 5:
         return (
+          <HoroscopeDetailsStep
+            formData={formData}
+            updateFormData={updateFormData}
+            onSubmit={submitHoroscopeDetails}
+            onBack={prevStep}
+            isLoading={isLoading}
+            profileId={profileId}
+          />
+        );
+      case 6:
+        return (
           <PhotoUploadStep
             onUpload={uploadPhoto}
             onBack={prevStep}
@@ -91,7 +105,7 @@ const Register = () => {
             isLoading={isLoading}
           />
         );
-      case 6:
+      case 7:
         return (
           <ProfileSummary
             formData={formData}
@@ -134,7 +148,7 @@ const Register = () => {
         </div>
         <StepIndicator
           currentStep={currentStep}
-          totalSteps={6}
+          totalSteps={7}
           stepLabels={stepLabels}
         />
         <div className="bg-card rounded-lg border shadow-sm p-4 sm:p-6">

@@ -48,6 +48,15 @@ export interface RegistrationData {
   siblings: string;
   siblingsDetails: string;
   
+  // Horoscope Details
+  timeOfBirth: string;
+  birthCountry: string;
+  birthState: string;
+  birthCity: string;
+  chartStyle: string;
+  horoscopeLanguage: string;
+  horoscopeUrl: string;
+  
   // Photo
   photoUrl: string;
 }
@@ -86,6 +95,13 @@ const initialData: RegistrationData = {
   motherOccupation: "",
   siblings: "",
   siblingsDetails: "",
+  timeOfBirth: "",
+  birthCountry: "India",
+  birthState: "",
+  birthCity: "",
+  chartStyle: "",
+  horoscopeLanguage: "",
+  horoscopeUrl: "",
   photoUrl: "",
 };
 
@@ -100,7 +116,7 @@ export const useRegistration = () => {
   };
 
   const nextStep = () => {
-    if (currentStep < 6) {
+    if (currentStep < 7) {
       setCurrentStep((prev) => prev + 1);
     }
   };
@@ -247,6 +263,34 @@ export const useRegistration = () => {
     }
   };
 
+  const submitHoroscopeDetails = async () => {
+    setIsLoading(true);
+    try {
+      const { error } = await supabase
+        .from("profiles")
+        .update({
+          time_of_birth: formData.timeOfBirth,
+          birth_country: formData.birthCountry,
+          birth_state: formData.birthState,
+          birth_city: formData.birthCity,
+          chart_style: formData.chartStyle,
+          horoscope_language: formData.horoscopeLanguage,
+          horoscope_url: formData.horoscopeUrl || null,
+          registration_step: 5,
+        })
+        .eq("profile_id", profileId);
+
+      if (error) throw error;
+      
+      toast.success("Horoscope details saved!");
+      nextStep();
+    } catch (error: any) {
+      toast.error(error.message || "Failed to save horoscope details");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const uploadPhoto = async (file: File) => {
     setIsLoading(true);
     try {
@@ -270,7 +314,7 @@ export const useRegistration = () => {
         .from("profiles")
         .update({ 
           photo_url: photoUrl,
-          registration_step: 5 
+          registration_step: 6 
         })
         .eq("profile_id", profileId);
 
@@ -293,7 +337,7 @@ export const useRegistration = () => {
         .from("profiles")
         .update({ 
           is_complete: true,
-          registration_step: 6 
+          registration_step: 7 
         })
         .eq("profile_id", profileId);
 
@@ -319,6 +363,7 @@ export const useRegistration = () => {
     submitPassword,
     submitPersonalDetails,
     submitFamilyDetails,
+    submitHoroscopeDetails,
     uploadPhoto,
     completeRegistration,
     setCurrentStep,
