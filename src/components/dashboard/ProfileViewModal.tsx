@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -25,6 +26,7 @@ import {
   Crown,
   FileText,
   Check,
+  ExternalLink,
 } from 'lucide-react';
 
 interface ProfileViewModalProps {
@@ -75,6 +77,7 @@ interface FullProfile {
 }
 
 const ProfileViewModal = ({ profileId, isOpen, onClose, currentUserIsPrime = false }: ProfileViewModalProps) => {
+  const navigate = useNavigate();
   const [profile, setProfile] = useState<FullProfile | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [interestSent, setInterestSent] = useState(false);
@@ -406,6 +409,17 @@ const ProfileViewModal = ({ profileId, isOpen, onClose, currentUserIsPrime = fal
                     Shortlist
                   </>
                 )}
+              </Button>
+              <Button 
+                variant="secondary"
+                onClick={() => {
+                  onClose();
+                  navigate(`/profile/${profileId}`);
+                }}
+                className="gap-1"
+              >
+                <ExternalLink className="h-4 w-4" />
+                <span className="hidden sm:inline">Full Profile</span>
               </Button>
             </div>
 

@@ -418,61 +418,72 @@ const Dashboard = () => {
             )}
 
             {activeView === 'view-profile' && (
-              <ViewProfileSection
-                profile={{
-                  id: profile.id,
-                  name: profile.name,
-                  profile_id: profile.profile_id,
-                  photo_url: profile.photo_url,
-                  gender: profile.gender,
-                  email: profile.email,
-                  phone: profile.phone,
-                  date_of_birth: profile.date_of_birth,
-                  height: profile.height,
-                  marital_status: profile.marital_status,
-                  mother_tongue: profile.mother_tongue,
-                  religion: profile.religion,
-                  caste: profile.caste,
-                  sub_caste: profile.sub_caste,
-                  gothram: profile.gothram,
-                  star: profile.star,
-                  dosham: profile.dosham,
-                  education: profile.education,
-                  education_detail: profile.education_detail,
-                  employment_type: profile.employment_type,
-                  occupation: profile.occupation,
-                  company_name: profile.company_name,
-                  annual_income: profile.annual_income,
-                  country: profile.country,
-                  state: profile.state,
-                  city: profile.city,
-                  family_status: profile.family_status,
-                  family_type: profile.family_type,
-                  father_name: (profile as any).father_name || null,
-                  father_occupation: (profile as any).father_occupation || null,
-                  mother_name: (profile as any).mother_name || null,
-                  mother_occupation: (profile as any).mother_occupation || null,
-                  siblings: (profile as any).siblings || null,
-                  siblings_details: (profile as any).siblings_details || null,
-                  about_me: profile.about_me,
-                  hobbies: profile.hobbies,
-                  horoscope_url: profile.horoscope_url,
-                  time_of_birth: (profile as any).time_of_birth || null,
-                  birth_country: (profile as any).birth_country || null,
-                  birth_state: (profile as any).birth_state || null,
-                  birth_city: (profile as any).birth_city || null,
-                  chart_style: (profile as any).chart_style || null,
-                  horoscope_language: (profile as any).horoscope_language || null,
-                  is_prime: profile.is_prime,
-                  phone_verified: profile.phone_verified,
-                  email_verified: profile.email_verified,
-                  verification_status: profile.verification_status,
-                  profile_completion_percentage: profile.profile_completion_percentage,
-                  updated_at: profile.updated_at,
-                  created_at: profile.created_at,
-                }}
-                currentUserIsPrime={profile.is_prime || false}
-              />
+              <div className="space-y-4">
+                <div className="flex justify-end">
+                  <Button 
+                    onClick={() => navigate(`/profile/${profile.id}`)}
+                    className="gap-2"
+                  >
+                    <User className="h-4 w-4" />
+                    View Full Profile Page
+                  </Button>
+                </div>
+                <ViewProfileSection
+                  profile={{
+                    id: profile.id,
+                    name: profile.name,
+                    profile_id: profile.profile_id,
+                    photo_url: profile.photo_url,
+                    gender: profile.gender,
+                    email: profile.email,
+                    phone: profile.phone,
+                    date_of_birth: profile.date_of_birth,
+                    height: profile.height,
+                    marital_status: profile.marital_status,
+                    mother_tongue: profile.mother_tongue,
+                    religion: profile.religion,
+                    caste: profile.caste,
+                    sub_caste: profile.sub_caste,
+                    gothram: profile.gothram,
+                    star: profile.star,
+                    dosham: profile.dosham,
+                    education: profile.education,
+                    education_detail: profile.education_detail,
+                    employment_type: profile.employment_type,
+                    occupation: profile.occupation,
+                    company_name: profile.company_name,
+                    annual_income: profile.annual_income,
+                    country: profile.country,
+                    state: profile.state,
+                    city: profile.city,
+                    family_status: profile.family_status,
+                    family_type: profile.family_type,
+                    father_name: (profile as any).father_name || null,
+                    father_occupation: (profile as any).father_occupation || null,
+                    mother_name: (profile as any).mother_name || null,
+                    mother_occupation: (profile as any).mother_occupation || null,
+                    siblings: (profile as any).siblings || null,
+                    siblings_details: (profile as any).siblings_details || null,
+                    about_me: profile.about_me,
+                    hobbies: profile.hobbies,
+                    horoscope_url: profile.horoscope_url,
+                    time_of_birth: (profile as any).time_of_birth || null,
+                    birth_country: (profile as any).birth_country || null,
+                    birth_state: (profile as any).birth_state || null,
+                    birth_city: (profile as any).birth_city || null,
+                    chart_style: (profile as any).chart_style || null,
+                    horoscope_language: (profile as any).horoscope_language || null,
+                    is_prime: profile.is_prime,
+                    phone_verified: profile.phone_verified,
+                    email_verified: profile.email_verified,
+                    verification_status: profile.verification_status,
+                    profile_completion_percentage: profile.profile_completion_percentage,
+                    updated_at: profile.updated_at,
+                    created_at: profile.created_at,
+                  }}
+                  currentUserIsPrime={profile.is_prime || false}
+                />
+              </div>
             )}
 
             {activeView === 'interests' && (
