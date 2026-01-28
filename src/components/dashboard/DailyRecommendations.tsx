@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
@@ -34,12 +35,17 @@ interface DailyRecommendationsProps {
 const MAX_DAILY_RECOMMENDATIONS = 5;
 
 const DailyRecommendations = ({ userGender, userId, userAge, userReligion, onViewProfile, onViewAllClick }: DailyRecommendationsProps) => {
+  const navigate = useNavigate();
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [loading, setLoading] = useState(true);
   const [shortlistedIds, setShortlistedIds] = useState<string[]>([]);
   const [todaysCount, setTodaysCount] = useState(0);
 
   const targetGender = userGender?.toLowerCase() === 'male' ? 'Female' : 'Male';
+  
+  const handleProfileClick = (profileId: string) => {
+    navigate(`/profile/${profileId}`);
+  };
 
   // Calculate age range based on user's gender and age
   const getAgeRange = () => {
@@ -282,7 +288,7 @@ const DailyRecommendations = ({ userGender, userId, userAge, userReligion, onVie
                   key={profile.id}
                   profile={profile}
                   isShortlisted={shortlistedIds.includes(profile.id)}
-                  onViewProfile={() => onViewProfile?.(profile.id)}
+                  onViewProfile={() => handleProfileClick(profile.id)}
                   onSendInterest={() => handleSendInterest(profile.id)}
                   onShortlist={() => handleShortlist(profile.id)}
                 />

@@ -89,7 +89,7 @@ const Header = () => {
             </Button>
           )}
           <Button className="bg-black hover:bg-black/80 text-white" size="sm" asChild>
-            <Link to="/staff-login">Staff</Link>
+            <Link to="/staff-login">Admin Login</Link>
           </Button>
           <Button className="bg-black hover:bg-black/80 text-white" size="sm" asChild>
             <Link to="/login">Log In</Link>
@@ -140,7 +140,7 @@ const Header = () => {
               )}
               <div className="flex gap-2">
                 <Button className="flex-1 bg-black hover:bg-black/80 text-white" size="sm" asChild>
-                  <Link to="/staff-login">Staff</Link>
+                  <Link to="/staff-login">Admin Login</Link>
                 </Button>
                 <Button className="flex-1 bg-black hover:bg-black/80 text-white" size="sm" asChild>
                   <Link to="/login">Log In</Link>

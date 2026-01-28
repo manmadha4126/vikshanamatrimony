@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -35,8 +36,13 @@ const ProfileCard = ({
   onShortlist,
   isShortlisted = false,
 }: ProfileCardProps) => {
+  const navigate = useNavigate();
   const [allPhotos, setAllPhotos] = useState<string[]>([]);
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
+  
+  const handleCardClick = () => {
+    navigate(`/profile/${profile.id}`);
+  };
 
   useEffect(() => {
     const fetchAdditionalPhotos = async () => {
@@ -103,7 +109,7 @@ const ProfileCard = ({
   return (
     <Card 
       className="overflow-hidden hover:shadow-xl hover:shadow-primary/10 transition-all duration-300 group cursor-pointer hover:-translate-y-1 active:scale-[0.98]"
-      onClick={onViewProfile}
+      onClick={handleCardClick}
     >
       <div className="relative">
         {/* Profile Image */}
