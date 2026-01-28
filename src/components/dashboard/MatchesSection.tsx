@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -62,6 +63,7 @@ interface MatchesSectionProps {
 type SortOption = 'score' | 'age' | 'recent';
 
 const MatchesSection = ({ userId, userGender, onViewProfile }: MatchesSectionProps) => {
+  const navigate = useNavigate();
   const [matches, setMatches] = useState<MatchedProfile[]>([]);
   const [filteredMatches, setFilteredMatches] = useState<MatchedProfile[]>([]);
   const [loading, setLoading] = useState(true);
@@ -78,6 +80,10 @@ const MatchesSection = ({ userId, userGender, onViewProfile }: MatchesSectionPro
   const [ageRange, setAgeRange] = useState<[number, number]>([18, 60]);
   const [showFilters, setShowFilters] = useState(false);
   const [zoomedPhoto, setZoomedPhoto] = useState<{ url: string; name: string } | null>(null);
+  
+  const handleProfileClick = (profileId: string) => {
+    navigate(`/profile/${profileId}`);
+  };
 
   const calculateAge = (dob: string | null) => {
     if (!dob) return null;
@@ -535,7 +541,7 @@ const MatchesSection = ({ userId, userGender, onViewProfile }: MatchesSectionPro
                   const hasSentInterest = sentInterests.includes(match.id);
                   
                   return (
-                    <Card key={match.id} className="overflow-hidden hover:shadow-md transition-shadow cursor-pointer w-20 flex-shrink-0" onClick={() => onViewProfile?.(match.id)}>
+                    <Card key={match.id} className="overflow-hidden hover:shadow-md transition-shadow cursor-pointer w-20 flex-shrink-0" onClick={() => handleProfileClick(match.id)}>
                       {/* Profile Image */}
                       <div className="relative">
                         <AspectRatio ratio={1}>
@@ -582,7 +588,7 @@ const MatchesSection = ({ userId, userGender, onViewProfile }: MatchesSectionPro
                 const hasSentInterest = sentInterests.includes(match.id);
                 
                 return (
-                  <Card key={match.id} className="overflow-hidden hover:shadow-md transition-shadow cursor-pointer" onClick={() => onViewProfile?.(match.id)}>
+                  <Card key={match.id} className="overflow-hidden hover:shadow-md transition-shadow cursor-pointer" onClick={() => handleProfileClick(match.id)}>
                     {/* Profile Image */}
                     <div className="relative group/photo">
                       <AspectRatio ratio={1}>
