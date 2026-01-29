@@ -1,8 +1,9 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { CheckCircle2, User, Briefcase, MapPin, GraduationCap, Heart } from "lucide-react";
+import { CheckCircle2, User, Briefcase, MapPin, GraduationCap, Heart, Users, Clock, Star } from "lucide-react";
 import { RegistrationData } from "@/hooks/useRegistration";
 import { useNavigate } from "react-router-dom";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface ProfileSummaryProps {
   formData: RegistrationData;
@@ -37,145 +38,233 @@ export const ProfileSummary = ({ formData, profileId, onComplete, isLoading, fro
         )}
       </div>
 
-      <div className="space-y-4">
-        {/* Profile Photo & Basic Info */}
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-start gap-4">
-              {formData.photoUrl ? (
-                <img
-                  src={formData.photoUrl}
-                  alt="Profile"
-                  className="w-20 h-20 rounded-full object-cover"
-                />
-              ) : (
-                <div className="w-20 h-20 rounded-full bg-muted flex items-center justify-center">
-                  <User className="w-10 h-10 text-muted-foreground" />
+      <ScrollArea className="max-h-[60vh]">
+        <div className="space-y-4 pr-4">
+          {/* Profile Photo & Basic Info */}
+          <Card>
+            <CardContent className="pt-6">
+              <div className="flex items-start gap-4">
+                {formData.photoUrl ? (
+                  <img
+                    src={formData.photoUrl}
+                    alt="Profile"
+                    className="w-20 h-20 rounded-full object-cover"
+                  />
+                ) : (
+                  <div className="w-20 h-20 rounded-full bg-muted flex items-center justify-center">
+                    <User className="w-10 h-10 text-muted-foreground" />
+                  </div>
+                )}
+                <div>
+                  <h3 className="text-xl font-semibold">{formData.name}</h3>
+                  <p className="text-muted-foreground">{formData.email}</p>
+                  <p className="text-muted-foreground">{formData.phone}</p>
+                  <p className="text-sm text-muted-foreground">Profile for: {formData.profileFor}</p>
                 </div>
-              )}
-              <div>
-                <h3 className="text-xl font-semibold">{formData.name}</h3>
-                <p className="text-muted-foreground">{formData.email}</p>
-                <p className="text-muted-foreground">{formData.phone}</p>
-                <p className="text-sm text-muted-foreground">Profile for: {formData.profileFor}</p>
               </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
 
-        {/* Personal Details */}
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-2 mb-4">
-              <Heart className="w-5 h-5 text-primary" />
-              <h3 className="font-semibold">Personal Details</h3>
-            </div>
-            <div className="grid grid-cols-2 gap-3 text-sm">
-              <div>
-                <span className="text-muted-foreground">Gender:</span>
-                <span className="ml-2">{formData.gender}</span>
+          {/* Personal Details */}
+          <Card>
+            <CardContent className="pt-6">
+              <div className="flex items-center gap-2 mb-4">
+                <Heart className="w-5 h-5 text-primary" />
+                <h3 className="font-semibold">Personal Details</h3>
               </div>
-              <div>
-                <span className="text-muted-foreground">DOB:</span>
-                <span className="ml-2">{formData.dateOfBirth || "Not specified"}</span>
+              <div className="grid grid-cols-2 gap-3 text-sm">
+                <div>
+                  <span className="text-muted-foreground">Gender:</span>
+                  <span className="ml-2">{formData.gender}</span>
+                </div>
+                <div>
+                  <span className="text-muted-foreground">DOB:</span>
+                  <span className="ml-2">{formData.dateOfBirth || "Not specified"}</span>
+                </div>
+                <div>
+                  <span className="text-muted-foreground">Height:</span>
+                  <span className="ml-2">{formData.height || "Not specified"}</span>
+                </div>
+                <div>
+                  <span className="text-muted-foreground">Marital Status:</span>
+                  <span className="ml-2">{formData.maritalStatus || "Not specified"}</span>
+                </div>
+                <div>
+                  <span className="text-muted-foreground">Mother Tongue:</span>
+                  <span className="ml-2">{formData.motherTongue || "Not specified"}</span>
+                </div>
               </div>
-              <div>
-                <span className="text-muted-foreground">Height:</span>
-                <span className="ml-2">{formData.height || "Not specified"}</span>
-              </div>
-              <div>
-                <span className="text-muted-foreground">Marital Status:</span>
-                <span className="ml-2">{formData.maritalStatus || "Not specified"}</span>
-              </div>
-              <div>
-                <span className="text-muted-foreground">Mother Tongue:</span>
-                <span className="ml-2">{formData.motherTongue || "Not specified"}</span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
 
-        {/* Religion & Caste */}
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-2 mb-4">
-              <User className="w-5 h-5 text-primary" />
-              <h3 className="font-semibold">Religion & Caste</h3>
-            </div>
-            <div className="grid grid-cols-2 gap-3 text-sm">
-              <div>
-                <span className="text-muted-foreground">Religion:</span>
-                <span className="ml-2">{formData.religion || "Not specified"}</span>
+          {/* Religion & Caste */}
+          <Card>
+            <CardContent className="pt-6">
+              <div className="flex items-center gap-2 mb-4">
+                <Star className="w-5 h-5 text-primary" />
+                <h3 className="font-semibold">Religion & Caste</h3>
               </div>
-              <div>
-                <span className="text-muted-foreground">Caste:</span>
-                <span className="ml-2">{formData.caste || "Not specified"}</span>
+              <div className="grid grid-cols-2 gap-3 text-sm">
+                <div>
+                  <span className="text-muted-foreground">Religion:</span>
+                  <span className="ml-2">{formData.religion || "Not specified"}</span>
+                </div>
+                <div>
+                  <span className="text-muted-foreground">Caste:</span>
+                  <span className="ml-2">{formData.caste || "Not specified"}</span>
+                </div>
+                <div>
+                  <span className="text-muted-foreground">Sub Caste:</span>
+                  <span className="ml-2">{formData.subCaste || "Not specified"}</span>
+                </div>
+                <div>
+                  <span className="text-muted-foreground">Gothram:</span>
+                  <span className="ml-2">{formData.gothram || "Not specified"}</span>
+                </div>
+                <div>
+                  <span className="text-muted-foreground">Star:</span>
+                  <span className="ml-2">{formData.star || "Not specified"}</span>
+                </div>
+                <div>
+                  <span className="text-muted-foreground">Dosham:</span>
+                  <span className="ml-2">{formData.dosham || "Not specified"}</span>
+                </div>
+                <div>
+                  <span className="text-muted-foreground">Family Status:</span>
+                  <span className="ml-2">{formData.familyStatus || "Not specified"}</span>
+                </div>
+                <div>
+                  <span className="text-muted-foreground">Family Type:</span>
+                  <span className="ml-2">{formData.familyType || "Not specified"}</span>
+                </div>
               </div>
-              <div>
-                <span className="text-muted-foreground">Gothram:</span>
-                <span className="ml-2">{formData.gothram || "Not specified"}</span>
-              </div>
-              <div>
-                <span className="text-muted-foreground">Star:</span>
-                <span className="ml-2">{formData.star || "Not specified"}</span>
-              </div>
-              <div>
-                <span className="text-muted-foreground">Dosham:</span>
-                <span className="ml-2">{formData.dosham || "Not specified"}</span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
 
-        {/* Location */}
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-2 mb-4">
-              <MapPin className="w-5 h-5 text-primary" />
-              <h3 className="font-semibold">Location</h3>
-            </div>
-            <p className="text-sm">
-              {[formData.city, formData.state, formData.country].filter(Boolean).join(", ") || "Not specified"}
-            </p>
-          </CardContent>
-        </Card>
+          {/* Location */}
+          <Card>
+            <CardContent className="pt-6">
+              <div className="flex items-center gap-2 mb-4">
+                <MapPin className="w-5 h-5 text-primary" />
+                <h3 className="font-semibold">Location</h3>
+              </div>
+              <p className="text-sm">
+                {[formData.city, formData.state, formData.country].filter(Boolean).join(", ") || "Not specified"}
+              </p>
+            </CardContent>
+          </Card>
 
-        {/* Education & Career */}
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-2 mb-4">
-              <GraduationCap className="w-5 h-5 text-primary" />
-              <h3 className="font-semibold">Education & Career</h3>
-            </div>
-            <div className="grid grid-cols-2 gap-3 text-sm">
-              <div>
-                <span className="text-muted-foreground">Education:</span>
-                <span className="ml-2">{formData.education || "Not specified"}</span>
+          {/* Education & Career */}
+          <Card>
+            <CardContent className="pt-6">
+              <div className="flex items-center gap-2 mb-4">
+                <GraduationCap className="w-5 h-5 text-primary" />
+                <h3 className="font-semibold">Education & Career</h3>
               </div>
-              <div>
-                <span className="text-muted-foreground">Details:</span>
-                <span className="ml-2">{formData.educationDetail || "Not specified"}</span>
+              <div className="grid grid-cols-2 gap-3 text-sm">
+                <div>
+                  <span className="text-muted-foreground">Education:</span>
+                  <span className="ml-2">{formData.education || "Not specified"}</span>
+                </div>
+                <div>
+                  <span className="text-muted-foreground">Details:</span>
+                  <span className="ml-2">{formData.educationDetail || "Not specified"}</span>
+                </div>
+                <div>
+                  <span className="text-muted-foreground">Employment:</span>
+                  <span className="ml-2">{formData.employmentType || "Not specified"}</span>
+                </div>
+                <div>
+                  <span className="text-muted-foreground">Occupation:</span>
+                  <span className="ml-2">{formData.occupation || "Not specified"}</span>
+                </div>
+                <div>
+                  <span className="text-muted-foreground">Company:</span>
+                  <span className="ml-2">{formData.companyName || "Not specified"}</span>
+                </div>
+                <div>
+                  <span className="text-muted-foreground">Income:</span>
+                  <span className="ml-2">{formData.annualIncome || "Not specified"}</span>
+                </div>
               </div>
-              <div>
-                <span className="text-muted-foreground">Employment:</span>
-                <span className="ml-2">{formData.employmentType || "Not specified"}</span>
+            </CardContent>
+          </Card>
+
+          {/* Family Details */}
+          <Card>
+            <CardContent className="pt-6">
+              <div className="flex items-center gap-2 mb-4">
+                <Users className="w-5 h-5 text-primary" />
+                <h3 className="font-semibold">Family Details</h3>
               </div>
-              <div>
-                <span className="text-muted-foreground">Occupation:</span>
-                <span className="ml-2">{formData.occupation || "Not specified"}</span>
+              <div className="grid grid-cols-2 gap-3 text-sm">
+                <div>
+                  <span className="text-muted-foreground">Father's Name:</span>
+                  <span className="ml-2">{formData.fatherName || "Not specified"}</span>
+                </div>
+                <div>
+                  <span className="text-muted-foreground">Father's Occupation:</span>
+                  <span className="ml-2">{formData.fatherOccupation || "Not specified"}</span>
+                </div>
+                <div>
+                  <span className="text-muted-foreground">Mother's Name:</span>
+                  <span className="ml-2">{formData.motherName || "Not specified"}</span>
+                </div>
+                <div>
+                  <span className="text-muted-foreground">Mother's Occupation:</span>
+                  <span className="ml-2">{formData.motherOccupation || "Not specified"}</span>
+                </div>
+                <div>
+                  <span className="text-muted-foreground">Siblings:</span>
+                  <span className="ml-2">{formData.siblings || "Not specified"}</span>
+                </div>
+                {formData.siblingsDetails && (
+                  <div className="col-span-2">
+                    <span className="text-muted-foreground">Siblings Details:</span>
+                    <span className="ml-2">{formData.siblingsDetails}</span>
+                  </div>
+                )}
               </div>
-              <div>
-                <span className="text-muted-foreground">Company:</span>
-                <span className="ml-2">{formData.companyName || "Not specified"}</span>
+            </CardContent>
+          </Card>
+
+          {/* Horoscope Details */}
+          <Card>
+            <CardContent className="pt-6">
+              <div className="flex items-center gap-2 mb-4">
+                <Clock className="w-5 h-5 text-primary" />
+                <h3 className="font-semibold">Horoscope Details</h3>
               </div>
-              <div>
-                <span className="text-muted-foreground">Income:</span>
-                <span className="ml-2">{formData.annualIncome || "Not specified"}</span>
+              <div className="grid grid-cols-2 gap-3 text-sm">
+                <div>
+                  <span className="text-muted-foreground">Time of Birth:</span>
+                  <span className="ml-2">{formData.timeOfBirth || "Not specified"}</span>
+                </div>
+                <div>
+                  <span className="text-muted-foreground">Birth Place:</span>
+                  <span className="ml-2">
+                    {[formData.birthCity, formData.birthState, formData.birthCountry].filter(Boolean).join(", ") || "Not specified"}
+                  </span>
+                </div>
+                <div>
+                  <span className="text-muted-foreground">Chart Style:</span>
+                  <span className="ml-2">{formData.chartStyle || "Not specified"}</span>
+                </div>
+                <div>
+                  <span className="text-muted-foreground">Horoscope Language:</span>
+                  <span className="ml-2">{formData.horoscopeLanguage || "Not specified"}</span>
+                </div>
+                {formData.horoscopeUrl && (
+                  <div className="col-span-2">
+                    <span className="text-muted-foreground">Horoscope:</span>
+                    <a href={formData.horoscopeUrl} target="_blank" rel="noopener noreferrer" className="ml-2 text-primary underline">View Horoscope</a>
+                  </div>
+                )}
               </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+            </CardContent>
+          </Card>
+        </div>
+      </ScrollArea>
 
       <Button onClick={handleComplete} disabled={isLoading} className="w-full" size="lg">
         {isLoading ? "Completing..." : "Complete Registration"}

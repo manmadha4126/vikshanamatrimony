@@ -87,6 +87,21 @@ interface Profile {
   company_name: string | null;
   annual_income: string | null;
   photo_url: string | null;
+  // Family details
+  father_name: string | null;
+  father_occupation: string | null;
+  mother_name: string | null;
+  mother_occupation: string | null;
+  siblings: string | null;
+  siblings_details: string | null;
+  // Horoscope details
+  time_of_birth: string | null;
+  birth_country: string | null;
+  birth_state: string | null;
+  birth_city: string | null;
+  chart_style: string | null;
+  horoscope_language: string | null;
+  horoscope_url: string | null;
 }
 
 type VerificationFilter = "all" | "pending" | "verified" | "rejected";
@@ -1154,7 +1169,7 @@ const StaffDashboard = () => {
                     <Users className="w-4 h-4" />
                     Family Details
                   </h4>
-                  <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
                     <div>
                       <label className="text-xs text-muted-foreground uppercase">Family Status</label>
                       <p className="font-medium">{selectedProfile.family_status || "-"}</p>
@@ -1163,6 +1178,32 @@ const StaffDashboard = () => {
                       <label className="text-xs text-muted-foreground uppercase">Family Type</label>
                       <p className="font-medium">{selectedProfile.family_type || "-"}</p>
                     </div>
+                    <div>
+                      <label className="text-xs text-muted-foreground uppercase">Father's Name</label>
+                      <p className="font-medium">{selectedProfile.father_name || "-"}</p>
+                    </div>
+                    <div>
+                      <label className="text-xs text-muted-foreground uppercase">Father's Occupation</label>
+                      <p className="font-medium">{selectedProfile.father_occupation || "-"}</p>
+                    </div>
+                    <div>
+                      <label className="text-xs text-muted-foreground uppercase">Mother's Name</label>
+                      <p className="font-medium">{selectedProfile.mother_name || "-"}</p>
+                    </div>
+                    <div>
+                      <label className="text-xs text-muted-foreground uppercase">Mother's Occupation</label>
+                      <p className="font-medium">{selectedProfile.mother_occupation || "-"}</p>
+                    </div>
+                    <div>
+                      <label className="text-xs text-muted-foreground uppercase">Siblings</label>
+                      <p className="font-medium">{selectedProfile.siblings || "-"}</p>
+                    </div>
+                    {selectedProfile.siblings_details && (
+                      <div className="col-span-2">
+                        <label className="text-xs text-muted-foreground uppercase">Siblings Details</label>
+                        <p className="font-medium">{selectedProfile.siblings_details}</p>
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -1223,6 +1264,52 @@ const StaffDashboard = () => {
                       <label className="text-xs text-muted-foreground uppercase">Annual Income</label>
                       <p className="font-medium">{selectedProfile.annual_income || "-"}</p>
                     </div>
+                  </div>
+                </div>
+
+                <Separator />
+
+                {/* Horoscope Details */}
+                <div className="space-y-3">
+                  <h4 className="font-semibold text-maroon flex items-center gap-2">
+                    <Clock className="w-4 h-4" />
+                    Horoscope Details
+                  </h4>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
+                    <div>
+                      <label className="text-xs text-muted-foreground uppercase">Time of Birth</label>
+                      <p className="font-medium">{selectedProfile.time_of_birth || "-"}</p>
+                    </div>
+                    <div>
+                      <label className="text-xs text-muted-foreground uppercase">Birth Country</label>
+                      <p className="font-medium">{selectedProfile.birth_country || "-"}</p>
+                    </div>
+                    <div>
+                      <label className="text-xs text-muted-foreground uppercase">Birth State</label>
+                      <p className="font-medium">{selectedProfile.birth_state || "-"}</p>
+                    </div>
+                    <div>
+                      <label className="text-xs text-muted-foreground uppercase">Birth City</label>
+                      <p className="font-medium">{selectedProfile.birth_city || "-"}</p>
+                    </div>
+                    <div>
+                      <label className="text-xs text-muted-foreground uppercase">Chart Style</label>
+                      <p className="font-medium">{selectedProfile.chart_style || "-"}</p>
+                    </div>
+                    <div>
+                      <label className="text-xs text-muted-foreground uppercase">Horoscope Language</label>
+                      <p className="font-medium">{selectedProfile.horoscope_language || "-"}</p>
+                    </div>
+                    {selectedProfile.horoscope_url && (
+                      <div className="col-span-2 md:col-span-3">
+                        <label className="text-xs text-muted-foreground uppercase">Horoscope Document</label>
+                        <p className="font-medium">
+                          <a href={selectedProfile.horoscope_url} target="_blank" rel="noopener noreferrer" className="text-primary underline hover:text-primary/80">
+                            View Horoscope
+                          </a>
+                        </p>
+                      </div>
+                    )}
                   </div>
                 </div>
 
