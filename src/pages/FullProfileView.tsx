@@ -547,45 +547,54 @@ const FullProfileView = () => {
             <CardTitle className="font-display text-lg flex items-center gap-2">
               <FileText className="h-5 w-5 text-primary" />
               Horoscope Details
+              {!isOwnProfile && !currentUserIsPrime && (
+                <Badge variant="outline" className="ml-auto gap-1 text-xs">
+                  <Lock className="h-3 w-3" />
+                  Prime Only
+                </Badge>
+              )}
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <InfoRow label="Time of Birth" value={profile.time_of_birth} />
-            <InfoRow label="Birth Country" value={profile.birth_country} />
-            <InfoRow label="Birth State" value={profile.birth_state} />
-            <InfoRow label="Birth City" value={profile.birth_city} />
-            <InfoRow label="Chart Style" value={profile.chart_style} />
-            <InfoRow label="Language" value={profile.horoscope_language} />
-            {profile.horoscope_url ? (
-              currentUserIsPrime || isOwnProfile ? (
-                <div className="mt-4 pt-4 border-t">
-                  <Button size="sm" variant="outline" asChild>
-                    <a href={profile.horoscope_url} target="_blank" rel="noopener noreferrer">
-                      <FileText className="h-4 w-4 mr-2" />
-                      View Horoscope Document
-                    </a>
-                  </Button>
-                </div>
-              ) : (
-                <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg mt-4">
-                  <div className="flex items-center gap-2">
-                    <Lock className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-sm text-muted-foreground">Horoscope available</span>
+            {isOwnProfile || currentUserIsPrime ? (
+              <>
+                <InfoRow label="Time of Birth" value={profile.time_of_birth} />
+                <InfoRow label="Birth Country" value={profile.birth_country} />
+                <InfoRow label="Birth State" value={profile.birth_state} />
+                <InfoRow label="Birth City" value={profile.birth_city} />
+                <InfoRow label="Chart Style" value={profile.chart_style} />
+                <InfoRow label="Language" value={profile.horoscope_language} />
+                {profile.horoscope_url ? (
+                  <div className="mt-4 pt-4 border-t">
+                    <Button size="sm" variant="outline" asChild>
+                      <a href={profile.horoscope_url} target="_blank" rel="noopener noreferrer">
+                        <FileText className="h-4 w-4 mr-2" />
+                        View Horoscope Document
+                      </a>
+                    </Button>
                   </div>
-                  <Button 
-                    size="sm" 
-                    variant="outline" 
-                    className="gap-1"
-                    onClick={() => navigate('/my-dashboard')}
-                  >
-                    <Crown className="h-3 w-3 text-amber-500" />
-                    Upgrade
-                  </Button>
-                </div>
-              )
+                ) : (
+                  <div className="mt-4 pt-4 border-t">
+                    <p className="text-sm text-muted-foreground">No horoscope uploaded</p>
+                  </div>
+                )}
+              </>
             ) : (
-              <div className="mt-4 pt-4 border-t">
-                <p className="text-sm text-muted-foreground">No horoscope uploaded</p>
+              <div className="flex flex-col items-center justify-center py-8 text-center">
+                <div className="h-16 w-16 rounded-full bg-amber-500/10 flex items-center justify-center mb-4">
+                  <Lock className="h-8 w-8 text-amber-500" />
+                </div>
+                <h4 className="font-semibold text-lg mb-2">Horoscope Details Locked</h4>
+                <p className="text-muted-foreground text-sm mb-4 max-w-xs">
+                  Upgrade to Prime to view horoscope details including birth time, location, and horoscope document.
+                </p>
+                <Button 
+                  className="bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-foreground gap-2"
+                  onClick={() => navigate('/my-dashboard')}
+                >
+                  <Crown className="h-4 w-4" />
+                  Upgrade to Prime
+                </Button>
               </div>
             )}
           </CardContent>
