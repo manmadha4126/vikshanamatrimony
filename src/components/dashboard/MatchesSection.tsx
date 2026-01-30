@@ -3,18 +3,14 @@ import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
-import { AspectRatio } from '@/components/ui/aspect-ratio';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Slider } from '@/components/ui/slider';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Label } from '@/components/ui/label';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
-import { Gem, Heart, Loader2, MapPin, GraduationCap, Briefcase, Star, Filter, SlidersHorizontal, X, ZoomIn } from 'lucide-react';
+import { Gem, Loader2, SlidersHorizontal, X, Filter } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import placeholderMale from '@/assets/placeholder-male.png';
-import placeholderFemale from '@/assets/placeholder-female.png';
+import MatchProfileCard from './MatchProfileCard';
 
 interface Profile {
   id: string;
@@ -33,6 +29,7 @@ interface Profile {
   marital_status: string | null;
   annual_income: string | null;
   gender?: string;
+  updated_at?: string;
 }
 
 interface MatchedProfile extends Profile {
@@ -57,18 +54,20 @@ interface PartnerPreferences {
 interface MatchesSectionProps {
   userId: string;
   userGender: string;
+  userIsPrime?: boolean;
   onViewProfile?: (profileId: string) => void;
 }
 
-type SortOption = 'score' | 'age' | 'recent';
+type SortOption = 'score' | 'age' | 'recent' | 'newly_joined';
 
-const MatchesSection = ({ userId, userGender, onViewProfile }: MatchesSectionProps) => {
+const MatchesSection = ({ userId, userGender, userIsPrime = false, onViewProfile }: MatchesSectionProps) => {
   const navigate = useNavigate();
   const [matches, setMatches] = useState<MatchedProfile[]>([]);
   const [filteredMatches, setFilteredMatches] = useState<MatchedProfile[]>([]);
   const [loading, setLoading] = useState(true);
   const [sendingInterest, setSendingInterest] = useState<string | null>(null);
   const [sentInterests, setSentInterests] = useState<string[]>([]);
+  const [shortlistedProfiles, setShortlistedProfiles] = useState<string[]>([]);
   const { toast } = useToast();
 
   // Filter states
@@ -79,11 +78,8 @@ const MatchesSection = ({ userId, userGender, onViewProfile }: MatchesSectionPro
   const [filterCity, setFilterCity] = useState<string>('all');
   const [ageRange, setAgeRange] = useState<[number, number]>([18, 60]);
   const [showFilters, setShowFilters] = useState(false);
-  const [zoomedPhoto, setZoomedPhoto] = useState<{ url: string; name: string } | null>(null);
-  
-  const handleProfileClick = (profileId: string) => {
-    navigate(`/profile/${profileId}`);
-  };
+  const [showOnlyWithPhoto, setShowOnlyWithPhoto] = useState(false);
+  const [showNotSeen, setShowNotSeen] = useState(false);
 
   const calculateAge = (dob: string | null) => {
     if (!dob) return null;
@@ -219,13 +215,21 @@ const MatchesSection = ({ userId, userGender, onViewProfile }: MatchesSectionPro
 
       setSentInterests(interests?.map(i => i.to_profile_id) || []);
 
+      // Fetch shortlisted profiles
+      const { data: shortlisted } = await supabase
+        .from('shortlisted_profiles')
+        .select('profile_id')
+        .eq('user_id', userId);
+
+      setShortlistedProfiles(shortlisted?.map(s => s.profile_id) || []);
+
       // Fetch profiles of opposite gender
       const { data: profiles, error: profilesError } = await supabase
         .from('profiles')
-        .select('id, name, photo_url, profile_id, date_of_birth, height, city, state, education, occupation, religion, caste, mother_tongue, marital_status, annual_income, gender')
+        .select('id, name, photo_url, profile_id, date_of_birth, height, city, state, education, occupation, religion, caste, mother_tongue, marital_status, annual_income, gender, updated_at')
         .eq('is_complete', true)
         .neq('gender', userGender)
-        .limit(50);
+        .limit(100);
 
       if (profilesError) throw profilesError;
 
@@ -292,9 +296,14 @@ const MatchesSection = ({ userId, userGender, onViewProfile }: MatchesSectionPro
     // Filter by age range
     result = result.filter(m => {
       const age = calculateAge(m.date_of_birth);
-      if (age === null) return true; // Include profiles without DOB
+      if (age === null) return true;
       return age >= ageRange[0] && age <= ageRange[1];
     });
+
+    // Filter by photo
+    if (showOnlyWithPhoto) {
+      result = result.filter(m => m.photo_url);
+    }
 
     // Sort
     if (sortBy === 'score') {
@@ -305,10 +314,15 @@ const MatchesSection = ({ userId, userGender, onViewProfile }: MatchesSectionPro
         const ageB = calculateAge(b.date_of_birth) || 0;
         return ageA - ageB;
       });
+    } else if (sortBy === 'newly_joined') {
+      result.sort((a, b) => {
+        if (!a.updated_at || !b.updated_at) return 0;
+        return new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime();
+      });
     }
 
     setFilteredMatches(result);
-  }, [matches, minScore, sortBy, filterReligion, filterEducation, filterCity, ageRange]);
+  }, [matches, minScore, sortBy, filterReligion, filterEducation, filterCity, ageRange, showOnlyWithPhoto, showNotSeen]);
 
   const sendInterest = async (profileId: string) => {
     setSendingInterest(profileId);
@@ -339,13 +353,39 @@ const MatchesSection = ({ userId, userGender, onViewProfile }: MatchesSectionPro
     }
   };
 
+  const toggleShortlist = async (profileId: string) => {
+    const isCurrentlyShortlisted = shortlistedProfiles.includes(profileId);
+    
+    try {
+      if (isCurrentlyShortlisted) {
+        await supabase
+          .from('shortlisted_profiles')
+          .delete()
+          .eq('user_id', userId)
+          .eq('profile_id', profileId);
+        
+        setShortlistedProfiles(prev => prev.filter(id => id !== profileId));
+        toast({ title: "Removed from shortlist" });
+      } else {
+        await supabase
+          .from('shortlisted_profiles')
+          .insert({ user_id: userId, profile_id: profileId });
+        
+        setShortlistedProfiles(prev => [...prev, profileId]);
+        toast({ title: "Added to shortlist" });
+      }
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to update shortlist",
+        variant: "destructive",
+      });
+    }
+  };
+
   useEffect(() => {
     fetchMatches();
   }, [userId, userGender]);
-
-  const getPlaceholderImage = (gender?: string) => {
-    return gender?.toLowerCase() === 'male' ? placeholderMale : placeholderFemale;
-  };
 
   const clearFilters = () => {
     setMinScore(0);
@@ -354,9 +394,11 @@ const MatchesSection = ({ userId, userGender, onViewProfile }: MatchesSectionPro
     setFilterEducation('all');
     setFilterCity('all');
     setAgeRange([18, 60]);
+    setShowOnlyWithPhoto(false);
+    setShowNotSeen(false);
   };
 
-  const hasActiveFilters = minScore > 0 || (filterReligion && filterReligion !== 'all') || (filterEducation && filterEducation !== 'all') || (filterCity && filterCity !== 'all') || ageRange[0] !== 18 || ageRange[1] !== 60;
+  const hasActiveFilters = minScore > 0 || (filterReligion && filterReligion !== 'all') || (filterEducation && filterEducation !== 'all') || (filterCity && filterCity !== 'all') || ageRange[0] !== 18 || ageRange[1] !== 60 || showOnlyWithPhoto || showNotSeen;
 
   // Get unique values for filters
   const uniqueReligions = [...new Set(matches.map(m => m.religion).filter(Boolean))] as string[];
@@ -372,148 +414,155 @@ const MatchesSection = ({ userId, userGender, onViewProfile }: MatchesSectionPro
   }
 
   return (
-    <Card className="lg:p-0">
-      <CardHeader className="pb-2 lg:pb-3 p-3 lg:p-6">
-        <div className="flex items-center justify-between gap-2">
-          <CardTitle className="flex items-center gap-1 lg:gap-2 text-sm lg:text-base">
-            <Gem className="h-4 w-4 lg:h-5 lg:w-5 text-primary" />
-            <span className="hidden sm:inline">Your Matches</span>
-            <span className="sm:hidden">Matches</span>
-          </CardTitle>
-          
-          <div className="flex items-center gap-1 lg:gap-2">
-            {/* View All button - visible on mobile */}
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className="lg:hidden text-xs h-7 px-2"
-              onClick={() => onViewProfile?.('all')}
+    <div className="space-y-4">
+      {/* Header with count and filters */}
+      <div className="flex flex-col gap-3">
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-semibold text-primary">
+            {filteredMatches.length} Matches based on your{' '}
+            <button 
+              onClick={() => onViewProfile?.('preferences')}
+              className="text-primary underline hover:no-underline"
             >
-              View All
-            </Button>
-            
-            <Select value={sortBy} onValueChange={(v: SortOption) => setSortBy(v)}>
-              <SelectTrigger className="w-[100px] lg:w-[140px] h-7 lg:h-9 text-xs lg:text-sm">
-                <SelectValue placeholder="Sort by" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="score">Best Match</SelectItem>
-                <SelectItem value="age">Age</SelectItem>
-                <SelectItem value="recent">Recent</SelectItem>
-              </SelectContent>
-            </Select>
-
-            <Popover open={showFilters} onOpenChange={setShowFilters}>
-              <PopoverTrigger asChild>
-                <Button 
-                  variant={hasActiveFilters ? "default" : "outline"} 
-                  size="sm" 
-                  className="gap-1 h-7 lg:h-9 px-2 lg:px-3 text-xs lg:text-sm"
-                >
-                  <SlidersHorizontal className="h-3 w-3 lg:h-4 lg:w-4" />
-                  <span className="hidden sm:inline">Filters</span>
-                  {hasActiveFilters && (
-                    <Badge variant="secondary" className="ml-1 h-4 w-4 lg:h-5 lg:w-5 p-0 text-[10px] lg:text-xs">
-                      !
-                    </Badge>
-                  )}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-80" align="end">
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <h4 className="font-medium">Filter Matches</h4>
-                    {hasActiveFilters && (
-                      <Button variant="ghost" size="sm" onClick={clearFilters}>
-                        <X className="h-3 w-3 mr-1" />
-                        Clear
-                      </Button>
-                    )}
-                  </div>
-
-                  {/* Minimum Score Filter */}
-                  <div className="space-y-2">
-                    <Label className="text-sm">Minimum Match Score: {minScore}%</Label>
-                    <Slider
-                      value={[minScore]}
-                      onValueChange={(v) => setMinScore(v[0])}
-                      max={100}
-                      step={10}
-                      className="py-2"
-                    />
-                  </div>
-
-                  {/* Religion Filter */}
-                  <div className="space-y-2">
-                    <Label className="text-sm">Religion</Label>
-                    <Select value={filterReligion} onValueChange={setFilterReligion}>
-                      <SelectTrigger className="h-9">
-                        <SelectValue placeholder="All religions" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">All religions</SelectItem>
-                        {uniqueReligions.map(r => (
-                          <SelectItem key={r} value={r}>{r}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  {/* Education Filter */}
-                  <div className="space-y-2">
-                    <Label className="text-sm">Education</Label>
-                    <Select value={filterEducation} onValueChange={setFilterEducation}>
-                      <SelectTrigger className="h-9">
-                        <SelectValue placeholder="All education" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">All education</SelectItem>
-                        {uniqueEducations.map(e => (
-                          <SelectItem key={e} value={e}>{e}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  {/* City Filter */}
-                  <div className="space-y-2">
-                    <Label className="text-sm">City</Label>
-                    <Select value={filterCity} onValueChange={setFilterCity}>
-                      <SelectTrigger className="h-9">
-                        <SelectValue placeholder="All cities" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">All cities</SelectItem>
-                        {uniqueCities.map(c => (
-                          <SelectItem key={c} value={c}>{c}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  {/* Age Range Filter */}
-                  <div className="space-y-2">
-                    <Label className="text-sm">Age Range: {ageRange[0]} - {ageRange[1]} years</Label>
-                    <div className="pt-2">
-                      <Slider
-                        value={ageRange}
-                        onValueChange={(v) => setAgeRange(v as [number, number])}
-                        min={18}
-                        max={60}
-                        step={1}
-                        className="py-2"
-                      />
-                    </div>
-                  </div>
-                </div>
-              </PopoverContent>
-            </Popover>
-          </div>
+              preferences
+            </button>
+          </h2>
         </div>
-      </CardHeader>
-      <CardContent className="p-2 lg:p-6 pt-0 lg:pt-0">
-        {filteredMatches.length === 0 ? (
-          <div className="text-center py-12">
+
+        {/* Quick Filters Bar */}
+        <div className="flex flex-wrap items-center gap-2">
+          <Popover open={showFilters} onOpenChange={setShowFilters}>
+            <PopoverTrigger asChild>
+              <Button 
+                variant={hasActiveFilters ? "default" : "outline"} 
+                size="sm" 
+                className="gap-1 h-8"
+              >
+                <Filter className="h-3 w-3" />
+                Filter
+                {hasActiveFilters && (
+                  <Badge variant="secondary" className="ml-1 h-4 w-4 p-0 text-xs">
+                    !
+                  </Badge>
+                )}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-80" align="start">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h4 className="font-medium">Filter Matches</h4>
+                  {hasActiveFilters && (
+                    <Button variant="ghost" size="sm" onClick={clearFilters}>
+                      <X className="h-3 w-3 mr-1" />
+                      Clear
+                    </Button>
+                  )}
+                </div>
+
+                {/* Minimum Score Filter */}
+                <div className="space-y-2">
+                  <Label className="text-sm">Minimum Match Score: {minScore}%</Label>
+                  <Slider
+                    value={[minScore]}
+                    onValueChange={(v) => setMinScore(v[0])}
+                    max={100}
+                    step={10}
+                    className="py-2"
+                  />
+                </div>
+
+                {/* Age Range Filter */}
+                <div className="space-y-2">
+                  <Label className="text-sm">Age Range: {ageRange[0]} - {ageRange[1]} years</Label>
+                  <Slider
+                    value={ageRange}
+                    onValueChange={(v) => setAgeRange(v as [number, number])}
+                    min={18}
+                    max={60}
+                    step={1}
+                    className="py-2"
+                  />
+                </div>
+
+                {/* Religion Filter */}
+                <div className="space-y-2">
+                  <Label className="text-sm">Religion</Label>
+                  <Select value={filterReligion} onValueChange={setFilterReligion}>
+                    <SelectTrigger className="h-9">
+                      <SelectValue placeholder="All religions" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All religions</SelectItem>
+                      {uniqueReligions.map(r => (
+                        <SelectItem key={r} value={r}>{r}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Education Filter */}
+                <div className="space-y-2">
+                  <Label className="text-sm">Education</Label>
+                  <Select value={filterEducation} onValueChange={setFilterEducation}>
+                    <SelectTrigger className="h-9">
+                      <SelectValue placeholder="All education" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All education</SelectItem>
+                      {uniqueEducations.map(e => (
+                        <SelectItem key={e} value={e}>{e}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* City Filter */}
+                <div className="space-y-2">
+                  <Label className="text-sm">City</Label>
+                  <Select value={filterCity} onValueChange={setFilterCity}>
+                    <SelectTrigger className="h-9">
+                      <SelectValue placeholder="All cities" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All cities</SelectItem>
+                      {uniqueCities.map(c => (
+                        <SelectItem key={c} value={c}>{c}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </PopoverContent>
+          </Popover>
+
+          <Select value={sortBy} onValueChange={(v: SortOption) => setSortBy(v)}>
+            <SelectTrigger className="w-[120px] h-8 text-sm">
+              <SelectValue placeholder="Sort by" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="score">Best Match</SelectItem>
+              <SelectItem value="age">Age</SelectItem>
+              <SelectItem value="newly_joined">Newly Joined</SelectItem>
+              <SelectItem value="recent">Recently Active</SelectItem>
+            </SelectContent>
+          </Select>
+
+          {/* Quick Filter Chips */}
+          <Button
+            variant={showOnlyWithPhoto ? "default" : "outline"}
+            size="sm"
+            className="h-8 text-xs"
+            onClick={() => setShowOnlyWithPhoto(!showOnlyWithPhoto)}
+          >
+            Profiles with photo
+          </Button>
+        </div>
+      </div>
+
+      {/* Matches List */}
+      {filteredMatches.length === 0 ? (
+        <Card>
+          <CardContent className="text-center py-12">
             <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mx-auto mb-4">
               <Gem className="h-8 w-8 text-muted-foreground" />
             </div>
@@ -530,177 +579,27 @@ const MatchesSection = ({ userId, userGender, onViewProfile }: MatchesSectionPro
                 Clear Filters
               </Button>
             )}
-          </div>
-        ) : (
-          <>
-            {/* Mobile: Horizontal scroll - ultra compact cards */}
-            <div className="lg:hidden overflow-x-auto pb-1 -mx-2 px-2 scrollbar-thin">
-              <div className="flex gap-1.5" style={{ width: 'max-content' }}>
-                {filteredMatches.map((match) => {
-                  const age = calculateAge(match.date_of_birth);
-                  const hasSentInterest = sentInterests.includes(match.id);
-                  
-                  return (
-                    <Card key={match.id} className="overflow-hidden hover:shadow-md transition-shadow cursor-pointer w-20 flex-shrink-0" onClick={() => handleProfileClick(match.id)}>
-                      {/* Profile Image */}
-                      <div className="relative">
-                        <AspectRatio ratio={1}>
-                          <img
-                            src={match.photo_url || getPlaceholderImage(match.gender)}
-                            alt={match.name}
-                            className="w-full h-full object-cover"
-                          />
-                        </AspectRatio>
-                        
-                        {/* Compatibility Badge */}
-                        <div className="absolute top-0 right-0">
-                          <Badge 
-                            className={`text-[7px] px-0.5 py-0 rounded-none rounded-bl ${
-                              match.compatibilityScore >= 80 ? 'bg-green-500' :
-                              match.compatibilityScore >= 60 ? 'bg-blue-500' :
-                              match.compatibilityScore >= 40 ? 'bg-yellow-500' :
-                              'bg-orange-500'
-                            } text-white font-semibold`}
-                          >
-                            {match.compatibilityScore}%
-                          </Badge>
-                        </div>
-                      </div>
-
-                      <CardContent className="p-1">
-                        <div className="space-y-0">
-                          <h3 className="font-medium text-[9px] text-foreground truncate leading-tight">{match.name.split(' ')[0]}</h3>
-                          {age && (
-                            <p className="text-[7px] text-muted-foreground truncate leading-tight">{age} yrs</p>
-                          )}
-                        </div>
-                      </CardContent>
-                    </Card>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Desktop: Grid layout */}
-            <div className="hidden lg:grid gap-2 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
-              {filteredMatches.map((match) => {
-                const age = calculateAge(match.date_of_birth);
-                const hasSentInterest = sentInterests.includes(match.id);
-                
-                return (
-                  <Card key={match.id} className="overflow-hidden hover:shadow-md transition-shadow cursor-pointer" onClick={() => handleProfileClick(match.id)}>
-                    {/* Profile Image */}
-                    <div className="relative group/photo">
-                      <AspectRatio ratio={1}>
-                        <img
-                          src={match.photo_url || getPlaceholderImage(match.gender)}
-                          alt={match.name}
-                          className="w-full h-full object-cover"
-                        />
-                      </AspectRatio>
-                      
-                      {/* Photo Zoom Button */}
-                      {match.photo_url && (
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setZoomedPhoto({ url: match.photo_url!, name: match.name });
-                          }}
-                          className="absolute bottom-1 left-1 p-1 rounded-full bg-black/50 text-white opacity-0 group-hover/photo:opacity-100 transition-opacity hover:bg-black/70"
-                          aria-label="Zoom photo"
-                        >
-                          <ZoomIn className="h-2.5 w-2.5" />
-                        </button>
-                      )}
-                      
-                      {/* Compatibility Badge */}
-                      <div className="absolute top-1 right-1">
-                        <Badge 
-                          className={`text-[10px] px-1 py-0 ${
-                            match.compatibilityScore >= 80 ? 'bg-green-500' :
-                            match.compatibilityScore >= 60 ? 'bg-blue-500' :
-                            match.compatibilityScore >= 40 ? 'bg-yellow-500' :
-                            'bg-orange-500'
-                          } text-white font-semibold`}
-                        >
-                          {match.compatibilityScore}%
-                        </Badge>
-                      </div>
-                    </div>
-
-                    <CardContent className="p-1.5">
-                      <div className="space-y-1">
-                        {/* Name and Profile ID */}
-                        <div>
-                          <h3 className="font-medium text-xs text-foreground truncate">{match.name}</h3>
-                          {match.profile_id && (
-                            <p className="text-[9px] text-muted-foreground">{match.profile_id}</p>
-                          )}
-                        </div>
-
-                        {/* Details */}
-                        <div className="text-[10px] text-muted-foreground">
-                          {age && <p className="truncate">{age} yrs{match.height ? `, ${match.height}` : ''}</p>}
-                        </div>
-
-                        {/* Matched Criteria */}
-                        {match.matchedCriteria.length > 0 && (
-                          <div className="flex flex-wrap gap-0.5">
-                            {match.matchedCriteria.slice(0, 1).map((criteria) => (
-                              <Badge key={criteria} variant="secondary" className="text-[9px] px-1 py-0">
-                                {criteria}
-                              </Badge>
-                            ))}
-                          </div>
-                        )}
-
-                        {/* Send Interest Button */}
-                        <Button
-                          size="sm"
-                          className="w-full h-6 text-[10px]"
-                          disabled={hasSentInterest || sendingInterest === match.id}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            sendInterest(match.id);
-                          }}
-                        >
-                          {sendingInterest === match.id ? (
-                            <Loader2 className="h-2.5 w-2.5 animate-spin" />
-                          ) : (
-                            <Heart className={`h-2.5 w-2.5 ${hasSentInterest ? 'fill-current' : ''}`} />
-                          )}
-                          <span className="ml-0.5">{hasSentInterest ? 'Sent' : 'Interest'}</span>
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                );
-              })}
-            </div>
-          </>
-        )}
-      </CardContent>
-
-      {/* Photo Zoom Dialog */}
-      <Dialog open={!!zoomedPhoto} onOpenChange={() => setZoomedPhoto(null)}>
-        <DialogContent className="max-w-3xl p-0 overflow-hidden bg-black/95 border-none">
-          <div className="relative">
-            {zoomedPhoto && (
-              <>
-                <img
-                  src={zoomedPhoto.url}
-                  alt={zoomedPhoto.name}
-                  className="w-full h-auto max-h-[80vh] object-contain"
-                />
-                <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent">
-                  <p className="text-white font-medium text-lg">{zoomedPhoto.name}</p>
-                </div>
-              </>
-            )}
-          </div>
-        </DialogContent>
-      </Dialog>
-    </Card>
+          </CardContent>
+        </Card>
+      ) : (
+        <div className="space-y-3">
+          {filteredMatches.map((match) => (
+            <MatchProfileCard
+              key={match.id}
+              profile={match}
+              compatibilityScore={match.compatibilityScore}
+              matchedCriteria={match.matchedCriteria}
+              hasSentInterest={sentInterests.includes(match.id)}
+              isShortlisted={shortlistedProfiles.includes(match.id)}
+              isSendingInterest={sendingInterest === match.id}
+              onSendInterest={() => sendInterest(match.id)}
+              onShortlist={() => toggleShortlist(match.id)}
+              showCallButtons={userIsPrime}
+            />
+          ))}
+        </div>
+      )}
+    </div>
   );
 };
 

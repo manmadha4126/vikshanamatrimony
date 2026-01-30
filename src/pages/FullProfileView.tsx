@@ -494,14 +494,54 @@ const FullProfileView = () => {
             <CardTitle className="font-display text-lg flex items-center gap-2">
               <Phone className="h-5 w-5 text-primary" />
               Contact Information
+              {!isOwnProfile && !currentUserIsPrime && (
+                <Badge variant="outline" className="ml-auto gap-1 text-xs">
+                  <Lock className="h-3 w-3" />
+                  Prime Only
+                </Badge>
+              )}
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <InfoRow label="Email" value={isOwnProfile ? profile.email : (currentUserIsPrime ? profile.email : '***')} isRestricted={!isOwnProfile} />
-            <InfoRow label="Phone" value={profile.phone} isRestricted={!isOwnProfile} />
-            <InfoRow label="Country" value={profile.country} />
-            <InfoRow label="State" value={profile.state} />
-            <InfoRow label="City" value={profile.city} />
+            {isOwnProfile || currentUserIsPrime ? (
+              <>
+                <InfoRow label="Email" value={profile.email} />
+                <InfoRow label="Phone" value={profile.phone} />
+                <InfoRow label="Country" value={profile.country} />
+                <InfoRow label="State" value={profile.state} />
+                <InfoRow label="City" value={profile.city} />
+              </>
+            ) : (
+              <>
+                {/* Show location freely, lock phone and email */}
+                <div className="flex items-center justify-between py-2 border-b last:border-0">
+                  <span className="text-muted-foreground text-sm">Phone</span>
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <Lock className="h-3 w-3" />
+                    <span className="text-sm">Hidden for free users</span>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between py-2 border-b last:border-0">
+                  <span className="text-muted-foreground text-sm">Email</span>
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <Lock className="h-3 w-3" />
+                    <span className="text-sm">Hidden for free users</span>
+                  </div>
+                </div>
+                <InfoRow label="Country" value={profile.country} />
+                <InfoRow label="State" value={profile.state} />
+                <InfoRow label="City" value={profile.city} />
+                <div className="mt-4 pt-4 border-t">
+                  <Button 
+                    className="w-full bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-foreground gap-2"
+                    onClick={() => navigate('/my-dashboard')}
+                  >
+                    <Crown className="h-4 w-4" />
+                    Upgrade to Prime to View Contact Details
+                  </Button>
+                </div>
+              </>
+            )}
           </CardContent>
         </Card>
 
