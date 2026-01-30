@@ -512,6 +512,7 @@ const Dashboard = () => {
               <MatchesSection
                 userId={user.id}
                 userGender={profile.gender}
+                userIsPrime={profile.is_prime || false}
                 onViewProfile={handleViewProfile}
               />
             )}
