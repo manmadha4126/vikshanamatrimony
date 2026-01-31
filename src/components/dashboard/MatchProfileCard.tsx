@@ -91,7 +91,7 @@ const MatchProfileCard = ({
   };
 
   const handleCardClick = () => {
-    navigate(`/profile/${profile.id}`);
+    navigate(`/profile/${profile.id}`, { state: { fromMatches: true } });
   };
 
   const age = calculateAge(profile.date_of_birth);
