@@ -1,11 +1,10 @@
 import { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
 import {
   User,
   MapPin,
@@ -13,8 +12,6 @@ import {
   GraduationCap,
   Heart,
   Star,
-  Calendar,
-  Ruler,
   Phone,
   Mail,
   Sparkles,
@@ -28,6 +25,10 @@ import {
   Clock,
   CheckCircle2,
   XCircle,
+  Bookmark,
+  X,
+  MessageCircle,
+  ChevronRight,
 } from 'lucide-react';
 import { format, formatDistanceToNow } from 'date-fns';
 import placeholderMale from '@/assets/placeholder-male.png';
@@ -37,6 +38,7 @@ interface FullProfile {
   id: string;
   name: string;
   profile_id: string | null;
+  profile_for: string | null;
   photo_url: string | null;
   gender: string;
   email: string;
@@ -89,12 +91,17 @@ interface FullProfile {
 const FullProfileView = () => {
   const { profileId } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const [profile, setProfile] = useState<FullProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [currentUserIsPrime, setCurrentUserIsPrime] = useState(false);
   const [isOwnProfile, setIsOwnProfile] = useState(false);
   const [interestSent, setInterestSent] = useState(false);
   const [isShortlisted, setIsShortlisted] = useState(false);
+  const [isSendingInterest, setIsSendingInterest] = useState(false);
+
+  // Check if coming from matches section
+  const fromMatches = location.state?.fromMatches || false;
 
   useEffect(() => {
     if (profileId) {
@@ -191,8 +198,9 @@ const FullProfileView = () => {
   };
 
   const handleSendInterest = async () => {
-    if (!profile || interestSent) return;
+    if (!profile || interestSent || isSendingInterest) return;
     
+    setIsSendingInterest(true);
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
@@ -231,11 +239,13 @@ const FullProfileView = () => {
         description: error.message,
         variant: "destructive",
       });
+    } finally {
+      setIsSendingInterest(false);
     }
   };
 
   const handleShortlist = async () => {
-    if (!profile || isShortlisted) return;
+    if (!profile) return;
     
     try {
       const { data: { user } } = await supabase.auth.getUser();
@@ -248,37 +258,73 @@ const FullProfileView = () => {
         return;
       }
 
-      const { error } = await supabase
-        .from('shortlisted_profiles')
-        .insert({
-          user_id: user.id,
-          profile_id: profile.id,
-        });
-
-      if (error) {
-        if (error.code === '23505') {
-          setIsShortlisted(true);
-        } else {
-          throw error;
-        }
-      } else {
-        setIsShortlisted(true);
+      if (isShortlisted) {
+        // Remove from shortlist
+        await supabase
+          .from('shortlisted_profiles')
+          .delete()
+          .eq('user_id', user.id)
+          .eq('profile_id', profile.id);
+        
+        setIsShortlisted(false);
         toast({
-          title: "Profile shortlisted!",
-          description: `${profile.name} has been added to your shortlist.`,
+          title: "Removed from shortlist",
+          description: `${profile.name} has been removed from your shortlist.`,
         });
+      } else {
+        const { error } = await supabase
+          .from('shortlisted_profiles')
+          .insert({
+            user_id: user.id,
+            profile_id: profile.id,
+          });
+
+        if (error) {
+          if (error.code === '23505') {
+            setIsShortlisted(true);
+          } else {
+            throw error;
+          }
+        } else {
+          setIsShortlisted(true);
+          toast({
+            title: "Profile shortlisted!",
+            description: `${profile.name} has been added to your shortlist.`,
+          });
+        }
       }
     } catch (error: any) {
       toast({
-        title: "Failed to shortlist",
+        title: "Failed to update shortlist",
         description: error.message,
         variant: "destructive",
       });
     }
   };
 
+  const handleBack = () => {
+    if (fromMatches) {
+      navigate('/my-dashboard', { state: { activeSection: 'matches' } });
+    } else {
+      navigate(-1);
+    }
+  };
+
   const getPlaceholderImage = () => {
     return profile?.gender?.toLowerCase() === 'male' ? placeholderMale : placeholderFemale;
+  };
+
+  const getLastSeen = () => {
+    if (!profile?.updated_at) return null;
+    return formatDistanceToNow(new Date(profile.updated_at), { addSuffix: true });
+  };
+
+  const isNewlyJoined = () => {
+    if (!profile?.created_at) return false;
+    const createdDate = new Date(profile.created_at);
+    const weekAgo = new Date();
+    weekAgo.setDate(weekAgo.getDate() - 7);
+    return createdDate > weekAgo;
   };
 
   const InfoRow = ({ label, value, isRestricted = false }: { label: string; value: string | null | undefined; isRestricted?: boolean }) => (
@@ -314,120 +360,229 @@ const FullProfileView = () => {
   }
 
   const age = calculateAge(profile.date_of_birth);
+  const lastSeen = getLastSeen();
+  const newlyJoined = isNewlyJoined();
+
+  // Build quick info parts
+  const quickInfoParts: string[] = [];
+  if (profile.marital_status) quickInfoParts.push(profile.marital_status);
+  if (profile.profile_for) quickInfoParts.push(`Profile created by ${profile.profile_for}`);
+  if (age) quickInfoParts.push(`${age} yrs`);
+  if (profile.height) quickInfoParts.push(profile.height.split(' ')[0]);
+  if (profile.religion) {
+    let religionCaste = profile.religion;
+    if (profile.caste) religionCaste += `(${profile.caste})`;
+    quickInfoParts.push(religionCaste);
+  }
+
+  const professionalParts: string[] = [];
+  if (profile.education) professionalParts.push(profile.education);
+  if (profile.occupation) professionalParts.push(profile.occupation);
+  if (profile.annual_income) professionalParts.push(profile.annual_income);
+  if (profile.city) professionalParts.push(profile.city);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-muted/30 to-background">
-      {/* Sticky Header */}
+      {/* Sticky Header with Back Navigation */}
       <div className="sticky top-0 z-50 bg-background/95 backdrop-blur-md border-b shadow-sm">
         <div className="container py-3 flex items-center gap-3">
-          <Button variant="ghost" size="icon" onClick={() => navigate(-1)} className="shrink-0">
-            <ArrowLeft className="h-5 w-5" />
+          <Button variant="ghost" size="sm" onClick={handleBack} className="gap-2">
+            <ArrowLeft className="h-4 w-4" />
+            <span className="hidden sm:inline">Back to Matches</span>
           </Button>
-          <div className="flex-1 min-w-0">
-            <h1 className="font-display font-semibold text-base sm:text-lg truncate">{profile.name}</h1>
-            <p className="text-xs text-muted-foreground">{profile.profile_id}</p>
-          </div>
-          {!isOwnProfile && (
-            <div className="flex gap-2 shrink-0">
-              <Button 
-                size="sm"
-                onClick={handleSendInterest}
-                disabled={interestSent}
-                className={`h-8 ${interestSent ? 'bg-green-500 hover:bg-green-500' : ''}`}
-              >
-                {interestSent ? <Check className="h-4 w-4" /> : <Heart className="h-4 w-4" />}
-                <span className="hidden sm:inline ml-1">{interestSent ? 'Sent' : 'Interest'}</span>
-              </Button>
-              <Button 
-                variant="outline"
-                size="sm"
-                onClick={handleShortlist}
-                disabled={isShortlisted}
-                className={`h-8 ${isShortlisted ? 'bg-amber-500 text-white border-amber-500 hover:bg-amber-500' : ''}`}
-              >
-                {isShortlisted ? <Check className="h-4 w-4" /> : <Star className="h-4 w-4" />}
-                <span className="hidden sm:inline ml-1">{isShortlisted ? 'Saved' : 'Save'}</span>
-              </Button>
-            </div>
+          <div className="flex-1" />
+          {!isOwnProfile && currentUserIsPrime && (
+            <Button variant="outline" size="sm" className="gap-2">
+              <ChevronRight className="h-4 w-4" />
+              <span className="hidden sm:inline">Next Profile</span>
+            </Button>
           )}
         </div>
       </div>
 
-      {/* Profile Content - Vertical Scrolling Sections */}
-      <div className="container py-4 sm:py-6 space-y-4 sm:space-y-6 max-w-2xl mx-auto">
+      <div className="container py-4 sm:py-6 space-y-4 sm:space-y-6 max-w-4xl mx-auto">
         
-        {/* Large Square Profile Photo */}
-        <Card className="overflow-hidden shadow-card">
-          <div className="relative aspect-square w-full bg-muted">
-            <img
-              src={profile.photo_url || getPlaceholderImage()}
-              alt={profile.name}
-              className="w-full h-full object-cover"
-            />
-            {/* Verification & Prime badges */}
-            <div className="absolute top-3 left-3 flex flex-col gap-2">
-              {profile.verification_status === 'verified' && (
-                <Badge className="bg-green-500 text-white gap-1">
-                  <CheckCircle2 className="h-3 w-3" />
-                  Verified
-                </Badge>
-              )}
-              {profile.is_prime && (
-                <Badge className="bg-gradient-to-r from-amber-500 to-orange-500 text-white gap-1">
-                  <Star className="h-3 w-3" /> Prime
-                </Badge>
-              )}
+        {/* Hero Profile Card - Telugu Matrimony Style */}
+        <Card className="overflow-hidden shadow-lg">
+          <div className="flex flex-col md:flex-row">
+            {/* Left: Profile Image */}
+            <div className="relative w-full md:w-80 lg:w-96 flex-shrink-0">
+              <div className="aspect-square md:aspect-auto md:h-full relative bg-muted">
+                <img
+                  src={profile.photo_url || getPlaceholderImage()}
+                  alt={profile.name}
+                  className="w-full h-full object-cover md:h-80 lg:h-96"
+                />
+                
+                {/* Newly Joined Badge */}
+                {newlyJoined && (
+                  <div className="absolute top-0 left-0">
+                    <div className="bg-gradient-to-r from-red-500 to-pink-500 text-white text-xs font-bold px-3 py-1 transform -rotate-0 origin-top-left rounded-br-lg">
+                      NEWLY JOINED
+                    </div>
+                  </div>
+                )}
+
+                {/* Photo counter */}
+                <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex items-center gap-2 bg-black/60 text-white text-xs px-3 py-1 rounded-full">
+                  <div className="w-6 h-1 bg-white rounded-full" />
+                  1/1
+                </div>
+              </div>
             </div>
-            {/* Profile completion */}
-            <div className="absolute top-3 right-3">
-              <Badge variant="secondary" className="bg-background/80">
-                {profile.profile_completion_percentage || 0}% Complete
-              </Badge>
-            </div>
-            {/* Name overlay at bottom */}
-            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-4 sm:p-6">
-              <h2 className="text-white text-2xl sm:text-3xl font-display font-bold">{profile.name}</h2>
-              <p className="text-white/90 text-sm sm:text-base mt-1">
-                {profile.profile_id}
-                {age && <span className="mx-2">•</span>}
-                {age && <span>{age} years</span>}
-                {profile.height && <span className="mx-2">•</span>}
-                {profile.height && <span>{profile.height}</span>}
+
+            {/* Right: Profile Details */}
+            <div className="flex-1 p-4 sm:p-6 flex flex-col">
+              {/* Top Row: Name section with Shortlist */}
+              <div className="flex items-start justify-between gap-4">
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <h1 className="text-xl sm:text-2xl font-display font-bold text-foreground">
+                      {profile.name}
+                    </h1>
+                    {profile.verification_status === 'verified' && (
+                      <Badge className="bg-green-500 text-white text-xs">
+                        <CheckCircle2 className="h-3 w-3 mr-1" />
+                        Verified
+                      </Badge>
+                    )}
+                    {profile.is_prime && (
+                      <Badge className="bg-gradient-to-r from-amber-500 to-orange-500 text-white text-xs">
+                        <Crown className="h-3 w-3 mr-1" />
+                        Prime
+                      </Badge>
+                    )}
+                  </div>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    {profile.profile_id}
+                    {lastSeen && <span> | Last seen {lastSeen}</span>}
+                  </p>
+                </div>
+                
+                {/* Shortlist & Actions */}
+                {!isOwnProfile && (
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={handleShortlist}
+                      className={`flex items-center gap-1 px-3 py-1.5 border rounded-md text-sm font-medium transition-colors ${
+                        isShortlisted 
+                          ? 'bg-primary text-primary-foreground border-primary' 
+                          : 'bg-background border-border hover:bg-muted'
+                      }`}
+                    >
+                      <Bookmark className={`h-4 w-4 ${isShortlisted ? 'fill-current' : ''}`} />
+                      Shortlist
+                    </button>
+                    
+                    {/* Call buttons for Prime */}
+                    {currentUserIsPrime && (
+                      <div className="flex gap-2">
+                        <button className="w-8 h-8 rounded-full border-2 border-orange-400 flex items-center justify-center text-orange-500 hover:bg-orange-50 transition-colors">
+                          <Phone className="h-4 w-4" />
+                        </button>
+                        <button className="w-8 h-8 rounded-full border-2 border-green-500 flex items-center justify-center text-green-500 hover:bg-green-50 transition-colors">
+                          <MessageCircle className="h-4 w-4" />
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* Quick Info Line 1 */}
+              <p className="text-sm text-foreground mt-4 leading-relaxed">
+                {quickInfoParts.map((part, idx) => (
+                  <span key={idx}>
+                    {idx > 0 && <span className="text-muted-foreground mx-1">•</span>}
+                    {part}
+                  </span>
+                ))}
               </p>
+
+              {/* Quick Info Line 2 - Professional */}
+              {professionalParts.length > 0 && (
+                <p className="text-sm text-foreground mt-2 leading-relaxed">
+                  {professionalParts.map((part, idx) => (
+                    <span key={idx}>
+                      {idx > 0 && <span className="text-muted-foreground mx-1">•</span>}
+                      {part}
+                    </span>
+                  ))}
+                </p>
+              )}
+
+              {/* Verification Status */}
+              <div className="flex flex-wrap gap-2 mt-4">
+                <Badge variant={profile.phone_verified ? 'default' : 'secondary'} className="gap-1 text-xs">
+                  {profile.phone_verified ? <CheckCircle2 className="h-3 w-3" /> : <XCircle className="h-3 w-3" />}
+                  Phone {profile.phone_verified ? 'Verified' : 'Unverified'}
+                </Badge>
+                <Badge variant={profile.email_verified ? 'default' : 'secondary'} className="gap-1 text-xs">
+                  {profile.email_verified ? <CheckCircle2 className="h-3 w-3" /> : <XCircle className="h-3 w-3" />}
+                  Email {profile.email_verified ? 'Verified' : 'Unverified'}
+                </Badge>
+                <Badge variant="outline" className="gap-1 text-xs">
+                  {profile.profile_completion_percentage || 0}% Complete
+                </Badge>
+              </div>
+
+              {/* Spacer */}
+              <div className="flex-1 min-h-4" />
+
+              {/* Action Buttons */}
+              {!isOwnProfile && (
+                <div className="flex items-center gap-2 mt-4 pt-4 border-t">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="flex-1 sm:flex-none h-9"
+                  >
+                    <X className="h-4 w-4 mr-1" />
+                    Don't Show
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="flex-1 sm:flex-none h-9 text-orange-500 border-orange-500 hover:bg-orange-50"
+                  >
+                    <ChevronRight className="h-4 w-4 mr-1" />
+                    Skip
+                  </Button>
+                  <Button
+                    size="sm"
+                    className={`flex-1 sm:flex-none h-9 ${
+                      interestSent 
+                        ? 'bg-green-500 hover:bg-green-500 text-white' 
+                        : 'bg-primary hover:bg-primary/90'
+                    }`}
+                    disabled={interestSent || isSendingInterest}
+                    onClick={handleSendInterest}
+                  >
+                    {isSendingInterest ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Heart className={`h-4 w-4 mr-1 ${interestSent ? 'fill-current' : ''}`} />
+                    )}
+                    {interestSent ? 'Interest Sent' : 'Send Interest'}
+                  </Button>
+                </div>
+              )}
             </div>
           </div>
         </Card>
 
-        {/* Last Updated */}
+        {/* Member Info */}
         <Card className="shadow-soft bg-primary/5 border-primary/20">
           <CardContent className="py-3 px-4">
             <div className="flex items-center justify-between flex-wrap gap-2 text-sm">
               <div className="flex items-center gap-2">
                 <Clock className="h-4 w-4 text-primary" />
                 <span className="text-muted-foreground">Updated:</span>
-                <span className="font-medium">
-                  {formatDistanceToNow(new Date(profile.updated_at), { addSuffix: true })}
-                </span>
+                <span className="font-medium">{lastSeen}</span>
               </div>
               <span className="text-xs text-muted-foreground">
                 Member since {format(new Date(profile.created_at), 'MMM yyyy')}
               </span>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Verification Status */}
-        <Card className="shadow-soft">
-          <CardContent className="py-4">
-            <div className="flex flex-wrap gap-2">
-              <Badge variant={profile.phone_verified ? 'default' : 'secondary'} className="gap-1">
-                {profile.phone_verified ? <CheckCircle2 className="h-3 w-3" /> : <XCircle className="h-3 w-3" />}
-                Phone {profile.phone_verified ? 'Verified' : 'Unverified'}
-              </Badge>
-              <Badge variant={profile.email_verified ? 'default' : 'secondary'} className="gap-1">
-                {profile.email_verified ? <CheckCircle2 className="h-3 w-3" /> : <XCircle className="h-3 w-3" />}
-                Email {profile.email_verified ? 'Verified' : 'Unverified'}
-              </Badge>
             </div>
           </CardContent>
         </Card>
@@ -466,12 +621,12 @@ const FullProfileView = () => {
           </Card>
         )}
 
-        {/* Basic Information */}
+        {/* Personal Information */}
         <Card className="shadow-soft">
           <CardHeader className="pb-2">
             <CardTitle className="font-display text-lg flex items-center gap-2">
               <User className="h-5 w-5 text-primary" />
-              Basic Information
+              Personal Information
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -513,7 +668,6 @@ const FullProfileView = () => {
               </>
             ) : (
               <>
-                {/* Show location freely, lock phone and email */}
                 <div className="flex items-center justify-between py-2 border-b last:border-0">
                   <span className="text-muted-foreground text-sm">Phone</span>
                   <div className="flex items-center gap-2 text-muted-foreground">
