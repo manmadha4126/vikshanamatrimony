@@ -799,6 +799,7 @@ export type Database = {
         Returns: number
       }
       generate_profile_id: { Args: { p_gender: string }; Returns: string }
+      get_email_by_phone: { Args: { p_phone: string }; Returns: string }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
