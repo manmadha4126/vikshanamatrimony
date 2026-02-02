@@ -55,6 +55,7 @@ const MessagesSection = ({ odBCqt, profileId, userName = 'User', initialRecipien
   const [loading, setLoading] = useState(true);
   const [sendingMessage, setSendingMessage] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const isFirstLoad = useRef(true);
   const { toast } = useToast();
   const { playNotificationSound } = useNotificationSound();
 
@@ -262,9 +263,25 @@ const MessagesSection = ({ odBCqt, profileId, userName = 'User', initialRecipien
     }
   }, [selectedConversation]);
 
+  // Scroll to top when conversation is first opened, then to bottom for new messages
+  
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (messages.length > 0) {
+      if (isFirstLoad.current) {
+        // On first load, scroll to top to show first messages
+        isFirstLoad.current = false;
+        // Don't scroll - let user see from top
+      } else {
+        // For new messages, scroll to bottom
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
   }, [messages]);
+  
+  // Reset first load flag when conversation changes
+  useEffect(() => {
+    isFirstLoad.current = true;
+  }, [selectedConversation?.odBCqt]);
 
   // Real-time subscription for new messages (both sent and received)
   useEffect(() => {

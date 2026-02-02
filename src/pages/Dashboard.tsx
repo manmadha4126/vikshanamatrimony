@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import DashboardHeader from '@/components/dashboard/DashboardHeader';
 import ProfileSidebar from '@/components/dashboard/ProfileSidebar';
@@ -88,8 +88,10 @@ const defaultFilters: SearchFilters = {
 
 const Dashboard = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { user, profile, loading, signOut, refreshProfile, isAuthenticated } = useAuth();
   const [activeView, setActiveView] = useState<DashboardView>('home');
+  const [showPrimeModal, setShowPrimeModal] = useState(false);
   
   // Search state
   const [filters, setFilters] = useState<SearchFilters>(defaultFilters);
@@ -99,11 +101,52 @@ const Dashboard = () => {
   const [messageRecipient, setMessageRecipient] = useState<MessageRecipient | null>(null);
   const [viewingProfileId, setViewingProfileId] = useState<string | null>(null);
 
+  // Handle navigation state from other pages (e.g., profile view redirecting to matches or opening prime modal)
+  useEffect(() => {
+    const state = location.state as { activeSection?: DashboardView; openPrimeModal?: boolean } | null;
+    if (state?.activeSection) {
+      setActiveView(state.activeSection);
+      // Clear the state to prevent re-triggering on refresh
+      window.history.replaceState({}, document.title);
+    }
+    if (state?.openPrimeModal) {
+      setShowPrimeModal(true);
+      // Clear the state
+      window.history.replaceState({}, document.title);
+    }
+  }, [location.state]);
+
   useEffect(() => {
     if (!loading && !isAuthenticated) {
       navigate('/login');
     }
   }, [loading, isAuthenticated, navigate]);
+
+  // Real-time subscription for profile updates (e.g., when subscription is approved)
+  useEffect(() => {
+    if (!profile?.id) return;
+    
+    const channel = supabase
+      .channel('profile-updates')
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'profiles',
+          filter: `id=eq.${profile.id}`,
+        },
+        () => {
+          // Refresh profile when it's updated (e.g., is_prime changed)
+          refreshProfile();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [profile?.id, refreshProfile]);
 
   useEffect(() => {
     if (user?.id && activeView === 'search') {
@@ -324,6 +367,8 @@ const Dashboard = () => {
                   userId={user.id}
                   profileId={profile.id}
                   userName={profile.name}
+                  externalOpenModal={showPrimeModal}
+                  onModalClose={() => setShowPrimeModal(false)}
                 />
 
                 <SubscriptionStatusCard
