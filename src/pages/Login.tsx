@@ -79,21 +79,38 @@ const Login = () => {
       // If it's a phone number, first find the email associated with it
       let loginEmail = identifier;
       if (!isEmail) {
+        // Normalize phone number - remove spaces, dashes, and handle country code
+        const normalizedPhone = identifier.replace(/[\s\-]/g, '');
+        
         // Look up the profile by phone number to get the email
-        const {
-          data: profileData,
-          error: profileError
-        } = await supabase.from('profiles').select('email').eq('phone', identifier).maybeSingle();
+        // Try multiple formats: with/without country code
+        const { data: profileData, error: profileError } = await supabase
+          .from('profiles')
+          .select('email, phone')
+          .or(`phone.eq.${normalizedPhone},phone.eq.+91${normalizedPhone},phone.eq.${normalizedPhone.replace(/^\+91/, '')}`)
+          .maybeSingle();
+        
         if (profileError || !profileData) {
-          toast({
-            title: "Login Failed",
-            description: "No account found with this phone number.",
-            variant: "destructive"
-          });
-          setIsLoading(false);
-          return;
+          // Try one more search with exact match
+          const { data: exactMatch } = await supabase
+            .from('profiles')
+            .select('email')
+            .eq('phone', identifier)
+            .maybeSingle();
+          
+          if (!exactMatch) {
+            toast({
+              title: "Login Failed",
+              description: "No account found with this phone number.",
+              variant: "destructive"
+            });
+            setIsLoading(false);
+            return;
+          }
+          loginEmail = exactMatch.email;
+        } else {
+          loginEmail = profileData.email;
         }
-        loginEmail = profileData.email;
       }
       const {
         error

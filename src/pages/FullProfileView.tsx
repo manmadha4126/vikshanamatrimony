@@ -303,10 +303,11 @@ const FullProfileView = () => {
   };
 
   const handleBack = () => {
+    // Always navigate to matches section when coming from matches
     if (fromMatches) {
       navigate('/my-dashboard', { state: { activeSection: 'matches' } });
     } else {
-      navigate(-1);
+      navigate('/my-dashboard', { state: { activeSection: 'matches' } });
     }
   };
 
@@ -335,7 +336,7 @@ const FullProfileView = () => {
           variant="outline" 
           size="sm" 
           className="h-6 text-xs gap-1"
-          onClick={() => navigate('/my-dashboard')}
+          onClick={() => navigate('/my-dashboard', { state: { activeSection: 'home', openPrimeModal: true } })}
         >
           <Lock className="h-3 w-3" />
           <Crown className="h-3 w-3 text-amber-500" />
@@ -688,7 +689,7 @@ const FullProfileView = () => {
                 <div className="mt-4 pt-4 border-t">
                   <Button 
                     className="w-full bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-foreground gap-2"
-                    onClick={() => navigate('/my-dashboard')}
+                    onClick={() => navigate('/my-dashboard', { state: { activeSection: 'home', openPrimeModal: true } })}
                   >
                     <Crown className="h-4 w-4" />
                     Upgrade to Prime to View Contact Details
@@ -784,7 +785,7 @@ const FullProfileView = () => {
                 </p>
                 <Button 
                   className="bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-foreground gap-2"
-                  onClick={() => navigate('/my-dashboard')}
+                  onClick={() => navigate('/my-dashboard', { state: { activeSection: 'home', openPrimeModal: true } })}
                 >
                   <Crown className="h-4 w-4" />
                   Upgrade to Prime

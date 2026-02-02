@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -11,15 +11,29 @@ interface AccountTypeSectionProps {
   userId: string;
   profileId: string;
   userName: string;
+  externalOpenModal?: boolean;
+  onModalClose?: () => void;
 }
 
-const AccountTypeSection = ({ isPrime, primeExpiresAt, userId, profileId, userName }: AccountTypeSectionProps) => {
+const AccountTypeSection = ({ isPrime, primeExpiresAt, userId, profileId, userName, externalOpenModal, onModalClose }: AccountTypeSectionProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // Handle external trigger to open modal
+  useEffect(() => {
+    if (externalOpenModal) {
+      setIsModalOpen(true);
+    }
+  }, [externalOpenModal]);
 
   const handlePrimeClick = () => {
     if (!isPrime) {
       setIsModalOpen(true);
     }
+  };
+
+  const handleModalClose = () => {
+    setIsModalOpen(false);
+    onModalClose?.();
   };
 
   return (
@@ -86,7 +100,7 @@ const AccountTypeSection = ({ isPrime, primeExpiresAt, userId, profileId, userNa
 
       <PrimeSubscriptionModal
         isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        onClose={handleModalClose}
         userId={userId}
         profileId={profileId}
         userName={userName}
