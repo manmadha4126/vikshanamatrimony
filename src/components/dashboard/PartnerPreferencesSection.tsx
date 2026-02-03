@@ -32,6 +32,7 @@ import {
   educationOptions,
   incomeOptions,
   stateOptions,
+  occupationOptions,
 } from '@/data/registrationOptions';
 import { castesByReligion } from '@/data/casteOptions';
 import { citiesByState } from '@/data/locationOptions';
@@ -303,6 +304,7 @@ const PartnerPreferencesSection = ({ userId }: PartnerPreferencesSectionProps) =
           country: data.country || [],
           residing_state: data.residing_state || [],
           residing_city: data.residing_city || [],
+          occupation: data.occupation || '',
           annual_income_from: data.annual_income?.split(' - ')[0] || '',
           annual_income_to: data.annual_income?.split(' - ')[1] || '',
         });
@@ -702,6 +704,14 @@ const PartnerPreferencesSection = ({ userId }: PartnerPreferencesSectionProps) =
                 onValueChange={(v) => handleInputChange('employed_in', v)}
                 options={EMPLOYED_IN_OPTIONS}
                 placeholder="Select employment type"
+              />
+
+              <StyledSelect
+                label="Occupation"
+                value={formData.occupation}
+                onValueChange={(v) => handleInputChange('occupation', v)}
+                options={['Any', ...occupationOptions]}
+                placeholder="Select occupation"
               />
 
               <div className="space-y-2">
