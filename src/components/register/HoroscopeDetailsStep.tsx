@@ -161,13 +161,14 @@ export const HoroscopeDetailsStep = ({
       <div className="space-y-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="space-y-2">
-            <Label className="text-sm">Time of Birth</Label>
-            <SearchableSelect
-              options={toOptions(timeOfBirthOptions)}
+            <Label className="text-sm">Time of Birth (HH:MM:SS)</Label>
+            <Input
+              type="time"
+              step="1"
               value={formData.timeOfBirth}
-              onValueChange={(value) => updateFormData({ timeOfBirth: value })}
-              placeholder="Select time of birth"
-              searchPlaceholder="Search time..."
+              onChange={(e) => updateFormData({ timeOfBirth: e.target.value })}
+              placeholder="HH:MM:SS"
+              className="h-10"
             />
           </div>
 
