@@ -168,15 +168,15 @@ export const HoroscopeDetailsStep = ({
                 inputMode="numeric"
                 value={(() => {
                   const parts = formData.timeOfBirth?.replace(/ (AM|PM)$/i, '').split(':') || [];
-                  return parts[0] || '';
+                  return parts[0] && parts[0] !== '00' ? parts[0] : '';
                 })()}
                 onChange={(e) => {
                   const val = e.target.value.replace(/\D/g, '').slice(0, 2);
                   const timePart = formData.timeOfBirth?.replace(/ (AM|PM)$/i, '') || '';
                   const parts = timePart.split(':');
                   const period = formData.timeOfBirth?.match(/(AM|PM)$/i)?.[0] || 'AM';
-                  const mm = parts[1] || '00';
-                  const ss = parts[2] || '00';
+                  const mm = parts[1] || '';
+                  const ss = parts[2] || '';
                   updateFormData({ timeOfBirth: `${val}:${mm}:${ss} ${period}` });
                 }}
                 placeholder="HH"
@@ -189,15 +189,15 @@ export const HoroscopeDetailsStep = ({
                 inputMode="numeric"
                 value={(() => {
                   const parts = formData.timeOfBirth?.replace(/ (AM|PM)$/i, '').split(':') || [];
-                  return parts[1] || '';
+                  return parts[1] && parts[1] !== '00' ? parts[1] : '';
                 })()}
                 onChange={(e) => {
                   const val = e.target.value.replace(/\D/g, '').slice(0, 2);
                   const timePart = formData.timeOfBirth?.replace(/ (AM|PM)$/i, '') || '';
                   const parts = timePart.split(':');
                   const period = formData.timeOfBirth?.match(/(AM|PM)$/i)?.[0] || 'AM';
-                  const hh = parts[0] || '00';
-                  const ss = parts[2] || '00';
+                  const hh = parts[0] || '';
+                  const ss = parts[2] || '';
                   updateFormData({ timeOfBirth: `${hh}:${val}:${ss} ${period}` });
                 }}
                 placeholder="MM"
@@ -210,15 +210,15 @@ export const HoroscopeDetailsStep = ({
                 inputMode="numeric"
                 value={(() => {
                   const parts = formData.timeOfBirth?.replace(/ (AM|PM)$/i, '').split(':') || [];
-                  return parts[2] || '';
+                  return parts[2] && parts[2] !== '00' ? parts[2] : '';
                 })()}
                 onChange={(e) => {
                   const val = e.target.value.replace(/\D/g, '').slice(0, 2);
                   const timePart = formData.timeOfBirth?.replace(/ (AM|PM)$/i, '') || '';
                   const parts = timePart.split(':');
                   const period = formData.timeOfBirth?.match(/(AM|PM)$/i)?.[0] || 'AM';
-                  const hh = parts[0] || '00';
-                  const mm = parts[1] || '00';
+                  const hh = parts[0] || '';
+                  const mm = parts[1] || '';
                   updateFormData({ timeOfBirth: `${hh}:${mm}:${val} ${period}` });
                 }}
                 placeholder="SS"
@@ -228,7 +228,7 @@ export const HoroscopeDetailsStep = ({
               <select
                 value={formData.timeOfBirth?.match(/(AM|PM)$/i)?.[0]?.toUpperCase() || 'AM'}
                 onChange={(e) => {
-                  const timePart = formData.timeOfBirth?.replace(/ (AM|PM)$/i, '') || '00:00:00';
+                  const timePart = formData.timeOfBirth?.replace(/ (AM|PM)$/i, '') || '::';
                   updateFormData({ timeOfBirth: `${timePart} ${e.target.value}` });
                 }}
                 className="h-10 px-3 rounded-md border border-input bg-background text-sm"
