@@ -162,22 +162,55 @@ export const HoroscopeDetailsStep = ({
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label className="text-sm">Time of Birth (HH:MM:SS AM/PM)</Label>
-            <div className="flex gap-2">
+            <div className="flex gap-2 items-center">
               <Input
                 type="text"
-                value={formData.timeOfBirth?.replace(/ (AM|PM)$/i, '') || ''}
+                inputMode="numeric"
+                value={formData.timeOfBirth?.split(':')[0]?.replace(/ (AM|PM)$/i, '') || ''}
                 onChange={(e) => {
+                  const val = e.target.value.replace(/\D/g, '').slice(0, 2);
+                  const parts = formData.timeOfBirth?.replace(/ (AM|PM)$/i, '').split(':') || ['', '', ''];
                   const period = formData.timeOfBirth?.match(/(AM|PM)$/i)?.[0] || 'AM';
-                  updateFormData({ timeOfBirth: `${e.target.value} ${period}` });
+                  updateFormData({ timeOfBirth: `${val}:${parts[1] || '00'}:${parts[2] || '00'} ${period}` });
                 }}
-                placeholder="HH:MM:SS"
-                className="h-10 flex-1"
-                maxLength={8}
+                placeholder="HH"
+                className="h-10 w-16 text-center"
+                maxLength={2}
+              />
+              <span className="text-muted-foreground font-medium">:</span>
+              <Input
+                type="text"
+                inputMode="numeric"
+                value={formData.timeOfBirth?.split(':')[1] || ''}
+                onChange={(e) => {
+                  const val = e.target.value.replace(/\D/g, '').slice(0, 2);
+                  const parts = formData.timeOfBirth?.replace(/ (AM|PM)$/i, '').split(':') || ['', '', ''];
+                  const period = formData.timeOfBirth?.match(/(AM|PM)$/i)?.[0] || 'AM';
+                  updateFormData({ timeOfBirth: `${parts[0] || '00'}:${val}:${parts[2] || '00'} ${period}` });
+                }}
+                placeholder="MM"
+                className="h-10 w-16 text-center"
+                maxLength={2}
+              />
+              <span className="text-muted-foreground font-medium">:</span>
+              <Input
+                type="text"
+                inputMode="numeric"
+                value={formData.timeOfBirth?.split(':')[2]?.replace(/ (AM|PM)$/i, '') || ''}
+                onChange={(e) => {
+                  const val = e.target.value.replace(/\D/g, '').slice(0, 2);
+                  const parts = formData.timeOfBirth?.replace(/ (AM|PM)$/i, '').split(':') || ['', '', ''];
+                  const period = formData.timeOfBirth?.match(/(AM|PM)$/i)?.[0] || 'AM';
+                  updateFormData({ timeOfBirth: `${parts[0] || '00'}:${parts[1] || '00'}:${val} ${period}` });
+                }}
+                placeholder="SS"
+                className="h-10 w-16 text-center"
+                maxLength={2}
               />
               <select
                 value={formData.timeOfBirth?.match(/(AM|PM)$/i)?.[0]?.toUpperCase() || 'AM'}
                 onChange={(e) => {
-                  const time = formData.timeOfBirth?.replace(/ (AM|PM)$/i, '') || '';
+                  const time = formData.timeOfBirth?.replace(/ (AM|PM)$/i, '') || '00:00:00';
                   updateFormData({ timeOfBirth: `${time} ${e.target.value}` });
                 }}
                 className="h-10 px-3 rounded-md border border-input bg-background text-sm"
