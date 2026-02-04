@@ -166,12 +166,18 @@ export const HoroscopeDetailsStep = ({
               <Input
                 type="text"
                 inputMode="numeric"
-                value={formData.timeOfBirth?.split(':')[0]?.replace(/ (AM|PM)$/i, '') || ''}
+                value={(() => {
+                  const parts = formData.timeOfBirth?.replace(/ (AM|PM)$/i, '').split(':') || [];
+                  return parts[0] || '';
+                })()}
                 onChange={(e) => {
                   const val = e.target.value.replace(/\D/g, '').slice(0, 2);
-                  const parts = formData.timeOfBirth?.replace(/ (AM|PM)$/i, '').split(':') || ['', '', ''];
+                  const timePart = formData.timeOfBirth?.replace(/ (AM|PM)$/i, '') || '';
+                  const parts = timePart.split(':');
                   const period = formData.timeOfBirth?.match(/(AM|PM)$/i)?.[0] || 'AM';
-                  updateFormData({ timeOfBirth: `${val}:${parts[1] || '00'}:${parts[2] || '00'} ${period}` });
+                  const mm = parts[1] || '00';
+                  const ss = parts[2] || '00';
+                  updateFormData({ timeOfBirth: `${val}:${mm}:${ss} ${period}` });
                 }}
                 placeholder="HH"
                 className="h-10 w-16 text-center"
@@ -181,12 +187,18 @@ export const HoroscopeDetailsStep = ({
               <Input
                 type="text"
                 inputMode="numeric"
-                value={formData.timeOfBirth?.split(':')[1] || ''}
+                value={(() => {
+                  const parts = formData.timeOfBirth?.replace(/ (AM|PM)$/i, '').split(':') || [];
+                  return parts[1] || '';
+                })()}
                 onChange={(e) => {
                   const val = e.target.value.replace(/\D/g, '').slice(0, 2);
-                  const parts = formData.timeOfBirth?.replace(/ (AM|PM)$/i, '').split(':') || ['', '', ''];
+                  const timePart = formData.timeOfBirth?.replace(/ (AM|PM)$/i, '') || '';
+                  const parts = timePart.split(':');
                   const period = formData.timeOfBirth?.match(/(AM|PM)$/i)?.[0] || 'AM';
-                  updateFormData({ timeOfBirth: `${parts[0] || '00'}:${val}:${parts[2] || '00'} ${period}` });
+                  const hh = parts[0] || '00';
+                  const ss = parts[2] || '00';
+                  updateFormData({ timeOfBirth: `${hh}:${val}:${ss} ${period}` });
                 }}
                 placeholder="MM"
                 className="h-10 w-16 text-center"
@@ -196,12 +208,18 @@ export const HoroscopeDetailsStep = ({
               <Input
                 type="text"
                 inputMode="numeric"
-                value={formData.timeOfBirth?.split(':')[2]?.replace(/ (AM|PM)$/i, '') || ''}
+                value={(() => {
+                  const parts = formData.timeOfBirth?.replace(/ (AM|PM)$/i, '').split(':') || [];
+                  return parts[2] || '';
+                })()}
                 onChange={(e) => {
                   const val = e.target.value.replace(/\D/g, '').slice(0, 2);
-                  const parts = formData.timeOfBirth?.replace(/ (AM|PM)$/i, '').split(':') || ['', '', ''];
+                  const timePart = formData.timeOfBirth?.replace(/ (AM|PM)$/i, '') || '';
+                  const parts = timePart.split(':');
                   const period = formData.timeOfBirth?.match(/(AM|PM)$/i)?.[0] || 'AM';
-                  updateFormData({ timeOfBirth: `${parts[0] || '00'}:${parts[1] || '00'}:${val} ${period}` });
+                  const hh = parts[0] || '00';
+                  const mm = parts[1] || '00';
+                  updateFormData({ timeOfBirth: `${hh}:${mm}:${val} ${period}` });
                 }}
                 placeholder="SS"
                 className="h-10 w-16 text-center"
@@ -210,8 +228,8 @@ export const HoroscopeDetailsStep = ({
               <select
                 value={formData.timeOfBirth?.match(/(AM|PM)$/i)?.[0]?.toUpperCase() || 'AM'}
                 onChange={(e) => {
-                  const time = formData.timeOfBirth?.replace(/ (AM|PM)$/i, '') || '00:00:00';
-                  updateFormData({ timeOfBirth: `${time} ${e.target.value}` });
+                  const timePart = formData.timeOfBirth?.replace(/ (AM|PM)$/i, '') || '00:00:00';
+                  updateFormData({ timeOfBirth: `${timePart} ${e.target.value}` });
                 }}
                 className="h-10 px-3 rounded-md border border-input bg-background text-sm"
               >
