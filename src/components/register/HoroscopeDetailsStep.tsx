@@ -161,15 +161,31 @@ export const HoroscopeDetailsStep = ({
       <div className="space-y-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="space-y-2">
-            <Label className="text-sm">Time of Birth (HH:MM:SS)</Label>
-            <Input
-              type="time"
-              step="1"
-              value={formData.timeOfBirth}
-              onChange={(e) => updateFormData({ timeOfBirth: e.target.value })}
-              placeholder="HH:MM:SS"
-              className="h-10"
-            />
+            <Label className="text-sm">Time of Birth (HH:MM:SS AM/PM)</Label>
+            <div className="flex gap-2">
+              <Input
+                type="text"
+                value={formData.timeOfBirth?.replace(/ (AM|PM)$/i, '') || ''}
+                onChange={(e) => {
+                  const period = formData.timeOfBirth?.match(/(AM|PM)$/i)?.[0] || 'AM';
+                  updateFormData({ timeOfBirth: `${e.target.value} ${period}` });
+                }}
+                placeholder="HH:MM:SS"
+                className="h-10 flex-1"
+                maxLength={8}
+              />
+              <select
+                value={formData.timeOfBirth?.match(/(AM|PM)$/i)?.[0]?.toUpperCase() || 'AM'}
+                onChange={(e) => {
+                  const time = formData.timeOfBirth?.replace(/ (AM|PM)$/i, '') || '';
+                  updateFormData({ timeOfBirth: `${time} ${e.target.value}` });
+                }}
+                className="h-10 px-3 rounded-md border border-input bg-background text-sm"
+              >
+                <option value="AM">AM</option>
+                <option value="PM">PM</option>
+              </select>
+            </div>
           </div>
 
           <div className="space-y-2">
