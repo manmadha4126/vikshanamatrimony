@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/select";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
-import { Save, User, Heart, MapPin, GraduationCap, Users } from "lucide-react";
+import { Save, User, Heart, MapPin, GraduationCap, Users, Camera, Plus, X, Loader2 } from "lucide-react";
 import {
   profileForOptions,
   genderOptions,
@@ -74,6 +74,12 @@ interface Profile {
   photo_url: string | null;
 }
 
+interface ProfilePhoto {
+  id: string;
+  photo_url: string;
+  display_order: number;
+}
+
 interface EditProfileDialogProps {
   profile: Profile | null;
   open: boolean;
@@ -89,16 +95,154 @@ export const EditProfileDialog = ({
 }: EditProfileDialogProps) => {
   const [formData, setFormData] = useState<Partial<Profile>>({});
   const [saving, setSaving] = useState(false);
+  const [photos, setPhotos] = useState<ProfilePhoto[]>([]);
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
   useEffect(() => {
     if (profile) {
       setFormData({ ...profile });
+      fetchPhotos(profile.id);
     }
   }, [profile]);
 
+  const fetchPhotos = async (profileId: string) => {
+    const { data, error } = await supabase
+      .from("profile_photos")
+      .select("*")
+      .eq("profile_id", profileId)
+      .order("display_order", { ascending: true });
+
+    if (!error && data) {
+      setPhotos(data);
+    }
+  };
+
   const handleChange = (field: keyof Profile, value: string | null) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!profile) return;
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    setUploadingPhoto(true);
+    try {
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        
+        if (file.size > 5 * 1024 * 1024) {
+          toast({
+            title: "File too large",
+            description: `${file.name} is larger than 5MB`,
+            variant: "destructive",
+          });
+          continue;
+        }
+
+        const fileExt = file.name.split(".").pop();
+        const fileName = `${profile.profile_id}_${Date.now()}_${i}.${fileExt}`;
+        const filePath = `photos/${fileName}`;
+
+        const { error: uploadError } = await supabase.storage
+          .from("profile-photos")
+          .upload(filePath, file);
+
+        if (uploadError) throw uploadError;
+
+        const { data: urlData } = supabase.storage
+          .from("profile-photos")
+          .getPublicUrl(filePath);
+
+        const { error: insertError } = await supabase
+          .from("profile_photos")
+          .insert({
+            profile_id: profile.id,
+            photo_url: urlData.publicUrl,
+            display_order: photos.length + i,
+          });
+
+        if (insertError) throw insertError;
+      }
+
+      await fetchPhotos(profile.id);
+      toast({
+        title: "Photos Uploaded",
+        description: "Photos have been added successfully.",
+      });
+    } catch (error: any) {
+      console.error("Error uploading photo:", error);
+      toast({
+        title: "Upload Failed",
+        description: error.message || "Failed to upload photo",
+        variant: "destructive",
+      });
+    } finally {
+      setUploadingPhoto(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+    }
+  };
+
+  const handleDeletePhoto = async (photoId: string, photoUrl: string) => {
+    try {
+      // Extract file path from URL
+      const urlParts = photoUrl.split("/");
+      const fileName = urlParts[urlParts.length - 1];
+      const filePath = `photos/${fileName}`;
+
+      // Delete from storage
+      await supabase.storage.from("profile-photos").remove([filePath]);
+
+      // Delete from database
+      const { error } = await supabase
+        .from("profile_photos")
+        .delete()
+        .eq("id", photoId);
+
+      if (error) throw error;
+
+      setPhotos((prev) => prev.filter((p) => p.id !== photoId));
+      toast({
+        title: "Photo Deleted",
+        description: "Photo has been removed.",
+      });
+    } catch (error: any) {
+      console.error("Error deleting photo:", error);
+      toast({
+        title: "Delete Failed",
+        description: error.message || "Failed to delete photo",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleSetPrimaryPhoto = async (photoUrl: string) => {
+    if (!profile) return;
+    try {
+      const { error } = await supabase
+        .from("profiles")
+        .update({ photo_url: photoUrl })
+        .eq("id", profile.id);
+
+      if (error) throw error;
+
+      setFormData((prev) => ({ ...prev, photo_url: photoUrl }));
+      toast({
+        title: "Primary Photo Updated",
+        description: "This photo is now the primary profile photo.",
+      });
+    } catch (error: any) {
+      console.error("Error setting primary photo:", error);
+      toast({
+        title: "Error",
+        description: "Failed to set primary photo",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleSave = async () => {
@@ -175,6 +319,70 @@ export const EditProfileDialog = ({
 
         <ScrollArea className="max-h-[calc(90vh-180px)] px-6">
           <div className="space-y-6 py-4">
+            {/* Profile Photos */}
+            <div className="space-y-4">
+              <h4 className="font-semibold text-maroon flex items-center gap-2">
+                <Camera className="w-4 h-4" />
+                Profile Photos
+              </h4>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                multiple
+                onChange={handlePhotoUpload}
+                className="hidden"
+              />
+              <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3">
+                {photos.map((photo) => (
+                  <div key={photo.id} className="relative group">
+                    <img
+                      src={photo.photo_url}
+                      alt="Profile"
+                      className={`w-full h-24 object-cover rounded-lg cursor-pointer transition-all ${
+                        formData.photo_url === photo.photo_url
+                          ? "ring-2 ring-primary"
+                          : "hover:ring-2 hover:ring-primary/50"
+                      }`}
+                      onClick={() => handleSetPrimaryPhoto(photo.photo_url)}
+                      title="Click to set as primary"
+                    />
+                    {formData.photo_url === photo.photo_url && (
+                      <span className="absolute bottom-1 left-1 bg-primary text-primary-foreground text-[10px] px-1 rounded">
+                        Primary
+                      </span>
+                    )}
+                    <button
+                      onClick={() => handleDeletePhoto(photo.id, photo.photo_url)}
+                      className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </div>
+                ))}
+                <div
+                  onClick={() => !uploadingPhoto && fileInputRef.current?.click()}
+                  className={`h-24 rounded-lg border-2 border-dashed border-muted-foreground/30 flex flex-col items-center justify-center cursor-pointer hover:border-primary/50 transition-colors bg-muted/50 ${
+                    uploadingPhoto ? "opacity-50 cursor-not-allowed" : ""
+                  }`}
+                >
+                  {uploadingPhoto ? (
+                    <Loader2 className="w-6 h-6 text-muted-foreground animate-spin" />
+                  ) : (
+                    <>
+                      <Plus className="w-6 h-6 text-muted-foreground" />
+                      <span className="text-[10px] text-muted-foreground mt-1">Add Photo</span>
+                    </>
+                  )}
+                </div>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Click on a photo to set it as primary. Max 5MB per photo.
+              </p>
+            </div>
+
+            <Separator />
+
             {/* Basic Details */}
             <div className="space-y-4">
               <h4 className="font-semibold text-maroon flex items-center gap-2">
