@@ -40,7 +40,7 @@ const Register = () => {
     submitPersonalDetails,
     submitFamilyDetails,
     submitHoroscopeDetails,
-    uploadPhoto,
+    uploadPhotos,
     completeRegistration,
   } = useRegistration();
 
@@ -99,7 +99,7 @@ const Register = () => {
       case 6:
         return (
           <PhotoUploadStep
-            onUpload={uploadPhoto}
+            onUpload={uploadPhotos}
             onBack={prevStep}
             onSkip={nextStep}
             isLoading={isLoading}

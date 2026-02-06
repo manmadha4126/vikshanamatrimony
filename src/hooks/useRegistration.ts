@@ -291,43 +291,81 @@ export const useRegistration = () => {
     }
   };
 
-  const uploadPhoto = async (file: File) => {
+  const uploadPhotos = async (files: File[]) => {
     setIsLoading(true);
     try {
-      const fileExt = file.name.split(".").pop();
-      const fileName = `${profileId}.${fileExt}`;
-      const filePath = `photos/${fileName}`;
+      // First, get the profile's UUID (id) using profile_id
+      const { data: profileData, error: profileError } = await supabase
+        .from("profiles")
+        .select("id")
+        .eq("profile_id", profileId)
+        .single();
 
-      const { error: uploadError } = await supabase.storage
-        .from("profile-photos")
-        .upload(filePath, file, { upsert: true });
+      if (profileError || !profileData) throw new Error("Profile not found");
 
-      if (uploadError) throw uploadError;
+      const profileUuid = profileData.id;
+      let primaryPhotoUrl = "";
 
-      const { data: urlData } = supabase.storage
-        .from("profile-photos")
-        .getPublicUrl(filePath);
+      // Upload each file
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const fileExt = file.name.split(".").pop();
+        const fileName = `${profileId}_${i}_${Date.now()}.${fileExt}`;
+        const filePath = `photos/${fileName}`;
 
-      const photoUrl = urlData.publicUrl;
-      
+        const { error: uploadError } = await supabase.storage
+          .from("profile-photos")
+          .upload(filePath, file, { upsert: true });
+
+        if (uploadError) throw uploadError;
+
+        const { data: urlData } = supabase.storage
+          .from("profile-photos")
+          .getPublicUrl(filePath);
+
+        const photoUrl = urlData.publicUrl;
+
+        // Set first photo as primary
+        if (i === 0) {
+          primaryPhotoUrl = photoUrl;
+        }
+
+        // Insert into profile_photos table
+        const { error: insertError } = await supabase
+          .from("profile_photos")
+          .insert({
+            profile_id: profileUuid,
+            photo_url: photoUrl,
+            display_order: i,
+          });
+
+        if (insertError) throw insertError;
+      }
+
+      // Update profile with primary photo URL
       const { error: updateError } = await supabase
         .from("profiles")
         .update({ 
-          photo_url: photoUrl,
+          photo_url: primaryPhotoUrl,
           registration_step: 6 
         })
         .eq("profile_id", profileId);
 
       if (updateError) throw updateError;
 
-      updateFormData({ photoUrl });
-      toast.success("Photo uploaded successfully!");
+      updateFormData({ photoUrl: primaryPhotoUrl });
+      toast.success(`${files.length} photo${files.length > 1 ? "s" : ""} uploaded successfully!`);
       nextStep();
     } catch (error: any) {
-      toast.error(error.message || "Failed to upload photo");
+      toast.error(error.message || "Failed to upload photos");
     } finally {
       setIsLoading(false);
     }
+  };
+
+  // Keep backward compatibility
+  const uploadPhoto = async (file: File) => {
+    await uploadPhotos([file]);
   };
 
   const completeRegistration = async () => {
@@ -365,6 +403,7 @@ export const useRegistration = () => {
     submitFamilyDetails,
     submitHoroscopeDetails,
     uploadPhoto,
+    uploadPhotos,
     completeRegistration,
     setCurrentStep,
   };

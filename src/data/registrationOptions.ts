@@ -737,6 +737,8 @@ export const occupationOptions = [
   "Cook / Chef (Domestic)",
   // Business & Entrepreneurship
   "Business Owner",
+  "Businessman",
+  "Businesswoman",
   "Entrepreneur",
   "Startup Founder",
   "Franchise Owner",
