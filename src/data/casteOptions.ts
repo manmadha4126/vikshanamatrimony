@@ -1,76 +1,39 @@
 export const castesByReligion: Record<string, string[]> = {
   "Hindu": [
-    "Brahmin",
-    "Rajput",
-    "Maratha",
-    "Thakur",
-    "Kshatriya Raju",
-    "Agarwal",
-    "Gupta",
-    "Khandelwal",
-    "Maheshwari",
-    "Jaiswal",
-    "Baniya",
-    "Arora",
-    "Khatri",
     "Reddy",
-    "Kamma",
+    "Balija",
     "Kapu",
-    "Balija Naidu",
-    "Velama Naidu",
-    "Chettiar",
-    "Nair",
-    "Pillai",
-    "Mudaliar",
-    "Gounder",
-    "Thevar",
-    "Nadar",
-    "Naicker",
-    "Vellalar",
-    "Vanniyar",
-    "Devar / Mukkulathor",
-    "Adi Dravidar",
-    "Patel",
-    "Jat",
-    "Gujjar",
-    "Yadav",
-    "Kurmi",
-    "Lodhi",
-    "Saini",
-    "Mali",
-    "Teli",
-    "Lohar",
-    "Sonar / Sunar",
-    "Kumhar",
-    "Nai / Nayi",
-    "Dhobi",
-    "Darji / Tailor",
-    "Kayastha",
-    "Lingayat",
-    "Khandayat",
-    "Bhumihar",
-    "Baidya",
-    "Mahishya",
-    "Namasudra",
-    "Rajbanshi",
-    "Koch",
-    "Vishwakarma",
+    "Kamma",
+    "Kshtriyas",
     "Padmashali",
-    "Devanga",
-    "Sali / Salvi",
-    "Koshti",
-    "Rangari",
-    "Goud",
-    "Meena",
-    "Bhil",
-    "Gond",
-    "Oraon",
-    "Munda",
-    "Santhal",
-    "Khasi",
-    "Garo",
-    "Mizo",
-    "Naga",
+    "Yadavas",
+    "Vishwa Brahmins",
+    "Rajaka",
+    "Nai Brahmins",
+    "Brahmin",
+    "Arya Vysya",
+    "Mudaliar",
+    "Gandla",
+    "Velama",
+    "SC Mala",
+    "Caste No Bar",
+    "Gowda",
+    "Vaddera",
+    "ST Erukula",
+    "Besta",
+    "Ediga",
+    "Adi Dravida",
+    "Agnikula Kshatriya",
+    "Chettiars",
+    "Bhatraju",
+    "Inter Caste",
+    "Kalinga Vysyas",
+    "Kapu Reddy",
+    "Kummari",
+    "Kuruba",
+    "Lingayat",
+    "Thogata Veera Kshatriya",
+    "Valmiki Boya",
     "Other Hindu"
   ],
   "Muslim": [
@@ -181,128 +144,43 @@ export const castesByReligion: Record<string, string[]> = {
 };
 
 export const subCastesByCaste: Record<string, string[]> = {
+  // Hindu - Reddy
+  "Reddy": [
+    "Pakanati",
+    "Malati",
+    "Reddys",
+    "Other Reddy"
+  ],
+  // Hindu - Balija
+  "Balija": [
+    "Setty Balija",
+    "Balija Naidu",
+    "Gajula Balija",
+    "Other Balija"
+  ],
+  // Hindu - Kapu
+  "Kapu": [
+    "Munnuru Kapu",
+    "Thurpu Kapu",
+    "Telaga",
+    "Other Kapu"
+  ],
+  // Hindu - Kamma
+  "Kamma": [
+    "Chowdary",
+    "Naidu",
+    "Other Kamma"
+  ],
   // Hindu - Brahmin
   "Brahmin": [
     "Iyer",
     "Iyengar",
     "Namboodiri",
     "Saraswat",
-    "Kanyakubja",
-    "Maithil",
-    "Gaur",
-    "Konkanastha",
-    "Deshastha",
-    "Havyaka",
-    "Hoysala Karnataka",
     "Smartha",
-    "Vadama",
-    "Vathima",
-    "Ashtasahasram",
-    "Chitpavan",
-    "Karhade",
-    "Devrukhe",
-    "Thanjavur",
-    "Hebbar",
-    "Mandyam",
-    "Shivalli",
-    "Sthanika",
-    "Udupi",
+    "Vaidiki",
+    "Niyogi",
     "Other Brahmin"
-  ],
-  // Hindu - Rajput
-  "Rajput": [
-    "Chauhan",
-    "Rathore",
-    "Sisodiya",
-    "Parmar",
-    "Solanki",
-    "Bundela",
-    "Chandela",
-    "Gahlot",
-    "Kachwaha",
-    "Tomar",
-    "Panwar",
-    "Bhati",
-    "Jhala",
-    "Gohil",
-    "Jadeja",
-    "Dogra",
-    "Katoch",
-    "Bais",
-    "Chandel",
-    "Other Rajput"
-  ],
-  // Hindu - Maratha
-  "Maratha": [
-    "96 Kuli Maratha",
-    "Kunbi Maratha",
-    "CKP (Chandraseniya Kayastha Prabhu)",
-    "Deshmukh",
-    "Patil",
-    "More",
-    "Shinde",
-    "Jadhav",
-    "Pawar",
-    "Bhonsle",
-    "Chavan",
-    "Gaikwad",
-    "Holkar",
-    "Other Maratha"
-  ],
-  // Hindu - Reddy
-  "Reddy": [
-    "Panta Reddy",
-    "Deshmukh Reddy",
-    "Motati Reddy",
-    "Kapu Reddy",
-    "Pakanati Reddy",
-    "Veerashaiva Reddy",
-    "Gajula Reddy",
-    "Boya Reddy",
-    "Pedakanti Reddy",
-    "Other Reddy"
-  ],
-  // Hindu - Kamma
-  "Kamma": [
-    "Chowdary",
-    "Naidu",
-    "Chowdhary",
-    "Rao",
-    "Setty",
-    "Other Kamma"
-  ],
-  // Hindu - Chettiar
-  "Chettiar": [
-    "Nattukotai Chettiar",
-    "Devanga Chettiar",
-    "Kaikkolars",
-    "Beeri Chettiar",
-    "Arya Vysya",
-    "Nagarathar",
-    "Other Chettiar"
-  ],
-  // Hindu - Nair
-  "Nair": [
-    "Menon",
-    "Pillai",
-    "Panicker",
-    "Kurup",
-    "Nambiar",
-    "Unnithan",
-    "Kaimal",
-    "Kartha",
-    "Marar",
-    "Pothuval",
-    "Thampi",
-    "Other Nair"
-  ],
-  // Hindu - Pillai
-  "Pillai": [
-    "Vellalar Pillai",
-    "Nair Pillai",
-    "Saiva Pillai",
-    "Agamudayar Pillai",
-    "Other Pillai"
   ],
   // Hindu - Mudaliar
   "Mudaliar": [
@@ -310,126 +188,24 @@ export const subCastesByCaste: Record<string, string[]> = {
     "Agamudayar Mudaliar",
     "Thuluva Vellalar",
     "Arcot Mudaliar",
-    "Isai Vellalar",
-    "Karkarthar",
-    "Saiva Mudaliar",
     "Other Mudaliar"
-  ],
-  // Hindu - Gounder
-  "Gounder": [
-    "Kongu Vellalar",
-    "Vanniyar Gounder",
-    "Kurumba Gounder",
-    "Nattu Gounder",
-    "Vettuva Gounder",
-    "Urali Gounder",
-    "Other Gounder"
-  ],
-  // Hindu - Thevar
-  "Thevar": [
-    "Maravar",
-    "Kallar",
-    "Agamudayar",
-    "Mukkulathor",
-    "Piramalai Kallar",
-    "Other Thevar"
-  ],
-  // Hindu - Nadar
-  "Nadar": [
-    "Gramani Nadar",
-    "Nelamaikaran",
-    "Nattathi Nadar",
-    "Karukku Nadar",
-    "Other Nadar"
-  ],
-  // Hindu - Patel
-  "Patel": [
-    "Leva Patel",
-    "Kadva Patel",
-    "Anjana Patel",
-    "Leuva Patidar",
-    "Kadva Patidar",
-    "Chaudhary Patel",
-    "Other Patel"
-  ],
-  // Hindu - Yadav
-  "Yadav": [
-    "Ahir",
-    "Gowda",
-    "Konar",
-    "Idayar",
-    "Goala",
-    "Gavli",
-    "Other Yadav"
-  ],
-  // Hindu - Kayastha
-  "Kayastha": [
-    "Chitraguptavanshi",
-    "CKP (Chandraseniya Kayastha Prabhu)",
-    "Bengali Kayastha",
-    "North Indian Kayastha",
-    "Mathur",
-    "Saxena",
-    "Srivastava",
-    "Nigam",
-    "Bhatnagar",
-    "Karan",
-    "Other Kayastha"
   ],
   // Hindu - Lingayat
   "Lingayat": [
     "Veerashaiva",
     "Jangama",
     "Panchamasali",
-    "Banajiga",
-    "Sadar",
-    "Ganiga",
-    "Reddy Lingayat",
     "Other Lingayat"
   ],
-  // Hindu - Jat
-  "Jat": [
-    "Hindu Jat",
-    "Jat Sikh",
-    "Dahiya",
-    "Sangwan",
-    "Malik",
-    "Dhankar",
-    "Ahlawat",
-    "Hooda",
-    "Deswal",
-    "Other Jat"
+  // Hindu - Chettiars
+  "Chettiars": [
+    "Nattukotai Chettiar",
+    "Devanga Chettiar",
+    "Arya Vysya",
+    "Other Chettiar"
   ],
-  // Hindu - Agarwal
-  "Agarwal": [
-    "Agarwal Baniya",
-    "Marwari Agarwal",
-    "Goel",
-    "Gupta Agarwal",
-    "Mittal",
-    "Singhal",
-    "Bansal",
-    "Jindal",
-    "Mangal",
-    "Other Agarwal"
-  ],
-  // Hindu - Gupta
-  "Gupta": [
-    "Vaish Gupta",
-    "Baniya Gupta",
-    "Agarwal Gupta",
-    "Rastogi",
-    "Other Gupta"
-  ],
-  // Hindu - Vishwakarma
-  "Vishwakarma": [
-    "Sutar / Carpenter",
-    "Lohar / Blacksmith",
-    "Sonar / Goldsmith",
-    "Kansari / Bronzesmith",
-    "Shilpi / Sculptor",
-    "Other Vishwakarma"
-  ],
+  // Default for others
+  "Other Hindu": ["Other"],
   // Muslim - Sunni
   "Sunni": [
     "Hanafi",
@@ -606,7 +382,6 @@ export const subCastesByCaste: Record<string, string[]> = {
     "Other Shwetambar"
   ],
   // Default for others
-  "Other Hindu": ["Other"],
   "Other Muslim": ["Other"],
   "Other Christian": ["Other"],
   "Other Sikh": ["Other"],
