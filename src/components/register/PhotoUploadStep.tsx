@@ -25,8 +25,8 @@ export const PhotoUploadStep = ({ onUpload, onBack, onSkip, isLoading }: PhotoUp
     const newPhotos: PhotoPreview[] = [];
     
     Array.from(files).forEach((file) => {
-      if (file.size > 5 * 1024 * 1024) {
-        alert(`File "${file.name}" is larger than 5MB and was skipped`);
+      if (file.size > 10 * 1024 * 1024) {
+        alert(`File "${file.name}" is larger than 10MB and was skipped`);
         return;
       }
       
@@ -152,7 +152,7 @@ export const PhotoUploadStep = ({ onUpload, onBack, onSkip, isLoading }: PhotoUp
 
       <div className="text-center text-sm text-muted-foreground">
         <p>Upload clear photos of yourself</p>
-        <p>Max file size: 5MB each • Up to 5 photos</p>
+        <p>Max file size: 10MB each • Up to 5 photos</p>
         <p className="text-xs mt-1">Click on a photo to set it as primary</p>
       </div>
 
