@@ -47,10 +47,10 @@ export const ProfilePhotosManager = ({ profileId, onPhotosChange }: ProfilePhoto
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (file.size > 5 * 1024 * 1024) {
+    if (file.size > 10 * 1024 * 1024) {
       toast({
         title: "File too large",
-        description: "Please select an image under 5MB",
+        description: "Please select an image under 10MB",
         variant: "destructive",
       });
       return;
@@ -208,7 +208,7 @@ export const ProfilePhotosManager = ({ profileId, onPhotosChange }: ProfilePhoto
         )}
 
         <p className="text-xs text-muted-foreground">
-          Max file size: 5MB. Supported formats: JPG, PNG, WebP
+          Max file size: 10MB. Supported formats: JPG, PNG, WebP
         </p>
       </CardContent>
     </Card>
