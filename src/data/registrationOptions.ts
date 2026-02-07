@@ -226,6 +226,7 @@ export const educationOptions = [
   // Postgraduate - Engineering & Technology
   "M.E. (Master of Engineering)",
   "M.Tech (Master of Technology)",
+  "MS - Engineering",
   "M.Arch (Master of Architecture)",
   "M.Plan (Master of Planning)",
   // Postgraduate - Computer & IT
