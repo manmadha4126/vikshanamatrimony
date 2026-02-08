@@ -1,9 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Shield, Lock, Phone, Mail, Crown, Star, Gem, Check, Sparkles, Clock, Users, MessageSquare, ThumbsUp } from 'lucide-react';
+import { ArrowLeft, Shield, Lock, Phone, Mail, Crown, Star, Gem, Check, Sparkles, Clock, Users, MessageSquare, ThumbsUp, Loader2 } from 'lucide-react';
 import PaymentModal from '@/components/subscription/PaymentModal';
 import {
   Dialog,
@@ -16,6 +16,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
+import { getPricingForCountry, formatPriceWithCurrency, type CountryPricing } from '@/data/packagePricing';
 
 type PlanType = 'gold' | 'prime_gold' | 'combo' | 'prime_combo' | 'assisted_gold' | 'assisted_prime' | 'assisted_supreme';
 type Duration = '1_month' | '3_months' | '6_months' | '1_year';
@@ -27,6 +28,7 @@ interface PlanSelection {
   durationLabel: string;
   price: number;
   category: string;
+  currency: string;
 }
 
 const AssistedSubscription = () => {
@@ -36,6 +38,36 @@ const AssistedSubscription = () => {
   const [isCallbackDialogOpen, setIsCallbackDialogOpen] = useState(false);
   const [callbackForm, setCallbackForm] = useState({ name: '', phone: '', preferredTime: 'morning' });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [userCountry, setUserCountry] = useState<string | null>(null);
+  const [pricing, setPricing] = useState<CountryPricing>(getPricingForCountry(null));
+  const [isLoadingCountry, setIsLoadingCountry] = useState(true);
+
+  // Fetch user's country from their profile
+  useEffect(() => {
+    const fetchUserCountry = async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('country')
+            .eq('user_id', user.id)
+            .single();
+          
+          if (profile?.country) {
+            setUserCountry(profile.country);
+            setPricing(getPricingForCountry(profile.country));
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching user country:', error);
+      } finally {
+        setIsLoadingCountry(false);
+      }
+    };
+
+    fetchUserCountry();
+  }, []);
 
   const basicPlans: Record<string, {
     name: string;
@@ -55,21 +87,6 @@ const AssistedSubscription = () => {
     }
   };
 
-  const basicPricing: Record<string, Record<Duration, number>> = {
-    gold: {
-      '1_month': 2000,
-      '3_months': 5000,
-      '6_months': 6500,
-      '1_year': 8000
-    },
-    prime_gold: {
-      '1_month': 3000,
-      '3_months': 6000,
-      '6_months': 7500,
-      '1_year': 9500
-    }
-  };
-
   const comboPlans: Record<string, {
     name: string;
     icon: typeof Gem;
@@ -86,21 +103,6 @@ const AssistedSubscription = () => {
       icon: Sparkles,
       color: 'from-pink-500 to-rose-600',
       badge: 'Popular'
-    }
-  };
-
-  const comboPricing: Record<string, Record<Duration, number>> = {
-    combo: {
-      '1_month': 2500,
-      '3_months': 6000,
-      '6_months': 7500,
-      '1_year': 9500
-    },
-    prime_combo: {
-      '1_month': 3500,
-      '3_months': 7500,
-      '6_months': 8500,
-      '1_year': 10000
     }
   };
 
@@ -131,27 +133,6 @@ const AssistedSubscription = () => {
     }
   };
 
-  const assistedPricing: Record<string, Record<Duration, number>> = {
-    assisted_gold: {
-      '1_month': 15000,
-      '3_months': 25000,
-      '6_months': 40000,
-      '1_year': 80000
-    },
-    assisted_prime: {
-      '1_month': 30000,
-      '3_months': 35000,
-      '6_months': 42000,
-      '1_year': 69000
-    },
-    assisted_supreme: {
-      '1_month': 35000,
-      '3_months': 41900,
-      '6_months': 52200,
-      '1_year': 90000
-    }
-  };
-
   const durations: {
     key: Duration;
     label: string;
@@ -178,7 +159,7 @@ const AssistedSubscription = () => {
     }));
   };
 
-  const handlePayNow = (planKey: PlanType, planName: string, category: string, pricing: Record<Duration, number>) => {
+  const handlePayNow = (planKey: PlanType, planName: string, category: string, planPricing: Record<string, number>) => {
     const duration = selectedDurations[planKey] || '1_month';
     const durationLabel = durations.find(d => d.key === duration)?.label || '1 Month';
     setSelectedPlan({
@@ -186,18 +167,15 @@ const AssistedSubscription = () => {
       planName,
       duration,
       durationLabel,
-      price: pricing[duration],
-      category
+      price: planPricing[duration],
+      category,
+      currency: pricing.currency
     });
     setIsPaymentModalOpen(true);
   };
 
   const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('en-IN', {
-      style: 'currency',
-      currency: 'INR',
-      maximumFractionDigits: 0
-    }).format(price);
+    return formatPriceWithCurrency(price, pricing.currency, pricing.currencySymbol);
   };
 
   const handleCallbackSubmit = async () => {
@@ -323,11 +301,16 @@ const AssistedSubscription = () => {
         </section>
 
         {/* Security Badge */}
-        <div className="flex justify-center">
+        <div className="flex flex-col sm:flex-row justify-center items-center gap-3">
           <div className="flex items-center gap-2 bg-green-50 dark:bg-green-950/30 text-green-700 dark:text-green-400 px-4 py-2 rounded-full text-sm font-medium">
             <Lock className="h-4 w-4" />
             <span>100% Secure Payments • SSL Protected • No Card Data Stored</span>
           </div>
+          {userCountry && (
+            <Badge variant="outline" className="text-sm">
+              Prices in {pricing.currency} ({pricing.currencySymbol})
+            </Badge>
+          )}
         </div>
 
         {/* Basic Plans Section */}
@@ -339,7 +322,7 @@ const AssistedSubscription = () => {
 
           <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
             {Object.entries(basicPlans).map(([key, plan]) => {
-              const pricing = basicPricing[key];
+              const planPricing = pricing.basic[key as keyof typeof pricing.basic];
               const duration = selectedDurations[key] || '1_month';
               const Icon = plan.icon;
               return (
@@ -368,10 +351,10 @@ const AssistedSubscription = () => {
                       ))}
                     </div>
                     <div className="text-center py-4">
-                      <span className="text-3xl font-bold text-foreground">{formatPrice(pricing[duration])}</span>
+                      <span className="text-3xl font-bold text-foreground">{formatPrice(planPricing[duration])}</span>
                       <span className="text-muted-foreground ml-2">/ {durations.find(d => d.key === duration)?.label}</span>
                     </div>
-                    <Button className="w-full gradient-primary text-lg py-6" onClick={() => handlePayNow(key as PlanType, plan.name, 'Basic', pricing)}>
+                    <Button className="w-full gradient-primary text-lg py-6" onClick={() => handlePayNow(key as PlanType, plan.name, 'Basic', planPricing)}>
                       Pay Now
                     </Button>
                   </CardContent>
@@ -390,7 +373,7 @@ const AssistedSubscription = () => {
 
           <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
             {Object.entries(comboPlans).map(([key, plan]) => {
-              const pricing = comboPricing[key];
+              const planPricing = pricing.combo[key as keyof typeof pricing.combo];
               const duration = selectedDurations[key] || '1_month';
               const Icon = plan.icon;
               return (
@@ -420,10 +403,10 @@ const AssistedSubscription = () => {
                       ))}
                     </div>
                     <div className="text-center py-4">
-                      <span className="text-3xl font-bold text-foreground">{formatPrice(pricing[duration])}</span>
+                      <span className="text-3xl font-bold text-foreground">{formatPrice(planPricing[duration])}</span>
                       <span className="text-muted-foreground ml-2">/ {durations.find(d => d.key === duration)?.label}</span>
                     </div>
-                    <Button className="w-full gradient-primary text-lg py-6" onClick={() => handlePayNow(key as PlanType, plan.name, 'Combo', pricing)}>
+                    <Button className="w-full gradient-primary text-lg py-6" onClick={() => handlePayNow(key as PlanType, plan.name, 'Combo', planPricing)}>
                       Pay Now
                     </Button>
                   </CardContent>
@@ -445,7 +428,7 @@ const AssistedSubscription = () => {
 
             <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
               {Object.entries(assistedPlans).map(([key, plan]) => {
-                const pricing = assistedPricing[key];
+                const planPricing = pricing.assisted[key as keyof typeof pricing.assisted];
                 const duration = selectedDurations[key] || '1_month';
                 const Icon = plan.icon;
                 const isRecommended = 'recommended' in plan && plan.recommended;
@@ -481,7 +464,7 @@ const AssistedSubscription = () => {
                       </div>
                       <div className="text-center py-4">
                         <div className="flex flex-col items-center gap-1">
-                          <span className="text-3xl md:text-4xl font-bold text-foreground">{formatPrice(pricing[duration])}</span>
+                          <span className="text-3xl md:text-4xl font-bold text-foreground">{formatPrice(planPricing[duration])}</span>
                           <span className="text-muted-foreground text-sm">/ {durations.find(d => d.key === duration)?.label}</span>
                         </div>
                       </div>
@@ -507,7 +490,7 @@ const AssistedSubscription = () => {
                       </ul>
                       <Button
                         className={`w-full text-lg py-6 ${isRecommended ? 'bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-700' : 'gradient-primary'}`}
-                        onClick={() => handlePayNow(key as PlanType, plan.name, 'Assisted', pricing)}
+                        onClick={() => handlePayNow(key as PlanType, plan.name, 'Assisted', planPricing)}
                       >
                         Pay Now
                       </Button>
