@@ -133,10 +133,10 @@ export const EditProfileDialog = ({
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
         
-        if (file.size > 5 * 1024 * 1024) {
+        if (file.size > 10 * 1024 * 1024) {
           toast({
             title: "File too large",
-            description: `${file.name} is larger than 5MB`,
+            description: `${file.name} is larger than 10MB`,
             variant: "destructive",
           });
           continue;
@@ -377,7 +377,7 @@ export const EditProfileDialog = ({
                 </div>
               </div>
               <p className="text-xs text-muted-foreground">
-                Click on a photo to set it as primary. Max 5MB per photo.
+                Click on a photo to set it as primary. Max 10MB per photo.
               </p>
             </div>
 
