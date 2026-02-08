@@ -15,6 +15,7 @@ import {
   educationOptions,
   employmentOptions,
   incomeOptions,
+  incomeOptionsByCountry,
   starOptions,
 } from "@/data/registrationOptions";
 import { countryOptions, statesByCountry, citiesByState } from "@/data/locationOptions";
@@ -37,6 +38,11 @@ export const PersonalDetailsStep = ({ formData, updateFormData, onSubmit, onBack
   const subCasteOptions = formData.caste ? subCastesByCaste[formData.caste] || [] : [];
   const stateOptions = formData.country ? statesByCountry[formData.country] || [] : [];
   const cityOptions = formData.state ? citiesByState[formData.state] || [] : [];
+  
+  // Get income options based on selected country
+  const countryIncomeOptions = formData.country 
+    ? incomeOptionsByCountry[formData.country] || incomeOptions 
+    : incomeOptions;
 
   // Reset dependent fields when parent changes
   const handleReligionChange = (value: string) => {
@@ -48,7 +54,7 @@ export const PersonalDetailsStep = ({ formData, updateFormData, onSubmit, onBack
   };
 
   const handleCountryChange = (value: string) => {
-    updateFormData({ country: value, state: "", city: "" });
+    updateFormData({ country: value, state: "", city: "", annualIncome: "" });
   };
 
   const handleStateChange = (value: string) => {
@@ -311,12 +317,12 @@ export const PersonalDetailsStep = ({ formData, updateFormData, onSubmit, onBack
             </div>
 
             <div className="space-y-2">
-              <Label>Annual Income</Label>
+              <Label>Annual Income {formData.country && formData.country !== "India" && <span className="text-xs text-muted-foreground">({formData.country} Currency)</span>}</Label>
               <SearchableSelect
-                options={toOptions(incomeOptions)}
+                options={toOptions(countryIncomeOptions)}
                 value={formData.annualIncome}
                 onValueChange={(value) => updateFormData({ annualIncome: value })}
-                placeholder="Select income range"
+                placeholder={formData.country ? "Select income range" : "Select country first for currency"}
                 searchPlaceholder="Search..."
               />
             </div>

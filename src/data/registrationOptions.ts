@@ -767,6 +767,7 @@ export const occupationOptions = [
   "Other"
 ];
 
+// Default income options (INR)
 export const incomeOptions = [
   "Below ₹2 Lakhs",
   "₹2-4 Lakhs",
@@ -781,6 +782,121 @@ export const incomeOptions = [
   "₹75 Lakhs - ₹1 Crore",
   "Above ₹1 Crore"
 ];
+
+// Income options by country with local currency
+export const incomeOptionsByCountry: Record<string, string[]> = {
+  "India": [
+    "Below ₹2 Lakhs",
+    "₹2-4 Lakhs",
+    "₹4-6 Lakhs",
+    "₹6-8 Lakhs",
+    "₹8-10 Lakhs",
+    "₹10-15 Lakhs",
+    "₹15-20 Lakhs",
+    "₹20-30 Lakhs",
+    "₹30-50 Lakhs",
+    "₹50-75 Lakhs",
+    "₹75 Lakhs - ₹1 Crore",
+    "Above ₹1 Crore"
+  ],
+  "United States": [
+    "Below $25,000",
+    "$25,000 - $50,000",
+    "$50,000 - $75,000",
+    "$75,000 - $100,000",
+    "$100,000 - $150,000",
+    "$150,000 - $200,000",
+    "$200,000 - $300,000",
+    "$300,000 - $500,000",
+    "Above $500,000"
+  ],
+  "United Kingdom": [
+    "Below £20,000",
+    "£20,000 - £35,000",
+    "£35,000 - £50,000",
+    "£50,000 - £75,000",
+    "£75,000 - £100,000",
+    "£100,000 - £150,000",
+    "£150,000 - £250,000",
+    "Above £250,000"
+  ],
+  "Canada": [
+    "Below CAD $30,000",
+    "CAD $30,000 - $50,000",
+    "CAD $50,000 - $75,000",
+    "CAD $75,000 - $100,000",
+    "CAD $100,000 - $150,000",
+    "CAD $150,000 - $200,000",
+    "CAD $200,000 - $300,000",
+    "Above CAD $300,000"
+  ],
+  "Australia": [
+    "Below AUD $40,000",
+    "AUD $40,000 - $60,000",
+    "AUD $60,000 - $90,000",
+    "AUD $90,000 - $120,000",
+    "AUD $120,000 - $180,000",
+    "AUD $180,000 - $250,000",
+    "AUD $250,000 - $400,000",
+    "Above AUD $400,000"
+  ],
+  "United Arab Emirates": [
+    "Below AED 50,000",
+    "AED 50,000 - 100,000",
+    "AED 100,000 - 200,000",
+    "AED 200,000 - 350,000",
+    "AED 350,000 - 500,000",
+    "AED 500,000 - 750,000",
+    "AED 750,000 - 1,000,000",
+    "Above AED 1,000,000"
+  ],
+  "Singapore": [
+    "Below SGD $30,000",
+    "SGD $30,000 - $50,000",
+    "SGD $50,000 - $80,000",
+    "SGD $80,000 - $120,000",
+    "SGD $120,000 - $180,000",
+    "SGD $180,000 - $250,000",
+    "SGD $250,000 - $400,000",
+    "Above SGD $400,000"
+  ],
+  "Malaysia": [
+    "Below RM 30,000",
+    "RM 30,000 - 60,000",
+    "RM 60,000 - 100,000",
+    "RM 100,000 - 150,000",
+    "RM 150,000 - 250,000",
+    "RM 250,000 - 400,000",
+    "Above RM 400,000"
+  ],
+  "Germany": [
+    "Below €25,000",
+    "€25,000 - €40,000",
+    "€40,000 - €60,000",
+    "€60,000 - €80,000",
+    "€80,000 - €120,000",
+    "€120,000 - €180,000",
+    "€180,000 - €300,000",
+    "Above €300,000"
+  ],
+  "New Zealand": [
+    "Below NZD $40,000",
+    "NZD $40,000 - $60,000",
+    "NZD $60,000 - $90,000",
+    "NZD $90,000 - $130,000",
+    "NZD $130,000 - $180,000",
+    "NZD $180,000 - $250,000",
+    "Above NZD $250,000"
+  ],
+  "Other": [
+    "Not Disclosed",
+    "Below $25,000 USD equivalent",
+    "$25,000 - $50,000 USD equivalent",
+    "$50,000 - $100,000 USD equivalent",
+    "$100,000 - $200,000 USD equivalent",
+    "Above $200,000 USD equivalent"
+  ]
+};
 
 export const stateOptions = [
   "Andhra Pradesh",
